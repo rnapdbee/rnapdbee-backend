@@ -9,9 +9,17 @@ Project generated with [Spring](https://start.spring.io/) version 2.6.6.
 ## Build
 The server starts on the localhost default 8080 port -> http://localhost:8080/
 
+### With docker
 To run project in command line type:
 ```
-mvn clean install
-docker build . -t rnapdbee-backend
-docker run -i -t --rm -p 8080:8080 --name rnapdbee-backend rnapdbee-backend
+mvn clean install -DskipTests
+docker compose up
 ```
+
+### IntelliJ IDEA
+To run only postgres database type:
+```
+docker run --name backend-db -p 5432:5432 -e POSTGRES_USER=rnapdbee -e POSTGRES_PASSWORD=a1s2d3f4 -d postgres
+```
+Then you can work with intelliJ environment and dockerized database.
+I recommend using build in IntelliJ professional - Database tool which you can configure following this [TUTORIAL](https://www.jetbrains.com/help/idea/postgresql.html).
