@@ -1,0 +1,18 @@
+version: "3"
+services:
+  backend-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=rnapdbee
+      - POSTGRES_PASSWORD=a1s2d3f4
+    ports:
+      - "5432:5432"
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://backend-db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=rnapdbee
+      - SPRING_DATASOURCE_PASSWORD=a1s2d3f4
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
