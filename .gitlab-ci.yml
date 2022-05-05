@@ -1,0 +1,26 @@
+image: maven:latest
+
+stages:
+  - build
+  - package
+
+build:
+  stage: build
+  script:
+    - mvn compile -DskipTests
+
+package:
+  stage: package
+
+  only:
+    - develop
+    - main
+
+  script:
+    - mvn package -DskipTests
+
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - target/*.jar
+    expire_in: 1 week
