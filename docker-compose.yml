@@ -1,13 +1,19 @@
 version: "3"
 services:
+
   backend-db:
+    container_name: backend-db
     image: postgres
     environment:
       - POSTGRES_USER=rnapdbee
       - POSTGRES_PASSWORD=a1s2d3f4
     ports:
       - "5432:5432"
+
   backend:
+    container_name: backend
+    depends_on:
+      - backend-db
     build: .
     ports:
       - "8080:8080"
