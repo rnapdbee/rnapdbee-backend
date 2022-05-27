@@ -9,7 +9,7 @@ import pl.poznan.put.rnapdbee.backend.model.Payload2DToThreeDots;
 import pl.poznan.put.rnapdbee.backend.model.Payload3DThreeDots;
 
 @RestController
-@RequestMapping("api/rnapdbee/2d")
+@RequestMapping("api/rnapdbee/backend/2d")
 public class Backend2DController {
 
     private static final Logger logger = LoggerFactory.getLogger(Backend2DController.class);
