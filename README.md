@@ -1,4 +1,6 @@
 # RNApdbee engine
+[![CI](https://github.com/rnapdbee/rnapdbee-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/rnapdbee/rnapdbee-backend/actions/workflows/ci.yml)
+
 Project generated with [Spring](https://start.spring.io/) version 2.6.6.
 
 ## Requirements
