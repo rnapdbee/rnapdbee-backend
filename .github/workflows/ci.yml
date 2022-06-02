@@ -1,6 +1,15 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,7 +25,19 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B package -f pom.xml
+        run: mvn clean install
 
       - name: Validate, build and run tests
-        run: mvn --batch-mode --update-snapshots verify
+        run: |
+          mvn test
+          mvn --batch-mode --update-snapshots verify
+
+      - name: Upload package
+        uses: actions/upload-artifact@v2
+        with:
+          name: rnapdbee-backend-package
+          path: ./target/*.jar
+          retention-days: 5
+
+      - name: Docker Build
+        run: DOCKER_BUILDKIT=1 docker-compose up -d
