@@ -8,7 +8,7 @@ import pl.poznan.put.rnapdbee.backend.model.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.model.Payload3DToMulti2D;
 
 @RestController
-@RequestMapping("api/rnapdbee/backend/multi")
+@RequestMapping("api/v1/engine/multi")
 public class Backend3DMulti2DController {
 
     private static final Logger logger = LoggerFactory.getLogger(Backend3DMulti2DController.class);

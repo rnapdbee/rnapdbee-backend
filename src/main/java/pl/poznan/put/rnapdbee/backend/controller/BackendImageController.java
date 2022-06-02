@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.poznan.put.rnapdbee.backend.model.*;
 
 @RestController
-@RequestMapping("api/rnapdbee/backend/image")
+@RequestMapping("api/v1/engine/image")
 public class BackendImageController {
 
     private static final Logger logger = LoggerFactory.getLogger(BackendImageController.class);
