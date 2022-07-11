@@ -1,4 +1,4 @@
-package com.example.rnapdbeeBackend;
+package pl.poznan.put.rnapdbee.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
