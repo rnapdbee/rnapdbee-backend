@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.5"
+  version: "1.0.6"
   title: "RNApdbee Backend"
 
 
@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Output3D"
+                $ref: "#/components/schemas/Response3D"
 
   /3d/{ID}:
     get:
@@ -89,7 +89,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Output3D"
+                $ref: "#/components/schemas/Response3D"
 
   /3d/pdb/{PDBID}:
     post:
@@ -118,7 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Output3D"
+                $ref: "#/components/schemas/Response3D"
 
   /multi/:
     post:
@@ -148,7 +148,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputMulti"
+                $ref: "#/components/schemas/ResponseMulti"
 
   /multi/{ID}:
     get:
@@ -173,7 +173,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputMulti"
+                $ref: "#/components/schemas/ResponseMulti"
 
   /multi/pdb/{PDBID}:
     post:
@@ -200,7 +200,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputMulti"
+                $ref: "#/components/schemas/ResponseMulti"
 
   /2d/:
     post:
@@ -229,7 +229,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Output2D"
+                $ref: "#/components/schemas/Response2D"
 
   /2d/{ID}:
     get:
@@ -252,7 +252,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Output2D"
+                $ref: "#/components/schemas/Response2D"
 
   /image/:
     post:
@@ -280,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputImage"
+                $ref: "#/components/schemas/ResponseImage"
 
   /image/{ID}:
     get:
@@ -303,7 +303,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OutputImage"
+                $ref: "#/components/schemas/ResponseImage"
 
 components:
   parameters:
@@ -312,58 +312,50 @@ components:
       name: modelSelection
       required: true
       schema:
-        type: "string"
-        enum: ["FIRST", "ALL"]
+        $ref: "#/components/schemas/ModelSelection"
+
     analysisTool:
       in: query
       name: analysisTool
       required: true
       schema:
-        type: "string"
-        enum:
-          - "FR3D_PYTHON"
-          - "BPNET"
-          - "BARNABA"
-          - "RNAVIEW"
-          - "MC_ANNOTATE"
+        $ref: "#/components/schemas/AnalysisTool"
+
     nonCanonicalHandling:
       in: query
       name: nonCanonicalHandling
       required: true
       schema:
-        type: "string"
-        enum:
-          - "VISUALIZATION_ONLY"
-          - "TEXT_AND_VISUALIZATION"
-          - "IGNORE"
+        $ref: "#/components/schemas/NonCanonicalHandling"
+
     removeIsolated:
       in: query
       name: removeIsolated
       required: true
       schema:
-        type: "boolean"
-        enum: [true, false]
+        $ref: "#/components/schemas/RemoveIsolated"
+
     includeNonCanonical:
       in: query
       name: includeNonCanonical
       required: true
       schema:
-        type: "boolean"
-        enum: [true, false]
+        $ref: "#/components/schemas/IncludeNonCanonical"
+
     structuralElementsHandling:
       in: query
       name: structuralElementsHandling
       required: true
       schema:
-        type: "string"
-        enum: ["USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS"]
+        $ref: "#/components/schemas/StructuralElementsHandling"
+
     visualizationTool:
       in: query
       name: visualizationTool
       required: true
       schema:
-        type: "string"
-        enum: ["VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE"]
+        $ref: "#/components/schemas/VisualizationTool"
+
     contentDispositionHeader:
       in: header
       name: Content-Disposition
@@ -374,6 +366,116 @@ components:
         example: attachment; filename="name.pdf"
 
   schemas:
+    Response3D:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        params:
+          type: "object"
+          properties:
+            modelSelection:
+              $ref: "#/components/schemas/ModelSelection"
+            analysisTool:
+              $ref: "#/components/schemas/AnalysisTool"
+            nonCanonicalHandling:
+              $ref: "#/components/schemas/NonCanonicalHandling"
+            removeIsolated:
+              $ref: "#/components/schemas/RemoveIsolated"
+            structuralElementsHandling:
+              $ref: "#/components/schemas/StructuralElementsHandling"
+            visualizationTool:
+              $ref: "#/components/schemas/VisualizationTool"
+        result:
+          $ref: "#/components/schemas/Output3D"
+
+    ResponseMulti:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        params:
+          type: "object"
+          properties:
+            modelSelection:
+              $ref: "#/components/schemas/ModelSelection"
+            includeNonCanonical:
+              $ref: "#/components/schemas/IncludeNonCanonical"
+            removeIsolated:
+              $ref: "#/components/schemas/RemoveIsolated"
+            visualizationTool:
+              $ref: "#/components/schemas/VisualizationTool"
+        result:
+          $ref: "#/components/schemas/OutputMulti"
+
+    Response2D:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        params:
+          type: "object"
+          properties:
+            removeIsolated:
+              $ref: "#/components/schemas/RemoveIsolated"
+            structuralElementsHandling:
+              $ref: "#/components/schemas/StructuralElementsHandling"
+            visualizationTool:
+              $ref: "#/components/schemas/VisualizationTool"
+        result:
+          $ref: "#/components/schemas/Output2D"
+
+    ResponseImage:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        params:
+          type: "object"
+          properties:
+            structuralElementsHandling:
+              $ref: "#/components/schemas/StructuralElementsHandling"
+            visualizationTool:
+              $ref: "#/components/schemas/VisualizationTool"
+        result:
+          $ref: "#/components/schemas/OutputImage"
+
+    ModelSelection:
+      type: "string"
+      enum: ["FIRST", "ALL"]
+
+    AnalysisTool:
+      type: "string"
+      enum:
+        - "FR3D_PYTHON"
+        - "BPNET"
+        - "BARNABA"
+        - "RNAVIEW"
+        - "MC_ANNOTATE"
+
+    NonCanonicalHandling:
+      type: "string"
+      enum:
+        - "VISUALIZATION_ONLY"
+        - "TEXT_AND_VISUALIZATION"
+        - "IGNORE"
+
+    RemoveIsolated:
+      type: "boolean"
+      enum: [true, false]
+
+    IncludeNonCanonical:
+      type: "boolean"
+      enum: [true, false]
+
+    StructuralElementsHandling:
+      type: "string"
+      enum: ["USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS"]
+
+    VisualizationTool:
+      type: "string"
+      enum: ["VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE"]
+
     Output3D:
       type: object
       properties:
