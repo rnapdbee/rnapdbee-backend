@@ -18,18 +18,18 @@ tags:
 
 
 servers:
-  - url: '{protocol}://RNApdbee.cs.put.poznan.pl/api/v1/engine'
+  - url: "{protocol}://RNApdbee.cs.put.poznan.pl/api/v1/engine"
     variables:
       port:
         enum:
-          - '8080'
-          - '8081'
-        default: '8080'
+          - "8080"
+          - "8081"
+        default: "8080"
       protocol:
         enum:
-          - http
-          - https
-        default: http
+          - "http"
+          - "https"
+        default: "http"
 
 paths:
 
@@ -308,62 +308,62 @@ paths:
 components:
   parameters:
     modelSelection:
-      in: query
-      name: modelSelection
+      in: "query"
+      name: "modelSelection"
       required: true
       schema:
         $ref: "#/components/schemas/ModelSelection"
 
     analysisTool:
-      in: query
-      name: analysisTool
+      in: "query"
+      name: "analysisTool"
       required: true
       schema:
         $ref: "#/components/schemas/AnalysisTool"
 
     nonCanonicalHandling:
-      in: query
-      name: nonCanonicalHandling
+      in: "query"
+      name: "nonCanonicalHandling"
       required: true
       schema:
         $ref: "#/components/schemas/NonCanonicalHandling"
 
     removeIsolated:
-      in: query
-      name: removeIsolated
+      in: "query"
+      name: "removeIsolated"
       required: true
       schema:
         $ref: "#/components/schemas/RemoveIsolated"
 
     includeNonCanonical:
-      in: query
-      name: includeNonCanonical
+      in: "query"
+      name: "includeNonCanonical"
       required: true
       schema:
         $ref: "#/components/schemas/IncludeNonCanonical"
 
     structuralElementsHandling:
-      in: query
-      name: structuralElementsHandling
+      in: "query"
+      name: "structuralElementsHandling"
       required: true
       schema:
         $ref: "#/components/schemas/StructuralElementsHandling"
 
     visualizationTool:
-      in: query
-      name: visualizationTool
+      in: "query"
+      name: "visualizationTool"
       required: true
       schema:
         $ref: "#/components/schemas/VisualizationTool"
 
     contentDispositionHeader:
-      in: header
-      name: Content-Disposition
+      in: "header"
+      name: "Content-Disposition"
       required: true
       schema:
-        type: string
-        description: Used only with `application/pdf` responses
-        example: attachment; filename="name.pdf"
+        type: "string"
+        description: "Used only with `application/pdf` responses"
+        example: 'attachment; filename="name.pdf"'
 
   schemas:
     Response3D:
@@ -497,42 +497,42 @@ components:
       enum: ["VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE"]
   
     Output3D:
-      type: object
+      type: "object"
       properties:
         analysisOutput:
           $ref: "#/components/schemas/AnalysisOutput"
         output2D:
           $ref: "#/components/schemas/Output2D"
       required:
-        - analysisOutput
-        - output2D
+        - "analysisOutput"
+        - "output2D"
 
     OutputMulti:
-      type: object
+      type: "object"
       properties:
         entries:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/OutputMultiEntry"
       required:
-        - entries
+        - "entries"
 
     OutputMultiEntry:
-      type: object
+      type: "object"
       properties:
         output2D:
           $ref: "#/components/schemas/Output2D"
         consensusVisualization:
           $ref: "#/components/schemas/ConsensusVisualization"
       required:
-        - output2D
-        - consensusVisualization
+        - "output2D"
+        - "consensusVisualization"
 
     ConsensusVisualization:
-      type: object
+      type: "object"
 
     Output2D:
-      type: object
+      type: "object"
       properties:
         bpseq:
           $ref: "#/components/schemas/BPSEQ"
@@ -545,67 +545,67 @@ components:
         outputImage:
           $ref: "#/components/schemas/OutputImage"
       required:
-        - bpseq
-        - ct
-        - dotBarcket
-        - structuralElements
-        - outputImage
+        - "bpseq"
+        - "ct"
+        - "dotBarcket"
+        - "structuralElements"
+        - "outputImage"
 
     BPSEQ:
-      type: object
+      type: "object"
 
     CT:
-      type: object
+      type: "object"
 
     DotBracket:
-      type: object
+      type: "object"
 
     StructuralElements:
-      type: object
+      type: "object"
 
     OutputImage:
-      type: object
+      type: "object"
       properties:
         visualization:
           $ref: "#/components/schemas/Visualization"
       required:
-        - visualization
+        - "visualization"
 
     Visualization:
-      type: object
+      type: "object"
 
     AnalysisOutput:
-      type: object
+      type: "object"
       properties:
         basePairs:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/BasePair"
         stackings:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/Stacking"
         baseRiboseInteractions:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/BaseRibose"
         basePhosphateInteractions:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/BasePhosphate"
         other:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/Other"
       required:
-        - basePairs
-        - stackings
-        - baseRiboseInteractions
-        - basePhosphateInteractions
-        - other
+        - "basePairs"
+        - "stackings"
+        - "baseRiboseInteractions"
+        - "basePhosphateInteractions"
+        - "other"
 
     BasePair:
-      type: object
+      type: "object"
       properties:
         nt1:
           $ref: "#/components/schemas/Residue"
@@ -616,12 +616,12 @@ components:
         saenger:
           $ref: "#/components/schemas/Saenger"
       required:
-        - leontisWesthof
-        - nt1
-        - nt2
+        - "leontisWesthof"
+        - "nt1"
+        - "nt2"
 
     BaseRibose:
-      type: object
+      type: "object"
       properties:
         nt1:
           $ref: "#/components/schemas/Residue"
@@ -630,11 +630,11 @@ components:
         br:
           $ref: "#/components/schemas/BR"
       required:
-        - nt1
-        - nt2
+        - "nt1"
+        - "nt2"
 
     BasePhosphate:
-      type: object
+      type: "object"
       properties:
         nt1:
           $ref: "#/components/schemas/Residue"
@@ -643,11 +643,11 @@ components:
         bph:
           $ref: "#/components/schemas/BPh"
       required:
-        - nt1
-        - nt2
+        - "nt1"
+        - "nt2"
 
     Stacking:
-      type: object
+      type: "object"
       properties:
         nt1:
           $ref: "#/components/schemas/Residue"
@@ -656,67 +656,67 @@ components:
         topology:
           $ref: "#/components/schemas/StackingTopology"
       required:
-        - nt1
-        - nt2
+        - "nt1"
+        - "nt2"
 
     Other:
-      type: object
+      type: "object"
       properties:
         nt1:
           $ref: "#/components/schemas/Residue"
         nt2:
           $ref: "#/components/schemas/Residue"
       required:
-        - nt1
-        - nt2
+        - "nt1"
+        - "nt2"
 
     Residue:
-      type: object
+      type: "object"
       properties:
         label:
           $ref: "#/components/schemas/ResidueLabel"
         auth:
           $ref: "#/components/schemas/ResidueAuth"
         atoms:
-          type: array
+          type: "array"
           items:
             $ref: "#/components/schemas/Atom"
       required:
-        - atoms
+        - "atoms"
 
     Atom:
-      type: object
+      type: "object"
 
     ResidueAuth:
-      type: object
+      type: "object"
       properties:
         chain:
-          type: string
+          type: "string"
         number:
-          type: integer
+          type: "integer"
         icode:
-          type: string
+          type: "string"
         name:
-          type: string
+          type: "string"
       required:
-        - chain
-        - number
-        - icode
-        - name
+        - "chain"
+        - "number"
+        - "icode"
+        - "name"
 
     ResidueLabel:
-      type: object
+      type: "object"
       properties:
         chain:
-          type: string
+          type: "string"
         number:
-          type: integer
+          type: "integer"
         name:
-          type: string
+          type: "string"
       required:
-        - chain
-        - number
-        - name
+        - "chain"
+        - "number"
+        - "name"
 
     LeontisWesthof:
       type: "string"
@@ -773,7 +773,7 @@ components:
         - "XXVIII"
 
     BR:
-      type: integer
+      type: "integer"
       enum:
         - 1
         - 2
@@ -786,7 +786,7 @@ components:
         - 9
 
     BPh:
-      type: integer
+      type: "integer"
       enum:
         - 1
         - 2
@@ -799,12 +799,13 @@ components:
         - 9
 
     StackingTopology:
-      type: string
+      type: "string"
       enum:
-        - upward
-        - downward
-        - inward
-        - outward
+        - "upward"
+        - "downward"
+        - "inward"
+        - "outward"
+
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
