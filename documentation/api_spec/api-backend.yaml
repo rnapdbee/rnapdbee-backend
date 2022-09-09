@@ -371,79 +371,99 @@ components:
       properties:
         id:
           type: "string"
-        params:
-          type: "object"
-          properties:
-            modelSelection:
-              $ref: "#/components/schemas/ModelSelection"
-            analysisTool:
-              $ref: "#/components/schemas/AnalysisTool"
-            nonCanonicalHandling:
-              $ref: "#/components/schemas/NonCanonicalHandling"
-            removeIsolated:
-              $ref: "#/components/schemas/RemoveIsolated"
-            structuralElementsHandling:
-              $ref: "#/components/schemas/StructuralElementsHandling"
-            visualizationTool:
-              $ref: "#/components/schemas/VisualizationTool"
-        result:
-          $ref: "#/components/schemas/Output3D"
+        results:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              params:
+                type: "object"
+                properties:
+                  modelSelection:
+                    $ref: "#/components/schemas/ModelSelection"
+                  analysisTool:
+                    $ref: "#/components/schemas/AnalysisTool"
+                  nonCanonicalHandling:
+                    $ref: "#/components/schemas/NonCanonicalHandling"
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  structuralElementsHandling:
+                    $ref: "#/components/schemas/StructuralElementsHandling"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
+              output:
+                $ref: "#/components/schemas/Output3D"
 
     ResponseMulti:
       type: "object"
       properties:
         id:
           type: "string"
-        params:
-          type: "object"
-          properties:
-            modelSelection:
-              $ref: "#/components/schemas/ModelSelection"
-            includeNonCanonical:
-              $ref: "#/components/schemas/IncludeNonCanonical"
-            removeIsolated:
-              $ref: "#/components/schemas/RemoveIsolated"
-            visualizationTool:
-              $ref: "#/components/schemas/VisualizationTool"
-        result:
-          $ref: "#/components/schemas/OutputMulti"
+        results:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              params:
+                type: "object"
+                properties:
+                  modelSelection:
+                    $ref: "#/components/schemas/ModelSelection"
+                  includeNonCanonical:
+                    $ref: "#/components/schemas/IncludeNonCanonical"
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
+              output:
+                $ref: "#/components/schemas/OutputMulti"
 
     Response2D:
       type: "object"
       properties:
         id:
           type: "string"
-        params:
-          type: "object"
-          properties:
-            removeIsolated:
-              $ref: "#/components/schemas/RemoveIsolated"
-            structuralElementsHandling:
-              $ref: "#/components/schemas/StructuralElementsHandling"
-            visualizationTool:
-              $ref: "#/components/schemas/VisualizationTool"
-        result:
-          $ref: "#/components/schemas/Output2D"
+        results:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              params:
+                type: "object"
+                properties:
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  structuralElementsHandling:
+                    $ref: "#/components/schemas/StructuralElementsHandling"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
+              output:
+                $ref: "#/components/schemas/Output2D"
 
     ResponseImage:
       type: "object"
       properties:
         id:
           type: "string"
-        params:
-          type: "object"
-          properties:
-            structuralElementsHandling:
-              $ref: "#/components/schemas/StructuralElementsHandling"
-            visualizationTool:
-              $ref: "#/components/schemas/VisualizationTool"
-        result:
-          $ref: "#/components/schemas/OutputImage"
-
+        results:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              params:
+                type: "object"
+                properties:
+                  structuralElementsHandling:
+                    $ref: "#/components/schemas/StructuralElementsHandling"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
+              output:
+                $ref: "#/components/schemas/OutputImage"
+  
     ModelSelection:
       type: "string"
       enum: ["FIRST", "ALL"]
-
+      
     AnalysisTool:
       type: "string"
       enum:
@@ -452,30 +472,30 @@ components:
         - "BARNABA"
         - "RNAVIEW"
         - "MC_ANNOTATE"
-
+  
     NonCanonicalHandling:
       type: "string"
       enum:
         - "VISUALIZATION_ONLY"
         - "TEXT_AND_VISUALIZATION"
         - "IGNORE"
-
+        
     RemoveIsolated:
       type: "boolean"
       enum: [true, false]
-
+        
     IncludeNonCanonical:
       type: "boolean"
       enum: [true, false]
-
+      
     StructuralElementsHandling:
       type: "string"
       enum: ["USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS"]
-
+      
     VisualizationTool:
       type: "string"
       enum: ["VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE"]
-
+  
     Output3D:
       type: object
       properties:
@@ -788,3 +808,4 @@ components:
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
+  
