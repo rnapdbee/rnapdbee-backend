@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.6"
+  version: "1.0.7"
   title: "RNApdbee Backend"
 
 
@@ -280,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseImage"
+                $ref: "#/components/schemas/Response2D"
 
   /image/{ID}:
     get:
@@ -303,7 +303,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseImage"
+                $ref: "#/components/schemas/Response2D"
 
 components:
   parameters:
@@ -440,30 +440,10 @@ components:
               output:
                 $ref: "#/components/schemas/Output2D"
 
-    ResponseImage:
-      type: "object"
-      properties:
-        id:
-          type: "string"
-        results:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              params:
-                type: "object"
-                properties:
-                  structuralElementsHandling:
-                    $ref: "#/components/schemas/StructuralElementsHandling"
-                  visualizationTool:
-                    $ref: "#/components/schemas/VisualizationTool"
-              output:
-                $ref: "#/components/schemas/OutputImage"
-  
     ModelSelection:
       type: "string"
-      enum: ["FIRST", "ALL"]
-      
+      enum: [ "FIRST", "ALL" ]
+
     AnalysisTool:
       type: "string"
       enum:
@@ -472,30 +452,30 @@ components:
         - "BARNABA"
         - "RNAVIEW"
         - "MC_ANNOTATE"
-  
+
     NonCanonicalHandling:
       type: "string"
       enum:
         - "VISUALIZATION_ONLY"
         - "TEXT_AND_VISUALIZATION"
         - "IGNORE"
-        
+
     RemoveIsolated:
       type: "boolean"
-      enum: [true, false]
-        
+      enum: [ true, false ]
+
     IncludeNonCanonical:
       type: "boolean"
-      enum: [true, false]
-      
+      enum: [ true, false ]
+
     StructuralElementsHandling:
       type: "string"
-      enum: ["USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS"]
-      
+      enum: [ "USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS" ]
+
     VisualizationTool:
       type: "string"
-      enum: ["VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE"]
-  
+      enum: [ "VARNA", "PSEUDO_VIEWER", "R_CHIE", "RNA_GLIB", "FORNA", "RNA_PUZZLER", "RNA_TURTLE", "RNA_TRAVELER", "BARNABA", "NONE" ]
+
     Output3D:
       type: "object"
       properties:
@@ -528,51 +508,119 @@ components:
         - "output2D"
         - "consensusVisualization"
 
-    ConsensusVisualization:
-      type: "object"
-
-    Output2D:
+    Output2DEntry:
       type: "object"
       properties:
-        bpseq:
+        strands:
+          $ref: "#/components/schemas/DotBracket"
+        bpSeq:
           $ref: "#/components/schemas/BPSEQ"
         ct:
           $ref: "#/components/schemas/CT"
-        dotBarcket:
-          $ref: "#/components/schemas/DotBracket"
+        interactions:
+          $ref: "#/components/schemas/Interactions"
         structuralElements:
           $ref: "#/components/schemas/StructuralElements"
-        outputImage:
-          $ref: "#/components/schemas/OutputImage"
+        imageInformation:
+          $ref: "#/components/schemas/ImageInformation"
       required:
-        - "bpseq"
+        - "strands"
+        - "bpSeq"
         - "ct"
-        - "dotBarcket"
+        - "interactions"
         - "structuralElements"
-        - "outputImage"
+        - "imageInformation"
+
+    ConsensusVisualization:
+      type: "object"
+      properties:
+        pathToPngImage:
+          type: "string"
+          example: "/resources/tmp/RNApdbee5553721596686458067.png"
+        pathToSvgImage:
+          type: "string"
+          example: "/resources/tmp/RNApdbee5553721596686458067.svg"
+
+    Output2D:
+      type: "object"
+      description: "Output2D object has currently list of Output2DEntry, which has always length of 1. Will be refactored in further version of API."
+      properties:
+        analysis:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Output2DEntry"
+      required:
+        - "analysis"
+
+    ImageInformation:
+      type: "object"
+      properties:
+        pathToPNGImage:
+          type: "string"
+          example: "/resources/tmp/RNApdbee7525567015472955018.png"
+        pathToSVGImage:
+          type: "string"
+          example: "/resources/tmp/RNApdbee2052380807386422791.svg"
+        successfulDrawer:
+          $ref: "#/components/schemas/VisualizationTool"
+        failedDrawer:
+          $ref: "#/components/schemas/VisualizationTool"
 
     BPSEQ:
-      type: "object"
+      type: "array"
+      items:
+        type: "string"
+        example: "1 G 0"
 
     CT:
-      type: "object"
+      type: "array"
+      items:
+        type: "string"
+        example: "1 G 0 2 0 1"
+
+    Interactions:
+      type: "array"
+      items:
+        type: "string"
+        example: "A.A181 - Z.U418"
 
     DotBracket:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/StrandEntry"
+
+    StrandEntry:
       type: "object"
+      properties:
+        name:
+          type: "string"
+          example: "A"
+        sequence:
+          type: "string"
+          example: "uGUUAUUUU"
+        structure:
+          type: "string"
+          example: ".]]]]]..."
 
     StructuralElements:
       type: "object"
-
-    OutputImage:
-      type: "object"
       properties:
-        visualization:
-          $ref: "#/components/schemas/Visualization"
-      required:
-        - "visualization"
+        stems:
+          $ref: "#/components/schemas/StructuralElementsArray"
+        loops:
+          $ref: "#/components/schemas/StructuralElementsArray"
+        singleStrands:
+          $ref: "#/components/schemas/StructuralElementsArray"
+        singleStrands5p:
+          $ref: "#/components/schemas/StructuralElementsArray"
+        singleStrands3p:
+          $ref: "#/components/schemas/StructuralElementsArray"
 
-    Visualization:
-      type: "object"
+    StructuralElementsArray:
+      type: "array"
+      items:
+        type: "string"
+        example: "6 10 CCCGG ((((( YYYRR 262 266 CCGGG ))))) YYRRR"
 
     AnalysisOutput:
       type: "object"
