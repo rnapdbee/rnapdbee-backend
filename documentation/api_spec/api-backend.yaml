@@ -371,26 +371,33 @@ components:
       properties:
         id:
           type: "string"
+          example: "123e4567-e89b-12d3-a456-426614174000"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              params:
+              meta:
                 type: "object"
                 properties:
-                  modelSelection:
-                    $ref: "#/components/schemas/ModelSelection"
-                  analysisTool:
-                    $ref: "#/components/schemas/AnalysisTool"
-                  nonCanonicalHandling:
-                    $ref: "#/components/schemas/NonCanonicalHandling"
-                  removeIsolated:
-                    $ref: "#/components/schemas/RemoveIsolated"
-                  structuralElementsHandling:
-                    $ref: "#/components/schemas/StructuralElementsHandling"
-                  visualizationTool:
-                    $ref: "#/components/schemas/VisualizationTool"
+                  filename:
+                    type: "string"
+                    example: "1EHZ.cif"
+                  params:
+                    type: "object"
+                    properties:
+                      modelSelection:
+                        $ref: "#/components/schemas/ModelSelection"
+                      analysisTool:
+                        $ref: "#/components/schemas/AnalysisTool"
+                      nonCanonicalHandling:
+                        $ref: "#/components/schemas/NonCanonicalHandling"
+                      removeIsolated:
+                        $ref: "#/components/schemas/RemoveIsolated"
+                      structuralElementsHandling:
+                        $ref: "#/components/schemas/StructuralElementsHandling"
+                      visualizationTool:
+                        $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/Output3D"
 
@@ -399,22 +406,29 @@ components:
       properties:
         id:
           type: "string"
+          example: "123e4567-e89b-12d3-a456-426614174000"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              params:
+              meta:
                 type: "object"
                 properties:
-                  modelSelection:
-                    $ref: "#/components/schemas/ModelSelection"
-                  includeNonCanonical:
-                    $ref: "#/components/schemas/IncludeNonCanonical"
-                  removeIsolated:
-                    $ref: "#/components/schemas/RemoveIsolated"
-                  visualizationTool:
-                    $ref: "#/components/schemas/VisualizationTool"
+                  filename:
+                    type: "string"
+                    example: "1EHZ.cif"
+                  params:
+                    type: "object"
+                    properties:
+                      modelSelection:
+                        $ref: "#/components/schemas/ModelSelection"
+                      includeNonCanonical:
+                        $ref: "#/components/schemas/IncludeNonCanonical"
+                      removeIsolated:
+                        $ref: "#/components/schemas/RemoveIsolated"
+                      visualizationTool:
+                        $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/OutputMulti"
 
@@ -423,20 +437,27 @@ components:
       properties:
         id:
           type: "string"
+          example: "123e4567-e89b-12d3-a456-426614174000"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              params:
+              meta:
                 type: "object"
                 properties:
-                  removeIsolated:
-                    $ref: "#/components/schemas/RemoveIsolated"
-                  structuralElementsHandling:
-                    $ref: "#/components/schemas/StructuralElementsHandling"
-                  visualizationTool:
-                    $ref: "#/components/schemas/VisualizationTool"
+                  filename:
+                    type: "string"
+                    example: "1EHZ.bpseq"
+                  params:
+                    type: "object"
+                    properties:
+                      removeIsolated:
+                        $ref: "#/components/schemas/RemoveIsolated"
+                      structuralElementsHandling:
+                        $ref: "#/components/schemas/StructuralElementsHandling"
+                      visualizationTool:
+                        $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/Output2D"
 
