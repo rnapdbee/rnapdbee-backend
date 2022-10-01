@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.7"
+  version: "1.0.8"
   title: "RNApdbee Backend"
 
 
@@ -11,8 +11,6 @@ tags:
     description: "Access to RNApdbee engine for 3D calculations"
   - name: "2D -> (...)"
     description: "Access to RNApdbee engine for 2D calculations"
-  - name: "(...) -> Image"
-    description: "Access to RNApdbee engine for Image calculations"
   - name: "3D -> multi 2D"
     description: "Access to RNApdbee engine for Multi calculations"
 
@@ -77,8 +75,37 @@ paths:
           in: "path"
           required: true
           schema:
-            type: "integer"
+            type: "string"
           description: "ID of resource in the database"
+      responses:
+        "400":
+          description: "Invalid supplied"
+        "404":
+          description: "Resource not found"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response3D"
+    post:
+      tags:
+        - "3D -> (...)"
+      summary: "Reanalyze calculation with different parameters"
+      description: ""
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of resource in the database"
+        - $ref: "#/components/parameters/modelSelection"
+        - $ref: "#/components/parameters/analysisTool"
+        - $ref: "#/components/parameters/nonCanonicalHandling"
+        - $ref: "#/components/parameters/removeIsolated"
+        - $ref: "#/components/parameters/structuralElementsHandling"
+        - $ref: "#/components/parameters/visualizationTool"
       responses:
         "400":
           description: "Invalid supplied"
@@ -161,8 +188,36 @@ paths:
           in: "path"
           required: true
           schema:
-            type: "integer"
+            type: "string"
           description: "ID of resource in the database"
+      responses:
+        "400":
+          description: "Invalid supplied"
+        "404":
+          description: "Resource not found"
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseMulti"
+    post:
+      tags:
+        - "3D -> multi 2D"
+      summary: "Reanalyze calculation with different parameters"
+      description: ""
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of resource in the database"
+        - $ref: "#/components/parameters/modelSelection"
+        - $ref: "#/components/parameters/includeNonCanonical"
+        - $ref: "#/components/parameters/removeIsolated"
+        - $ref: "#/components/parameters/visualizationTool"
+        - $ref: "#/components/parameters/contentDispositionHeader"
       responses:
         "400":
           description: "Invalid supplied"
@@ -242,7 +297,7 @@ paths:
           in: "path"
           required: true
           schema:
-            type: "integer"
+            type: "string"
           description: "ID of resource in the database"
       responses:
         "400":
@@ -253,48 +308,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Response2D"
-
-  /image/:
     post:
       tags:
-        - "(...) -> Image"
-      summary: "Perform an image calculation"
-      description: ""
-      parameters:
-        - $ref: "#/components/parameters/structuralElementsHandling"
-        - $ref: "#/components/parameters/visualizationTool"
-        - $ref: "#/components/parameters/contentDispositionHeader"
-      requestBody:
-        description: ""
-        required: true
-        content:
-          text/plain:
-            schema:
-              type: "string"
-              example: "content of the file"
-      responses:
-        "400":
-          description: "Bad request"
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response2D"
-
-  /image/{ID}:
-    get:
-      tags:
-        - "(...) -> Image"
-      summary: "Fetch an image calculation from the database"
+        - "2D -> (...)"
+      summary: "Reanalyze calculation with different parameters"
       description: ""
       parameters:
         - name: "ID"
           in: "path"
           required: true
           schema:
-            type: "integer"
+            type: "string"
           description: "ID of resource in the database"
+        - $ref: "#/components/parameters/removeIsolated"
+        - $ref: "#/components/parameters/structuralElementsHandling"
+        - $ref: "#/components/parameters/visualizationTool"
       responses:
         "400":
           description: "Bad request"
@@ -372,32 +400,29 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
+        filename:
+          type: "string"
+          example: "1EHZ.cif"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              meta:
+              params:
                 type: "object"
                 properties:
-                  filename:
-                    type: "string"
-                    example: "1EHZ.cif"
-                  params:
-                    type: "object"
-                    properties:
-                      modelSelection:
-                        $ref: "#/components/schemas/ModelSelection"
-                      analysisTool:
-                        $ref: "#/components/schemas/AnalysisTool"
-                      nonCanonicalHandling:
-                        $ref: "#/components/schemas/NonCanonicalHandling"
-                      removeIsolated:
-                        $ref: "#/components/schemas/RemoveIsolated"
-                      structuralElementsHandling:
-                        $ref: "#/components/schemas/StructuralElementsHandling"
-                      visualizationTool:
-                        $ref: "#/components/schemas/VisualizationTool"
+                  modelSelection:
+                    $ref: "#/components/schemas/ModelSelection"
+                  analysisTool:
+                    $ref: "#/components/schemas/AnalysisTool"
+                  nonCanonicalHandling:
+                    $ref: "#/components/schemas/NonCanonicalHandling"
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  structuralElementsHandling:
+                    $ref: "#/components/schemas/StructuralElementsHandling"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/Output3D"
 
@@ -407,28 +432,25 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
+        filename:
+          type: "string"
+          example: "1EHZ.cif"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              meta:
+              params:
                 type: "object"
                 properties:
-                  filename:
-                    type: "string"
-                    example: "1EHZ.cif"
-                  params:
-                    type: "object"
-                    properties:
-                      modelSelection:
-                        $ref: "#/components/schemas/ModelSelection"
-                      includeNonCanonical:
-                        $ref: "#/components/schemas/IncludeNonCanonical"
-                      removeIsolated:
-                        $ref: "#/components/schemas/RemoveIsolated"
-                      visualizationTool:
-                        $ref: "#/components/schemas/VisualizationTool"
+                  modelSelection:
+                    $ref: "#/components/schemas/ModelSelection"
+                  includeNonCanonical:
+                    $ref: "#/components/schemas/IncludeNonCanonical"
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/OutputMulti"
 
@@ -438,26 +460,23 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
+        filename: 
+          type: "string"
+          example: "1EHZ.bpseq"
         results:
           type: "array"
           items:
             type: "object"
             properties:
-              meta:
+              params:
                 type: "object"
                 properties:
-                  filename:
-                    type: "string"
-                    example: "1EHZ.bpseq"
-                  params:
-                    type: "object"
-                    properties:
-                      removeIsolated:
-                        $ref: "#/components/schemas/RemoveIsolated"
-                      structuralElementsHandling:
-                        $ref: "#/components/schemas/StructuralElementsHandling"
-                      visualizationTool:
-                        $ref: "#/components/schemas/VisualizationTool"
+                  removeIsolated:
+                    $ref: "#/components/schemas/RemoveIsolated"
+                  structuralElementsHandling:
+                    $ref: "#/components/schemas/StructuralElementsHandling"
+                  visualizationTool:
+                    $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/Output2D"
 
@@ -483,11 +502,11 @@ components:
 
     RemoveIsolated:
       type: "boolean"
-      enum: [ true, false ]
+      enum: [ false, true ]
 
     IncludeNonCanonical:
       type: "boolean"
-      enum: [ true, false ]
+      enum: [ false, true ]
 
     StructuralElementsHandling:
       type: "string"
