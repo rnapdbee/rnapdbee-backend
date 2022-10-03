@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.8"
+  version: "1.0.9"
   title: "RNApdbee Backend"
 
 
@@ -534,19 +534,26 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/OutputMultiEntry"
+        consensualVisualization:
+          $ref: "#/components/schemas/ConsensualVisualization"
       required:
         - "entries"
+        - "consensualVisualization"
 
     OutputMultiEntry:
       type: "object"
       properties:
         output2D:
           $ref: "#/components/schemas/Output2D"
-        consensusVisualization:
-          $ref: "#/components/schemas/ConsensusVisualization"
+        adapterEnums:
+          type: "array"
+          items:
+            type: "string"
+            description: "adapter enums for which this entry object was created"
+            example: "FR3D"
       required:
         - "output2D"
-        - "consensusVisualization"
+        - "adapterEnums"
 
     Output2DEntry:
       type: "object"
@@ -571,7 +578,7 @@ components:
         - "structuralElements"
         - "imageInformation"
 
-    ConsensusVisualization:
+    ConsensualVisualization:
       type: "object"
       properties:
         pathToPngImage:
