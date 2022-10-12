@@ -1,0 +1,16 @@
+version: "3"
+services:
+
+  backend-db:
+    container_name: backend-db
+    image: mongo
+    volumes:
+      - backend-db-mongo:/backend-db-mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=rnapdbee
+      - MONGO_INITDB_ROOT_PASSWORD=a1s2d3f4
+    ports:
+      - "27017:27017"
+
+volumes:
+  backend-db-mongo: {}
