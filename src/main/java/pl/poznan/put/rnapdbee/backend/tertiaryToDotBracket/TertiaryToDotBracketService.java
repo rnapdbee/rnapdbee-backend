@@ -9,7 +9,6 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHand
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParamsEntity;
-import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketResultEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.repository.TertiaryToDotBracketRepository;
 
 import java.time.Instant;

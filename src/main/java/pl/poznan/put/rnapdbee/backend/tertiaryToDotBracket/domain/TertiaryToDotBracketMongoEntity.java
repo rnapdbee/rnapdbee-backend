@@ -1,32 +1,21 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import pl.poznan.put.rnapdbee.backend.shared.domain.MongoEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ResultEntity;
 
-import javax.persistence.Id;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
 @Document
-public class TertiaryToDotBracketMongoEntity {
-    @Id
-    private UUID id;
-    private String filename;
-    private Set<TertiaryToDotBracketResultEntity> results;
-    private Instant createAt;
+public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBracketParamsEntity> {
 
     public TertiaryToDotBracketMongoEntity(
             UUID id,
             String filename,
-            Set<TertiaryToDotBracketResultEntity> results,
+            Set<ResultEntity<TertiaryToDotBracketParamsEntity>> results,
             Instant createAt) {
-        this.id = id;
-        this.filename = filename;
-        this.results = results;
-        this.createAt = createAt;
-    }
-
-    public UUID getId() {
-        return id;
+        super(id, filename, results, createAt);
     }
 }
