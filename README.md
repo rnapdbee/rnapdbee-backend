@@ -28,7 +28,7 @@ docker compose up
 To run only MongoDB database type:
 
 ```
-docker-compose -f docker-compose.db.yml up
+docker-compose up backend-db
 ```
 
 ## Documentation
