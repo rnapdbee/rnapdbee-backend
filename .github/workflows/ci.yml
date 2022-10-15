@@ -40,7 +40,7 @@ jobs:
 
   ci-dependabot:
     if: ${{ github.actor == 'dependabot[bot]' }}
-    needs: build
+    needs: CI
 
     runs-on: ubuntu-20.04
 
