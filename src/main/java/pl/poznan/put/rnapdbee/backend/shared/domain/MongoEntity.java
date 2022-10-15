@@ -8,13 +8,17 @@ import java.util.UUID;
 public abstract class MongoEntity<T> {
     @Id
     protected UUID id;
-    protected String filename;
+    protected FileDataEntity fileData;
     protected Set<ResultEntity<T>> results;
     protected Instant createAt;
 
-    public MongoEntity(UUID id, String filename, Set<ResultEntity<T>> results, Instant createAt) {
+    public MongoEntity(
+            UUID id,
+            FileDataEntity fileData,
+            Set<ResultEntity<T>> results,
+            Instant createAt) {
         this.id = id;
-        this.filename = filename;
+        this.fileData = fileData;
         this.results = results;
         this.createAt = createAt;
     }

@@ -2,6 +2,8 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.poznan.put.rnapdbee.backend.shared.domain.FileDataEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -29,19 +31,21 @@ public class TertiaryToDotBracketService {
     public void getResults(UUID id) {
         UUID randomId = UUID.randomUUID();
         tertiaryToDotBracketRepository.save(new TertiaryToDotBracketMongoEntity(
-                randomId,
-                "filename-test",
-                new HashSet<>(Arrays.asList(new TertiaryToDotBracketResultEntity(
-                        new TertiaryToDotBracketParamsEntity(
-                                ModelSelection.FIRST,
-                                AnalysisTool.FR3D_PYTHON,
-                                NonCanonicalHandling.VISUALIZATION_ONLY,
-                                true,
-                                StructuralElementsHandling.USE_PSEUDOKNOTS,
-                                VisualizationTool.VARNA
-                        ),
-                        "output"
-                ))),
+                id,
+                new FileDataEntity("filename-test", "filename-title"),
+                new HashSet<>(Arrays.asList(
+                        new ResultEntity<>(
+                                new TertiaryToDotBracketParamsEntity(
+                                        ModelSelection.FIRST,
+                                        AnalysisTool.FR3D_PYTHON,
+                                        NonCanonicalHandling.VISUALIZATION_ONLY,
+                                        true,
+                                        StructuralElementsHandling.USE_PSEUDOKNOTS,
+                                        VisualizationTool.VARNA
+                                ),
+                                "output"
+                        )
+                )),
                 Instant.now()
         ));
 

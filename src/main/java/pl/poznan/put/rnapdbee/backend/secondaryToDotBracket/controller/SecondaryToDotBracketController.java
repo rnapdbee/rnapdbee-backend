@@ -49,10 +49,10 @@ public class SecondaryToDotBracketController {
     @Operation(summary = "Reanalyze calculation with different parameters")
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> reanalyzeSecondaryToDotBracket(
+            @PathVariable("id") UUID id,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool,
-            @PathVariable("id") UUID id) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         throw new UnsupportedOperationException();
     }
 }

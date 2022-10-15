@@ -50,22 +50,22 @@ public class TertiaryToMultiSecondaryController {
     @Operation(summary = "Reanalyze calculation with different parameters")
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> reanalyzeTertiaryToMultiSecondary(
+            @PathVariable("id") UUID id,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool,
-            @PathVariable("id") UUID id) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         throw new UnsupportedOperationException();
     }
 
     @Operation(summary = "Perform a multi based on object fetched from Protein Data Bank")
     @PostMapping(path = "/pdb/{pdbId}", produces = "application/json")
     public ResponseEntity<Object> calculatePDBTertiaryToMultiSecondary(
+            @PathVariable("pdbId") String pdbId,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool,
-            @PathVariable("pdbId") String pdbId) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         throw new UnsupportedOperationException();
     }
 }

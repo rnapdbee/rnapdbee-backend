@@ -56,26 +56,26 @@ public class TertiaryToDotBracketController {
     @Operation(summary = "Reanalyze calculation with different parameters")
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> reanalyzeTertiaryToDotBracket(
+            @PathVariable("id") UUID id,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool,
-            @PathVariable("id") UUID id) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         throw new UnsupportedOperationException();
     }
 
     @Operation(summary = "Perform a 3d calculation based on object fetched from Protein Data Bank")
     @PostMapping(path = "/pdb/{pdbId}", produces = "application/json")
     public ResponseEntity<Object> calculatePDBTertiaryToDotBracket(
+            @PathVariable("pdbId") String pdbId,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool,
-            @PathVariable("pdbId") String pdbId) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         throw new UnsupportedOperationException();
     }
 }
