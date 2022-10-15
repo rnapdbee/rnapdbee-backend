@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.9"
+  version: "1.0.10"
   title: "RNApdbee Backend"
 
 
@@ -400,9 +400,8 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
-        filename:
-          type: "string"
-          example: "1EHZ.cif"
+        file:
+          $ref: "#/components/schemas/File"
         results:
           type: "array"
           items:
@@ -432,9 +431,8 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
-        filename:
-          type: "string"
-          example: "1EHZ.cif"
+        file:
+          $ref: "#/components/schemas/File"
         results:
           type: "array"
           items:
@@ -460,9 +458,8 @@ components:
         id:
           type: "string"
           example: "123e4567-e89b-12d3-a456-426614174000"
-        filename: 
-          type: "string"
-          example: "1EHZ.bpseq"
+        file:
+          $ref: "#/components/schemas/File"
         results:
           type: "array"
           items:
@@ -479,6 +476,16 @@ components:
                     $ref: "#/components/schemas/VisualizationTool"
               output:
                 $ref: "#/components/schemas/Output2D"
+
+    File:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          example: "1EHZ.bpseq"
+        title:
+          type: "string"
+          example: "THE CRYSTAL STRUCTURE OF YEAST PHENYLALANINE TRNA AT 1.93 A RESOLUTION"
 
     ModelSelection:
       type: "string"
