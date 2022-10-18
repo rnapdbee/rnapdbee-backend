@@ -49,7 +49,6 @@ public class TertiaryToDotBracketController {
     @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Object> getResultTertiaryToDotBracket(
             @PathVariable("id") UUID id) {
-        tertiaryToDotBracketService.getResults(id);
         throw new UnsupportedOperationException();
     }
 
