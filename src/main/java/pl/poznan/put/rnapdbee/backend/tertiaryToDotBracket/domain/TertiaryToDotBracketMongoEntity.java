@@ -16,7 +16,7 @@ public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBr
             UUID id,
             FileDataEntity fileData,
             Set<ResultEntity<TertiaryToDotBracketParamsEntity>> results,
-            Instant createAt) {
-        super(id, fileData, results, createAt);
+            Instant createdAt) {
+        super(id, fileData, results, createdAt);
     }
 }

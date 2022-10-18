@@ -10,4 +10,11 @@ public class FileEntity {
     @Id
     private UUID id;
     private String content;
+
+    public FileEntity(
+            UUID id,
+            String content) {
+        this.id = id;
+        this.content = content;
+    }
 }

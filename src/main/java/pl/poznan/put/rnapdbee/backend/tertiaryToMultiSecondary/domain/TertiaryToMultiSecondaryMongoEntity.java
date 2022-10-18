@@ -16,7 +16,7 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
             UUID id,
             FileDataEntity fileData,
             Set<ResultEntity<TertiaryToMultiSecondaryParamsEntity>> results,
-            Instant createAt) {
-        super(id, fileData, results, createAt);
+            Instant createdAt) {
+        super(id, fileData, results, createdAt);
     }
 }

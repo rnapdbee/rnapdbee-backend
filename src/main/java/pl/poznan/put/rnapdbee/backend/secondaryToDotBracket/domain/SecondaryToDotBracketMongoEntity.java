@@ -16,7 +16,7 @@ public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDot
             UUID id,
             FileDataEntity fileData,
             Set<ResultEntity<SecondaryToDotBracketParamsEntity>> results,
-            Instant createAt) {
-        super(id, fileData, results, createAt);
+            Instant createdAt) {
+        super(id, fileData, results, createdAt);
     }
 }

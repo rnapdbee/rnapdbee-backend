@@ -10,17 +10,17 @@ public abstract class MongoEntity<T> {
     protected UUID id;
     protected FileDataEntity fileData;
     protected Set<ResultEntity<T>> results;
-    protected Instant createAt;
+    protected Instant createdAt;
 
     public MongoEntity(
             UUID id,
             FileDataEntity fileData,
             Set<ResultEntity<T>> results,
-            Instant createAt) {
+            Instant createdAt) {
         this.id = id;
         this.fileData = fileData;
         this.results = results;
-        this.createAt = createAt;
+        this.createdAt = createdAt;
     }
 
     public UUID getId() {
