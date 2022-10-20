@@ -3,12 +3,14 @@ services:
 
   backend-db:
     container_name: backend-db
-    image: postgres
+    image: mongo
+    volumes:
+      - backend-db-mongo:/backend-db-mongo
     environment:
-      - POSTGRES_USER=rnapdbee
-      - POSTGRES_PASSWORD=a1s2d3f4
+      - MONGO_INITDB_ROOT_USERNAME=rnapdbee
+      - MONGO_INITDB_ROOT_PASSWORD=a1s2d3f4
     ports:
-      - "5432:5432"
+      - "27017:27017"
 
   backend:
     container_name: backend
@@ -18,7 +20,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://backend-db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=rnapdbee
-      - SPRING_DATASOURCE_PASSWORD=a1s2d3f4
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - spring_data_mongodb_authentication-database=admin
+      - spring_data_mongodb_username=rnapdbee
+      - spring_data_mongodb_password=a1s2d3f4
+      - spring_data_mongodb_database=backend-db
+      - spring_data_mongodb_port=27017
+      - spring_data_mongodb_host=localhost
+
+volumes:
+  backend-db-mongo: {}

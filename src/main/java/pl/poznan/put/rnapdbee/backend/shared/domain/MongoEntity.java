@@ -1,0 +1,29 @@
+package pl.poznan.put.rnapdbee.backend.shared.domain;
+
+import javax.persistence.Id;
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
+
+public abstract class MongoEntity<T> {
+    @Id
+    protected UUID id;
+    protected FileDataEntity fileData;
+    protected Set<ResultEntity<T>> results;
+    protected Instant createdAt;
+
+    public MongoEntity(
+            UUID id,
+            FileDataEntity fileData,
+            Set<ResultEntity<T>> results,
+            Instant createdAt) {
+        this.id = id;
+        this.fileData = fileData;
+        this.results = results;
+        this.createdAt = createdAt;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+}
