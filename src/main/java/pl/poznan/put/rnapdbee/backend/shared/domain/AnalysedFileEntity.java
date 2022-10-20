@@ -6,12 +6,12 @@ import javax.persistence.Id;
 import java.util.UUID;
 
 @Document
-public class FileEntity {
+public class AnalysedFileEntity {
     @Id
     private UUID id;
     private String content;
 
-    public FileEntity(
+    public AnalysedFileEntity(
             UUID id,
             String content) {
         this.id = id;
