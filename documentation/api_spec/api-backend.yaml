@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.11"
+  version: "1.0.12"
   title: "RNApdbee Backend"
 
 
@@ -618,9 +618,6 @@ components:
     ConsensualVisualization:
       type: "object"
       properties:
-        pathToPngImage:
-          type: "string"
-          example: "/resources/tmp/RNApdbee5553721596686458067.png"
         pathToSvgImage:
           type: "string"
           example: "/resources/tmp/RNApdbee5553721596686458067.svg"
