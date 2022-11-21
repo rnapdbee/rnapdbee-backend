@@ -2,7 +2,6 @@ package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,9 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.SecondaryToDotBracketService;
+import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -29,30 +30,39 @@ public class SecondaryToDotBracketController {
     }
 
     @Operation(summary = "Perform a 2D to Dot-Bracket calculation")
-    @PostMapping(path = "/", produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> calculateSecondaryToDotBracket(
+    @PostMapping(produces = "application/json", consumes = "text/plain")
+    public SecondaryToDotBracketMongoEntity calculateSecondaryToDotBracket(
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
-            @RequestBody String fileContent) {
-        throw new UnsupportedOperationException();
+            @RequestBody String fileContent) throws IOException {
+        return secondaryToDotBracketService.analyseSecondaryToDotBracket(
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool,
+                contentDispositionHeader,
+                fileContent);
     }
 
     @Operation(summary = "Fetch a 2D calculation from the database")
     @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<Object> getResultSecondaryToDotBracket(
+    public SecondaryToDotBracketMongoEntity getResultSecondaryToDotBracket(
             @PathVariable("id") UUID id) {
-        throw new UnsupportedOperationException();
+        return secondaryToDotBracketService.getResultSecondaryToDotBracket(id);
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
-    @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> reanalyzeSecondaryToDotBracket(
+    @PostMapping(path = "/{id}", produces = "application/json")
+    public SecondaryToDotBracketMongoEntity reanalyzeSecondaryToDotBracket(
             @PathVariable("id") UUID id,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-        throw new UnsupportedOperationException();
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) throws IOException {
+        return secondaryToDotBracketService.reanalyzeSecondaryToDotBracket(
+                id,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool);
     }
 }

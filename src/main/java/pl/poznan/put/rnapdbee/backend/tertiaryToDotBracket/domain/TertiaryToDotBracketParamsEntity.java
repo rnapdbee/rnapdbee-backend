@@ -7,25 +7,62 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHand
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 public class TertiaryToDotBracketParamsEntity {
-    private ModelSelection modelSelection;
-    private AnalysisTool analysisTool;
-    private NonCanonicalHandling nonCanonicalHandling;
-    private boolean removeIsolated;
-    private StructuralElementsHandling structuralElementsHandling;
-    private VisualizationTool visualizationTool;
+    private final ModelSelection modelSelection;
+    private final AnalysisTool analysisTool;
+    private final NonCanonicalHandling nonCanonicalHandling;
+    private final boolean removeIsolated;
+    private final StructuralElementsHandling structuralElementsHandling;
+    private final VisualizationTool visualizationTool;
 
-    public TertiaryToDotBracketParamsEntity(
-            ModelSelection modelSelection,
-            AnalysisTool analysisTool,
-            NonCanonicalHandling nonCanonicalHandling,
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool) {
-        this.modelSelection = modelSelection;
-        this.analysisTool = analysisTool;
-        this.nonCanonicalHandling = nonCanonicalHandling;
-        this.removeIsolated = removeIsolated;
-        this.structuralElementsHandling = structuralElementsHandling;
-        this.visualizationTool = visualizationTool;
+    private TertiaryToDotBracketParamsEntity(Builder builder) {
+        this.modelSelection = builder.modelSelection;
+        this.analysisTool = builder.analysisTool;
+        this.nonCanonicalHandling = builder.nonCanonicalHandling;
+        this.removeIsolated = builder.removeIsolated;
+        this.structuralElementsHandling = builder.structuralElementsHandling;
+        this.visualizationTool = builder.visualizationTool;
+    }
+
+    public static class Builder {
+        private ModelSelection modelSelection;
+        private AnalysisTool analysisTool;
+        private NonCanonicalHandling nonCanonicalHandling;
+        private boolean removeIsolated;
+        private StructuralElementsHandling structuralElementsHandling;
+        private VisualizationTool visualizationTool;
+
+        public Builder withModelSelection(ModelSelection modelSelection) {
+            this.modelSelection = modelSelection;
+            return this;
+        }
+
+        public Builder withAnalysisTool(AnalysisTool analysisTool) {
+            this.analysisTool = analysisTool;
+            return this;
+        }
+
+        public Builder withNonCanonicalHandling(NonCanonicalHandling nonCanonicalHandling) {
+            this.nonCanonicalHandling = nonCanonicalHandling;
+            return this;
+        }
+
+        public Builder withRemoveIsolated(boolean removeIsolated) {
+            this.removeIsolated = removeIsolated;
+            return this;
+        }
+
+        public Builder withStructuralElementsHandling(StructuralElementsHandling structuralElementsHandling) {
+            this.structuralElementsHandling = structuralElementsHandling;
+            return this;
+        }
+
+        public Builder withVisualizationTool(VisualizationTool visualizationTool) {
+            this.visualizationTool = visualizationTool;
+            return this;
+        }
+
+        public TertiaryToDotBracketParamsEntity build() {
+            return new TertiaryToDotBracketParamsEntity(this);
+        }
     }
 }
