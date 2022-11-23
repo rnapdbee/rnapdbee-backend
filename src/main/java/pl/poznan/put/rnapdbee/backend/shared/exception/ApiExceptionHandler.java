@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {
-            IdNotExistException.class,
+            IdNotExistsException.class,
             FileNameIsNullException.class,
             AnalyzedFileEntityNotExistException.class}
     )

@@ -15,7 +15,6 @@ import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDo
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -36,8 +35,8 @@ public class SecondaryToDotBracketController {
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
-            @RequestBody String fileContent) throws IOException {
-        return secondaryToDotBracketService.analyseSecondaryToDotBracket(
+            @RequestBody String fileContent) {
+        return secondaryToDotBracketService.analyzeSecondaryToDotBracket(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
@@ -58,7 +57,7 @@ public class SecondaryToDotBracketController {
             @PathVariable("id") UUID id,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) throws IOException {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
         return secondaryToDotBracketService.reanalyzeSecondaryToDotBracket(
                 id,
                 removeIsolated,
