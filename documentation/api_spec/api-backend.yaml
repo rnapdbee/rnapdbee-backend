@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.13"
+  version: "1.0.14"
   title: "RNApdbee Backend"
 
 
