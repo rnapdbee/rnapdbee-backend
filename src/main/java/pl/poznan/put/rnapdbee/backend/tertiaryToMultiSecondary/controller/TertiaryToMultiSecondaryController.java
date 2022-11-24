@@ -31,7 +31,6 @@ public class TertiaryToMultiSecondaryController {
     @Operation(summary = "Perform a 3D to multi 2D calculation")
     @PostMapping(produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> calculateTertiaryToMultiSecondary(
-            @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
@@ -51,7 +50,6 @@ public class TertiaryToMultiSecondaryController {
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> reanalyzeTertiaryToMultiSecondary(
             @PathVariable("id") UUID id,
-            @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
@@ -62,7 +60,6 @@ public class TertiaryToMultiSecondaryController {
     @PostMapping(path = "/pdb/{pdbId}", produces = "application/json")
     public ResponseEntity<Object> calculatePDBTertiaryToMultiSecondary(
             @PathVariable("pdbId") String pdbId,
-            @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {

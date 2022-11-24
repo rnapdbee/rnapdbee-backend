@@ -154,7 +154,6 @@ paths:
       summary: "Perform a multi calculation"
       description: ""
       parameters:
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
@@ -213,7 +212,6 @@ paths:
           schema:
             type: "string"
           description: "ID of resource in the database"
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
@@ -243,7 +241,6 @@ paths:
           schema:
             type: "string"
           description: "ID of resource in the Protein Data Bank"
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
