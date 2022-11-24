@@ -32,7 +32,7 @@ public class TertiaryToDotBracketController {
     }
 
     @Operation(summary = "Perform a 3d calculation based on the payload")
-    @PostMapping(path = "/", produces = "application/json", consumes = "text/plain")
+    @PostMapping(produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> calculateTertiaryToDotBracket(
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,

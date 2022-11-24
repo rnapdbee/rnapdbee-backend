@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.13"
+  version: "1.0.14"
   title: "RNApdbee Backend"
 
 
@@ -31,7 +31,7 @@ servers:
 
 paths:
 
-  /3d/:
+  /3d:
     post:
       tags:
         - "3D -> (...)"
@@ -147,14 +147,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response3D"
 
-  /multi/:
+  /multi:
     post:
       tags:
         - "3D -> multi 2D"
       summary: "Perform a multi calculation"
       description: ""
       parameters:
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
@@ -213,7 +212,6 @@ paths:
           schema:
             type: "string"
           description: "ID of resource in the database"
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
@@ -243,7 +241,6 @@ paths:
           schema:
             type: "string"
           description: "ID of resource in the Protein Data Bank"
-        - $ref: "#/components/parameters/modelSelection"
         - $ref: "#/components/parameters/includeNonCanonical"
         - $ref: "#/components/parameters/removeIsolated"
         - $ref: "#/components/parameters/visualizationTool"
@@ -257,7 +254,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ResponseMulti"
 
-  /2d/:
+  /2d:
     post:
       tags:
         - "2D -> (...)"
