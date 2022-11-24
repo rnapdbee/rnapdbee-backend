@@ -29,7 +29,7 @@ public class TertiaryToMultiSecondaryController {
     }
 
     @Operation(summary = "Perform a 3D to multi 2D calculation")
-    @PostMapping(path = "/", produces = "application/json", consumes = "text/plain")
+    @PostMapping(produces = "application/json", consumes = "text/plain")
     public ResponseEntity<Object> calculateTertiaryToMultiSecondary(
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
