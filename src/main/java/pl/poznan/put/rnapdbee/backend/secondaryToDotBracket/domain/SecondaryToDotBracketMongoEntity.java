@@ -20,11 +20,6 @@ public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDot
         super(id, fileName, results, createdAt);
     }
 
-    public void addResult(
-            ResultEntity<SecondaryToDotBracketParams, Output2D> newResult) {
-        this.results.add(newResult);
-    }
-
     public static class Builder extends MongoEntity.Builder<Builder, SecondaryToDotBracketParams, Output2D> {
 
         @Override

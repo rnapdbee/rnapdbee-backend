@@ -10,15 +10,12 @@ public class AnalyzedFileEntity {
     @Id
     private UUID id;
     private String content;
-    private String contentDisposition;
 
     private AnalyzedFileEntity(
             UUID id,
-            String content,
-            String contentDisposition) {
+            String content) {
         this.id = id;
         this.content = content;
-        this.contentDisposition = contentDisposition;
     }
 
     public UUID getId() {
@@ -29,14 +26,9 @@ public class AnalyzedFileEntity {
         return content;
     }
 
-    public String getContentDisposition() {
-        return contentDisposition;
-    }
-
     public static class Builder {
         private UUID id;
         private String content;
-        private String contentDisposition;
 
         public Builder withId(UUID id) {
             this.id = id;
@@ -48,16 +40,10 @@ public class AnalyzedFileEntity {
             return this;
         }
 
-        public Builder withContentDisposition(String contentDisposition) {
-            this.contentDisposition = contentDisposition;
-            return this;
-        }
-
         public AnalyzedFileEntity build() {
             return new AnalyzedFileEntity(
                     this.id,
-                    this.content,
-                    this.contentDisposition);
+                    this.content);
         }
     }
 }

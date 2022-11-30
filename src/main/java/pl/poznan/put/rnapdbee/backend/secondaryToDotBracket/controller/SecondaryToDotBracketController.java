@@ -17,6 +17,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 import java.util.UUID;
 
+/**
+ * Controller class for the Secondary To Dot Bracket API.
+ */
 @RestController
 @RequestMapping("api/v1/engine/2d")
 public class SecondaryToDotBracketController {

@@ -18,9 +18,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.AnalyzedFileEntityNotExistException;
-import pl.poznan.put.rnapdbee.backend.shared.exception.FileNameIsNullException;
-import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotExistsException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.AnalyzedFileEntityNotExistException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.FileNameIsNullException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotExistsException;
 import pl.poznan.put.rnapdbee.backend.shared.repository.AnalyzedFileRepository;
 
 import javax.servlet.ServletContext;
@@ -88,7 +88,6 @@ public class SecondaryToDotBracketService {
                 new AnalyzedFileEntity.Builder()
                         .withId(id)
                         .withContent(fileContent)
-                        .withContentDisposition(contentDispositionHeader)
                         .build());
 
         return secondaryToDotBracketMongoEntity;
@@ -115,7 +114,9 @@ public class SecondaryToDotBracketService {
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                fileContentToAnalyze.get().getContentDisposition(),
+                ContentDisposition.builder("attachment")
+                        .filename(secondaryToDotBracketMongoEntity.getFileName())
+                        .build().toString(),
                 fileContentToAnalyze.get().getContent());
 
         String pathToSVGImage = ImageUtils.generateSvgUrl(

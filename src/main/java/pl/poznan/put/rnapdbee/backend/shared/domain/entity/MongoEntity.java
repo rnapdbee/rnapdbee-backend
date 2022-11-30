@@ -28,6 +28,11 @@ public abstract class MongoEntity<T, O> {
         this.createdAt = createdAt;
     }
 
+    public void addResult(
+            ResultEntity<T, O> newResult) {
+        this.results.add(0, newResult);
+    }
+
     public UUID getId() {
         return id;
     }

@@ -7,6 +7,9 @@ import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class for manipulate svg image files
+ */
 public final class ImageUtils {
 
     public static Pair<File, String> generateSvgUrl(
