@@ -1,29 +1,21 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.EngineImageInformationOutputResponse;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 
-public class ImageInformationOutput {
-    private String pathToSVGImage;
-    private VisualizationTool successfulVisualizationTool;
-    private VisualizationTool failedVisualizationTool;
-    private String drawingResult;
+public abstract class ImageInformationOutput {
 
-    private ImageInformationOutput(
-            String pathToSVGImage,
+    protected VisualizationTool successfulVisualizationTool;
+    protected VisualizationTool failedVisualizationTool;
+    protected String drawingResult;
+
+    protected ImageInformationOutput(
             VisualizationTool successfulVisualizationTool,
             VisualizationTool failedVisualizationTool,
             String drawingResult) {
-        this.pathToSVGImage = pathToSVGImage;
         this.successfulVisualizationTool = successfulVisualizationTool;
         this.failedVisualizationTool = failedVisualizationTool;
         this.drawingResult = drawingResult;
-    }
-
-    public String getPathToSVGImage() {
-        return pathToSVGImage;
     }
 
     public VisualizationTool getSuccessfulVisualizationTool() {
@@ -38,35 +30,21 @@ public class ImageInformationOutput {
         return drawingResult;
     }
 
-    public static class Builder {
-        private String pathToSVGImage;
+    protected abstract static class Builder<B extends Builder<B>> {
         private VisualizationTool successfulVisualizationTool;
         private VisualizationTool failedVisualizationTool;
         private String drawingResult;
 
-        public Builder withPathToSVGImage(String pathToSVGImage) {
-            this.pathToSVGImage = pathToSVGImage;
-            return this;
+        protected abstract B self();
+
+        public B withEngineOutput2DResponse(ImageInformationByteArray imageInformationByteArray) {
+            this.successfulVisualizationTool = imageInformationByteArray.getSuccessfulVisualizationTool();
+            this.failedVisualizationTool = imageInformationByteArray.getFailedVisualizationTool();
+            this.drawingResult = imageInformationByteArray.getDrawingResult();
+            return self();
         }
 
-        public Builder withEngineOutput2DResponse(EngineImageInformationOutputResponse engineImageInformationOutputResponse) {
-            this.successfulVisualizationTool = engineImageInformationOutputResponse.getSuccessfulVisualizationTool();
-            this.failedVisualizationTool = engineImageInformationOutputResponse.getFailedVisualizationTool();
-            this.drawingResult = engineImageInformationOutputResponse.getDrawingResult();
-            return this;
-        }
-
-        public ImageInformationOutput build() {
-            return new ImageInformationOutput(
-                    this.getPathToSVGImage(),
-                    this.getSuccessfulVisualizationTool(),
-                    this.getFailedVisualizationTool(),
-                    this.getDrawingResult());
-        }
-
-        public String getPathToSVGImage() {
-            return pathToSVGImage;
-        }
+        protected abstract ImageInformationOutput build();
 
         public VisualizationTool getSuccessfulVisualizationTool() {
             return successfulVisualizationTool;

@@ -10,23 +10,23 @@ import java.util.List;
 import java.util.UUID;
 
 @Document
-public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToMultiSecondaryParamsEntity, Output2D> {
+public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToMultiSecondaryParams, Output2D> {
 
     private TertiaryToMultiSecondaryMongoEntity(
             UUID id,
-            String fileName,
-            List<ResultEntity<TertiaryToMultiSecondaryParamsEntity, Output2D>> results,
+            String filename,
+            List<ResultEntity<TertiaryToMultiSecondaryParams, Output2D>> results,
             Instant createdAt) {
-        super(id, fileName, results, createdAt);
+        super(id, filename, results, createdAt);
     }
 
-    public static class Builder extends MongoEntity.Builder<Builder, TertiaryToMultiSecondaryParamsEntity, Output2D> {
+    public static class Builder extends MongoEntity.Builder<Builder, TertiaryToMultiSecondaryParams, Output2D> {
 
         @Override
         public TertiaryToMultiSecondaryMongoEntity build() {
             return new TertiaryToMultiSecondaryMongoEntity(
                     this.getId(),
-                    this.getFileName(),
+                    this.getFilename(),
                     this.getResults(),
                     this.getCreatedAt());
         }

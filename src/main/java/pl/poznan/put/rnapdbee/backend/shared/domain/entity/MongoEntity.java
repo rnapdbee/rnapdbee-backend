@@ -11,7 +11,7 @@ import java.util.UUID;
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;
-    protected String fileName;
+    protected String filename;
     protected List<ResultEntity<T, O>> results;
 
     @JsonIgnore
@@ -19,11 +19,11 @@ public abstract class MongoEntity<T, O> {
 
     protected MongoEntity(
             UUID id,
-            String fileName,
+            String filename,
             List<ResultEntity<T, O>> results,
             Instant createdAt) {
         this.id = id;
-        this.fileName = fileName;
+        this.filename = filename;
         this.results = results;
         this.createdAt = createdAt;
     }
@@ -37,8 +37,8 @@ public abstract class MongoEntity<T, O> {
         return id;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getFilename() {
+        return filename;
     }
 
     public List<ResultEntity<T, O>> getResults() {
@@ -52,7 +52,7 @@ public abstract class MongoEntity<T, O> {
 
     protected abstract static class Builder<B extends Builder<B, T, O>, T, O> {
         private UUID id;
-        private String fileName = "";
+        private String filename = "";
         private List<ResultEntity<T, O>> results = new ArrayList<>();
         private Instant createdAt = Instant.now();
 
@@ -63,12 +63,12 @@ public abstract class MongoEntity<T, O> {
             return self();
         }
 
-        public B withFileName(String fileName) {
-            if (fileName.isBlank()) {
+        public B withFilename(String filename) {
+            if (filename.isBlank()) {
                 throw new IllegalArgumentException();
             }
 
-            this.fileName = fileName;
+            this.filename = filename;
             return self();
         }
 
@@ -88,8 +88,8 @@ public abstract class MongoEntity<T, O> {
             return id;
         }
 
-        public String getFileName() {
-            return fileName;
+        public String getFilename() {
+            return filename;
         }
 
         public List<ResultEntity<T, O>> getResults() {

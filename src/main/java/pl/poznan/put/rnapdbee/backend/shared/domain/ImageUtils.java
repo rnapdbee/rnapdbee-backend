@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain;
+package pl.poznan.put.rnapdbee.backend.shared.domain;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;

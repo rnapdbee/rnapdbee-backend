@@ -4,7 +4,6 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHand
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 public class SecondaryToDotBracketParams {
-
     private final boolean removeIsolated;
     private final StructuralElementsHandling structuralElementsHandling;
     private final VisualizationTool visualizationTool;
@@ -69,5 +68,17 @@ public class SecondaryToDotBracketParams {
         public VisualizationTool getVisualizationTool() {
             return visualizationTool;
         }
+    }
+
+    public static SecondaryToDotBracketParams of(
+            boolean removeIsolated,
+            StructuralElementsHandling structuralElementsHandling,
+            VisualizationTool visualizationTool
+    ) {
+        return new SecondaryToDotBracketParams.Builder()
+                .withRemoveIsolated(removeIsolated)
+                .withStructuralElementsHandling(structuralElementsHandling)
+                .withVisualizationTool(visualizationTool)
+                .build();
     }
 }

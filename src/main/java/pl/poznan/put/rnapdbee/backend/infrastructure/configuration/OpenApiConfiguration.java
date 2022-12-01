@@ -21,7 +21,7 @@ public class OpenApiConfiguration {
 
     @Bean
     public GroupedOpenApi tertiaryToDotBracketApi() {
-        return GroupedOpenApi.builder()
+        return GroupedOpenApi.()
                 .group("TertiaryToDotBracket")
                 .pathsToMatch("/**")
                 .packagesToScan("pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket")

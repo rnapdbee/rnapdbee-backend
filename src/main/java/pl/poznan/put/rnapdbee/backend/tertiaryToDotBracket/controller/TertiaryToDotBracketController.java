@@ -1,6 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.TertiaryToDotBracketService;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
 
 import java.util.UUID;
 
@@ -33,7 +35,7 @@ public class TertiaryToDotBracketController {
 
     @Operation(summary = "Perform a 3d calculation based on the payload")
     @PostMapping(produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> calculateTertiaryToDotBracket(
+    public TertiaryToDotBracketMongoEntity calculateTertiaryToDotBracket(
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
@@ -42,7 +44,16 @@ public class TertiaryToDotBracketController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
-        throw new UnsupportedOperationException();
+//        return tertiaryToDotBracketService.analyzeTertiaryToDotBracket(
+//                modelSelection,
+//                analysisTool,
+//                nonCanonicalHandling,
+//                removeIsolated,
+//                structuralElementsHandling,
+//                visualizationTool,
+//                contentDispositionHeader,
+//                fileContent);
+        throw new NotImplementedException();
     }
 
     @Operation(summary = "Fetch an existing 3d calculation")
