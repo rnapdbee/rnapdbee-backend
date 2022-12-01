@@ -1,6 +1,8 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 
 import java.util.List;
@@ -38,6 +40,23 @@ public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
         this.stackingInteractions = stackingInteractions;
         this.basePhosphateInteractions = basePhosphateInteractions;
         this.baseRiboseInteractions = baseRiboseInteractions;
+    }
+
+    public static SingleTertiaryModelOutput<ImageInformationPath> of(
+            SingleTertiaryModelOutput<ImageInformationByteArray> engineModelResponse,
+            Output2D<ImageInformationPath> output2D
+    ) {
+        return new SingleTertiaryModelOutput.Builder<ImageInformationPath>()
+                .setModelNumber(engineModelResponse.getModelNumber())
+                .setOutput2D(output2D)
+                .setMessages(engineModelResponse.getMessages())
+                .setCanonicalInteractions(engineModelResponse.getCanonicalInteractions())
+                .setNonCanonicalInteractions(engineModelResponse.getNonCanonicalInteractions())
+                .setInterStrandInteractions(engineModelResponse.getInterStrandInteractions())
+                .setStackingInteractions(engineModelResponse.getStackingInteractions())
+                .setBasePhosphateInteractions(engineModelResponse.getBasePhosphateInteractions())
+                .setBaseRiboseInteractions(engineModelResponse.getBaseRiboseInteractions())
+                .build();
     }
 
     public Output2D<T> getOutput2D() {

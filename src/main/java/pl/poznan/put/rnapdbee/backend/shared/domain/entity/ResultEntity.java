@@ -29,11 +29,11 @@ public class ResultEntity<T, O> {
                 .build();
     }
 
-    public static ResultEntity<TertiaryToDotBracketParams, Output3D> of(
+    public static ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> of(
             TertiaryToDotBracketParams tertiaryToDotBracketParams,
-            Output3D output3D
+            Output3D<ImageInformationPath> output3D
     ) {
-        return new ResultEntity.Builder<TertiaryToDotBracketParams, Output3D>()
+        return new ResultEntity.Builder<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>()
                 .withParams(tertiaryToDotBracketParams)
                 .withOutput(output3D)
                 .build();
