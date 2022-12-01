@@ -30,6 +30,24 @@ public class TertiaryToDotBracketParams {
         this.visualizationTool = visualizationTool;
     }
 
+    public static TertiaryToDotBracketParams of(
+            ModelSelection modelSelection,
+            AnalysisTool analysisTool,
+            NonCanonicalHandling nonCanonicalHandling,
+            boolean removeIsolated,
+            StructuralElementsHandling structuralElementsHandling,
+            VisualizationTool visualizationTool
+    ) {
+        return new TertiaryToDotBracketParams.Builder()
+                .withModelSelection(modelSelection)
+                .withAnalysisTool(analysisTool)
+                .withNonCanonicalHandling(nonCanonicalHandling)
+                .withRemoveIsolated(removeIsolated)
+                .withStructuralElementsHandling(structuralElementsHandling)
+                .withVisualizationTool(visualizationTool)
+                .build();
+    }
+
     public ModelSelection getModelSelection() {
         return modelSelection;
     }

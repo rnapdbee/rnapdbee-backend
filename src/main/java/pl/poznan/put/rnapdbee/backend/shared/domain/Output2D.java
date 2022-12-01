@@ -26,6 +26,20 @@ public class Output2D<T extends ImageInformationOutput> {
         this.imageInformation = imageInformation;
     }
 
+    public static Output2D<ImageInformationPath> of(
+            Output2D<ImageInformationByteArray> engineOutput2DResponse,
+            ImageInformationPath imageInformationPath
+    ) {
+        return new Output2D.Builder<ImageInformationPath>()
+                .withStrands(engineOutput2DResponse.getStrands())
+                .withBpSeq(engineOutput2DResponse.getBpSeq())
+                .withCt(engineOutput2DResponse.getCt())
+                .withInteractions(engineOutput2DResponse.getInteractions())
+                .withStructuralElement(engineOutput2DResponse.getStructuralElements())
+                .withImageInformation(imageInformationPath)
+                .build();
+    }
+
     public List<Object> getStrands() {
         return strands;
     }
@@ -90,7 +104,7 @@ public class Output2D<T extends ImageInformationOutput> {
         }
 
         public Output2D<T> build() {
-            return new Output2D<T>(
+            return new Output2D<>(
                     this.getStrands(),
                     this.getBpSeq(),
                     this.getCt(),

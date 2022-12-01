@@ -18,6 +18,18 @@ public class SecondaryToDotBracketParams {
         this.visualizationTool = visualizationTool;
     }
 
+    public static SecondaryToDotBracketParams of(
+            boolean removeIsolated,
+            StructuralElementsHandling structuralElementsHandling,
+            VisualizationTool visualizationTool
+    ) {
+        return new SecondaryToDotBracketParams.Builder()
+                .withRemoveIsolated(removeIsolated)
+                .withStructuralElementsHandling(structuralElementsHandling)
+                .withVisualizationTool(visualizationTool)
+                .build();
+    }
+
     public boolean isRemoveIsolated() {
         return removeIsolated;
     }
@@ -68,17 +80,5 @@ public class SecondaryToDotBracketParams {
         public VisualizationTool getVisualizationTool() {
             return visualizationTool;
         }
-    }
-
-    public static SecondaryToDotBracketParams of(
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool
-    ) {
-        return new SecondaryToDotBracketParams.Builder()
-                .withRemoveIsolated(removeIsolated)
-                .withStructuralElementsHandling(structuralElementsHandling)
-                .withVisualizationTool(visualizationTool)
-                .build();
     }
 }

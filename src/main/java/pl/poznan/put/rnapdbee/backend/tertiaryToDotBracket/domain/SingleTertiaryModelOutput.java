@@ -1,6 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 
 import java.util.List;
@@ -8,38 +8,20 @@ import java.util.List;
 /**
  * DTO class for SingleTertiaryModelOutput
  */
-public class SingleTertiaryModelOutput {
-
-    @JsonProperty("modelNumber")
-    private Integer modelNumber;
-
-    @JsonProperty("output2D")
-    private Output2D output2D;
-
-    @JsonProperty("messages")
-    private List<String> messages;
-
-    @JsonProperty("canonicalInteractions")
-    private List<Object> canonicalInteractions;
-
-    @JsonProperty("nonCanonicalInteractions")
-    private List<Object> nonCanonicalInteractions;
-
-    @JsonProperty("interStrandInteractions")
-    private List<Object> interStrandInteractions;
-
-    @JsonProperty("stackingInteractions")
-    private List<Object> stackingInteractions;
-
-    @JsonProperty("basePhosphateInteractions")
-    private List<Object> basePhosphateInteractions;
-
-    @JsonProperty("baseRiboseInteractions")
-    private List<Object> baseRiboseInteractions;
+public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
+    private final Integer modelNumber;
+    private final Output2D<T> output2D;
+    private final List<String> messages;
+    private final List<Object> canonicalInteractions;
+    private final List<Object> nonCanonicalInteractions;
+    private final List<Object> interStrandInteractions;
+    private final List<Object> stackingInteractions;
+    private final List<Object> basePhosphateInteractions;
+    private final List<Object> baseRiboseInteractions;
 
     private SingleTertiaryModelOutput(
             Integer modelNumber,
-            Output2D output2D,
+            Output2D<T> output2D,
             List<String> messages,
             List<Object> canonicalInteractions,
             List<Object> nonCanonicalInteractions,
@@ -58,7 +40,7 @@ public class SingleTertiaryModelOutput {
         this.baseRiboseInteractions = baseRiboseInteractions;
     }
 
-    public Output2D getOutput2D() {
+    public Output2D<T> getOutput2D() {
         return output2D;
     }
 
@@ -94,9 +76,9 @@ public class SingleTertiaryModelOutput {
         return modelNumber;
     }
 
-    public static class Builder {
+    public static class Builder<T extends ImageInformationOutput> {
         private Integer modelNumber;
-        private Output2D output2D;
+        private Output2D<T> output2D;
         private List<String> messages;
         private List<Object> canonicalInteractions;
         private List<Object> nonCanonicalInteractions;
@@ -105,53 +87,54 @@ public class SingleTertiaryModelOutput {
         private List<Object> basePhosphateInteractions;
         private List<Object> baseRiboseInteractions;
 
-        public Builder setModelNumber(Integer modelNumber) {
+        public Builder<T> setModelNumber(Integer modelNumber) {
             this.modelNumber = modelNumber;
             return this;
         }
 
-        public Builder setOutput2D(Output2D output2D) {
+        public Builder<T> setOutput2D(Output2D<T> output2D) {
             this.output2D = output2D;
             return this;
         }
 
-        public Builder setMessages(List<String> messages) {
+        public Builder<T> setMessages(List<String> messages) {
             this.messages = messages;
             return this;
         }
 
-        public Builder setCanonicalInteractions(List<Object> canonicalInteractions) {
+        public Builder<T> setCanonicalInteractions(List<Object> canonicalInteractions) {
             this.canonicalInteractions = canonicalInteractions;
             return this;
         }
 
-        public Builder setNonCanonicalInteractions(List<Object> nonCanonicalInteractions) {
+        public Builder<T> setNonCanonicalInteractions(List<Object> nonCanonicalInteractions) {
             this.nonCanonicalInteractions = nonCanonicalInteractions;
             return this;
         }
 
-        public Builder setInterStrandInteractions(List<Object> interStrandInteractions) {
+        public Builder<T> setInterStrandInteractions(List<Object> interStrandInteractions) {
             this.interStrandInteractions = interStrandInteractions;
             return this;
         }
 
-        public Builder setStackingInteractions(List<Object> stackingInteractions) {
+        public Builder<T> setStackingInteractions(List<Object> stackingInteractions) {
             this.stackingInteractions = stackingInteractions;
             return this;
         }
 
-        public Builder setBasePhosphateInteractions(List<Object> basePhosphateInteractions) {
+        public Builder<T> setBasePhosphateInteractions(List<Object> basePhosphateInteractions) {
             this.basePhosphateInteractions = basePhosphateInteractions;
             return this;
         }
 
-        public Builder setBaseRiboseInteractions(List<Object> baseRiboseInteractions) {
+        public Builder<T> setBaseRiboseInteractions(List<Object> baseRiboseInteractions) {
             this.baseRiboseInteractions = baseRiboseInteractions;
             return this;
         }
 
-        public SingleTertiaryModelOutput build() {
-            return new SingleTertiaryModelOutput(modelNumber,
+        public SingleTertiaryModelOutput<T> build() {
+            return new SingleTertiaryModelOutput<>(
+                    modelNumber,
                     output2D,
                     messages,
                     canonicalInteractions,

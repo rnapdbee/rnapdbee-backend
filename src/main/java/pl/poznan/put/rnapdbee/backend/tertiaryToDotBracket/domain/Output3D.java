@@ -1,19 +1,22 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Output3D {
-    private final List<SingleTertiaryModelOutput> models;
+public class Output3D<T extends ImageInformationOutput> {
+    private final List<SingleTertiaryModelOutput<T>> models;
     private final String title;
 
-    private Output3D(
-            List<SingleTertiaryModelOutput> models,
+    protected Output3D(
+            List<SingleTertiaryModelOutput<T>> models,
             String title) {
         this.models = models;
         this.title = title;
     }
 
-    public List<SingleTertiaryModelOutput> getModels() {
+    public List<SingleTertiaryModelOutput<T>> getModels() {
         return models;
     }
 
@@ -21,23 +24,37 @@ public class Output3D {
         return title;
     }
 
-    public static class Builder {
-        private List<SingleTertiaryModelOutput> models;
+    public static class Builder<T extends ImageInformationOutput> {
+        private List<SingleTertiaryModelOutput<T>> models = new ArrayList<>();
         private String title;
 
-        public Builder withModels(List<SingleTertiaryModelOutput> models) {
+        public Builder<T> withModels(List<SingleTertiaryModelOutput<T>> models) {
             this.models = models;
             return this;
         }
 
-        public Builder withTitle(String title) {
+        public Builder<T> addModel(SingleTertiaryModelOutput<T> model) {
+            this.models.add(model);
+            return this;
+        }
+
+        public Builder<T> withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Output3D build() {
-            return new Output3D(models, title);
+        public Output3D<T> build() {
+            return new Output3D<>(
+                    this.getModels(),
+                    this.getTitle());
+        }
+
+        public List<SingleTertiaryModelOutput<T>> getModels() {
+            return models;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 }
-

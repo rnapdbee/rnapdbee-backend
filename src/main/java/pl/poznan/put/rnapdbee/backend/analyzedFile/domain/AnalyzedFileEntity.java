@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
+package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,8 +8,8 @@ import java.util.UUID;
 @Document
 public class AnalyzedFileEntity {
     @Id
-    private UUID id;
-    private String content;
+    private final UUID id;
+    private final String content;
 
     private AnalyzedFileEntity(
             UUID id,

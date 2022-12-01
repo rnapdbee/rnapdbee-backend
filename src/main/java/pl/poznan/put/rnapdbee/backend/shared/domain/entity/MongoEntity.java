@@ -11,11 +11,10 @@ import java.util.UUID;
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;
-    protected String filename;
+    protected final String filename;
     protected List<ResultEntity<T, O>> results;
-
     @JsonIgnore
-    protected Instant createdAt;
+    protected final Instant createdAt;
 
     protected MongoEntity(
             UUID id,

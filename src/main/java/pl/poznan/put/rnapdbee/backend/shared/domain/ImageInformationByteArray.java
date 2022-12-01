@@ -4,7 +4,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 
 public class ImageInformationByteArray extends ImageInformationOutput {
-    private byte[] svgFile;
+    private final byte[] svgFile;
 
     private ImageInformationByteArray(
             byte[] svgFile,

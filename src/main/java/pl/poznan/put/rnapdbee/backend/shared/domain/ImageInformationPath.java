@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 public class ImageInformationPath extends ImageInformationOutput {
-    private String pathToSVGImage;
+    private final String pathToSVGImage;
 
     private ImageInformationPath(
             String pathToSVGImage,

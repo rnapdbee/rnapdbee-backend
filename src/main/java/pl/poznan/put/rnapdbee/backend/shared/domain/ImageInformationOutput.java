@@ -4,10 +4,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 
 public abstract class ImageInformationOutput {
-
-    protected VisualizationTool successfulVisualizationTool;
-    protected VisualizationTool failedVisualizationTool;
-    protected String drawingResult;
+    protected final VisualizationTool successfulVisualizationTool;
+    protected final VisualizationTool failedVisualizationTool;
+    protected final String drawingResult;
 
     protected ImageInformationOutput(
             VisualizationTool successfulVisualizationTool,
