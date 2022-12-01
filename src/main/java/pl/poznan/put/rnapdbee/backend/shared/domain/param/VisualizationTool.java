@@ -8,11 +8,6 @@ public enum VisualizationTool {
     VARNA,
     PSEUDO_VIEWER,
     R_CHIE,
-    RNA_GLIB,
-    FORNA,
     RNA_PUZZLER,
-    RNA_TURTLE,
-    RNA_TRAVELER,
-    BARNABA,
     NONE
 }
