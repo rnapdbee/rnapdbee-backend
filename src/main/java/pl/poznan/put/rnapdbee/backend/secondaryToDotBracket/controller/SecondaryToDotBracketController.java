@@ -51,7 +51,7 @@ public class SecondaryToDotBracketController {
     @GetMapping(path = "/{id}", produces = "application/json")
     public SecondaryToDotBracketMongoEntity getResultSecondaryToDotBracket(
             @PathVariable("id") UUID id) {
-        return secondaryToDotBracketService.getResultSecondaryToDotBracket(id);
+        return secondaryToDotBracketService.getResultsSecondaryToDotBracket(id);
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")

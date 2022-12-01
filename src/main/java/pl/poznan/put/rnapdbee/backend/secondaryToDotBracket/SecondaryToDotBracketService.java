@@ -95,7 +95,7 @@ public class SecondaryToDotBracketService {
         return secondaryToDotBracketMongoEntity;
     }
 
-    public SecondaryToDotBracketMongoEntity getResultSecondaryToDotBracket(UUID id) {
+    public SecondaryToDotBracketMongoEntity getResultsSecondaryToDotBracket(UUID id) {
         return findSecondaryToDotBracketDocument(id);
     }
 
@@ -107,6 +107,7 @@ public class SecondaryToDotBracketService {
 
         AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
+
         String contentDispositionHeader = ContentDisposition.builder("attachment")
                 .filename(secondaryToDotBracketMongoEntity.getFilename())
                 .build()
@@ -144,7 +145,7 @@ public class SecondaryToDotBracketService {
         return secondaryToDotBracketMongoEntity;
     }
 
-    public SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {
+    private SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {
         Optional<SecondaryToDotBracketMongoEntity> secondaryToDotBracketMongoEntity =
                 secondaryToDotBracketRepository.findById(id);
 
