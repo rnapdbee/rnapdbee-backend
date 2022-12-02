@@ -1,22 +1,21 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 
 /**
- * Class for manipulate svg image files
+ * Class managing creation of image resources
  */
 public final class ImageUtils {
 
-    public static Pair<File, String> generateSvgUrl(
+    public static String generateSvgUrl(
             final ServletContext context,
             final byte[] image) {
         final File imageFile = ImageUtils.exportImage(context, image);
-        return Pair.of(imageFile, String.format("%s/resources/tmp/%s", context.getContextPath(), imageFile.getName()));
+        return String.format("%s/resources/tmp/%s", context.getContextPath(), imageFile.getName());
     }
 
     private static File exportImage(

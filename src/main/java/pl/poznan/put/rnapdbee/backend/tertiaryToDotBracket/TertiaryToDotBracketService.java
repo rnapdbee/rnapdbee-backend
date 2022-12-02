@@ -13,13 +13,14 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageUtils;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotExistsException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
@@ -31,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static pl.poznan.put.rnapdbee.backend.shared.domain.ValidationPolicy.validateFilename;
-
 @Service
 public class TertiaryToDotBracketService {
 
@@ -40,18 +39,21 @@ public class TertiaryToDotBracketService {
     private final AnalyzedFileService analyzedFileService;
     private final WebClient engineWebClient;
     private final ServletContext servletContext;
+    private final ValidationComponent validationComponent;
 
     @Autowired
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
             @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
-            ServletContext servletContext
+            ServletContext servletContext,
+            ValidationComponent validationComponent
     ) {
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
         this.analyzedFileService = analyzedFileService;
         this.engineWebClient = engineWebClient;
         this.servletContext = servletContext;
+        this.validationComponent = validationComponent;
     }
 
     public TertiaryToDotBracketMongoEntity analyzeTertiaryToDotBracket(
@@ -64,7 +66,7 @@ public class TertiaryToDotBracketService {
             String contentDispositionHeader,
             String fileContent) {
 
-        String filename = validateFilename(contentDispositionHeader);
+        String filename = validationComponent.validateFilename(contentDispositionHeader);
 
         EngineResponse3D engineResponse3D = performAnalysisOnEngine(
                 modelSelection,
@@ -163,7 +165,7 @@ public class TertiaryToDotBracketService {
         for (SingleTertiaryModelOutput<ImageInformationByteArray> model : engineResponse3D.getModels()) {
             String pathToSVGImage = ImageUtils.generateSvgUrl(
                     servletContext,
-                    model.getOutput2D().getImageInformation().getSvgFile()).getRight();
+                    model.getOutput2D().getImageInformation().getSvgFile());
 
             output3DBuilder.addModel(
                     SingleTertiaryModelOutput.of(
@@ -187,7 +189,7 @@ public class TertiaryToDotBracketService {
                 tertiaryToDotBracketRepository.findById(id);
 
         if (tertiaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotExistsException(String.format("Current id '%s' not found", id));
+            throw new IdNotFoundException(id);
 
         return tertiaryToDotBracketMongoEntity.get();
     }

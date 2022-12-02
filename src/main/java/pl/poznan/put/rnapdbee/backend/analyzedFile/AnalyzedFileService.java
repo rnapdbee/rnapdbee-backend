@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.AnalyzedFileRepository;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.AnalyzedFileEntityNotExistException;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntityNotFoundException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -24,8 +24,7 @@ public class AnalyzedFileService {
     public AnalyzedFileEntity findAnalyzedFile(UUID id) {
         Optional<AnalyzedFileEntity> analyzedFile = analyzedFileRepository.findById(id);
         if (analyzedFile.isEmpty())
-            throw new AnalyzedFileEntityNotExistException(
-                    "file to reanalyze not found");
+            throw new AnalyzedFileEntityNotFoundException();
 
         return analyzedFile.get();
     }

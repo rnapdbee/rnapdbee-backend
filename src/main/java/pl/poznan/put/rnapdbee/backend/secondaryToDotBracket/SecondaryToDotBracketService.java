@@ -17,17 +17,16 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageUtils;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.StructuralElement;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotExistsException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
 
 import javax.servlet.ServletContext;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static pl.poznan.put.rnapdbee.backend.shared.domain.ValidationPolicy.validateFilename;
 
 @Service
 public class SecondaryToDotBracketService {
@@ -35,18 +34,21 @@ public class SecondaryToDotBracketService {
     private final AnalyzedFileService analyzedFileService;
     private final WebClient engineWebClient;
     private final ServletContext servletContext;
+    private final ValidationComponent validationComponent;
 
     @Autowired
     private SecondaryToDotBracketService(
             SecondaryToDotBracketRepository secondaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
             @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
-            ServletContext servletContext
+            ServletContext servletContext,
+            ValidationComponent validationComponent
     ) {
         this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
         this.analyzedFileService = analyzedFileService;
         this.engineWebClient = engineWebClient;
         this.servletContext = servletContext;
+        this.validationComponent = validationComponent;
     }
 
     public SecondaryToDotBracketMongoEntity analyzeSecondaryToDotBracket(
@@ -56,7 +58,7 @@ public class SecondaryToDotBracketService {
             String contentDispositionHeader,
             String fileContent) {
 
-        String filename = validateFilename(contentDispositionHeader);
+        String filename = validationComponent.validateFilename(contentDispositionHeader);
 
         EngineResponse2D engineOutput2DResponse = performAnalysisOnEngine(
                 removeIsolated,
@@ -67,7 +69,7 @@ public class SecondaryToDotBracketService {
 
         String pathToSVGImage = ImageUtils.generateSvgUrl(
                 servletContext,
-                engineOutput2DResponse.getImageInformation().getSvgFile()).getRight();
+                engineOutput2DResponse.getImageInformation().getSvgFile());
 
         UUID id = IdSupplier.generateId();
 
@@ -123,7 +125,7 @@ public class SecondaryToDotBracketService {
 
         String pathToSVGImage = ImageUtils.generateSvgUrl(
                 servletContext,
-                engineOutput2DResponse.getImageInformation().getSvgFile()).getRight();
+                engineOutput2DResponse.getImageInformation().getSvgFile());
 
         ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity =
                 ResultEntity.of(
@@ -151,7 +153,7 @@ public class SecondaryToDotBracketService {
                 secondaryToDotBracketRepository.findById(id);
 
         if (secondaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotExistsException(String.format("Current id '%s' not found", id));
+            throw new IdNotFoundException(id);
 
         return secondaryToDotBracketMongoEntity.get();
     }
