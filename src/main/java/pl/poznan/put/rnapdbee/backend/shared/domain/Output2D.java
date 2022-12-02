@@ -8,7 +8,7 @@ public class Output2D<T extends ImageInformationOutput> {
     private final List<String> bpSeq;
     private final List<String> ct;
     private final List<String> interactions;
-    private final Object structuralElements;
+    private final StructuralElement structuralElements;
     private final T imageInformation;
 
     protected Output2D(
@@ -16,7 +16,7 @@ public class Output2D<T extends ImageInformationOutput> {
             List<String> bpSeq,
             List<String> ct,
             List<String> interactions,
-            Object structuralElements,
+            StructuralElement structuralElements,
             T imageInformation) {
         this.strands = strands;
         this.bpSeq = bpSeq;
@@ -56,7 +56,7 @@ public class Output2D<T extends ImageInformationOutput> {
         return interactions;
     }
 
-    public Object getStructuralElements() {
+    public StructuralElement getStructuralElements() {
         return structuralElements;
     }
 
@@ -70,7 +70,7 @@ public class Output2D<T extends ImageInformationOutput> {
         private List<String> bpSeq;
         private List<String> ct;
         private List<String> interactions;
-        private Object structuralElements;
+        private StructuralElement structuralElements;
         private T imageInformation;
 
         public Builder<T> withStrands(List<Object> strands) {
@@ -93,7 +93,7 @@ public class Output2D<T extends ImageInformationOutput> {
             return this;
         }
 
-        public Builder<T> withStructuralElement(Object structuralElements) {
+        public Builder<T> withStructuralElement(StructuralElement structuralElements) {
             this.structuralElements = structuralElements;
             return this;
         }
@@ -129,7 +129,7 @@ public class Output2D<T extends ImageInformationOutput> {
             return interactions;
         }
 
-        public Object getStructuralElements() {
+        public StructuralElement getStructuralElements() {
             return structuralElements;
         }
 

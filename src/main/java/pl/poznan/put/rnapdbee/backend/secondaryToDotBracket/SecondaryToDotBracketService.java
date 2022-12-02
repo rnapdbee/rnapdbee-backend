@@ -16,6 +16,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageUtils;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.StructuralElement;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
@@ -182,7 +183,7 @@ public class SecondaryToDotBracketService {
                 List<String> bpSeq,
                 List<String> ct,
                 List<String> interactions,
-                Object structuralElements,
+                StructuralElement structuralElements,
                 ImageInformationByteArray imageInformation) {
             super(strands, bpSeq, ct, interactions, structuralElements, imageInformation);
         }
