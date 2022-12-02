@@ -573,12 +573,12 @@ components:
             $ref: "#/components/schemas/BPh"
           br:
             $ref: "#/components/schemas/BR"
+          stackingTopology:
+            $ref: "#/components/schemas/StackingTopology"
           leftResidue:
             $ref: "#/components/schemas/Residue"
           rightResidue:
             $ref: "#/components/schemas/Residue"
-          stackingTopology:
-            $ref: "#/components/schemas/StackingTopology"
         required:
           - "interactionType"
           - "leftResidue"
