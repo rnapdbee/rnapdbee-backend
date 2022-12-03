@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.shared.domain;
+package pl.poznan.put.rnapdbee.backend.shared;
 
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Component;

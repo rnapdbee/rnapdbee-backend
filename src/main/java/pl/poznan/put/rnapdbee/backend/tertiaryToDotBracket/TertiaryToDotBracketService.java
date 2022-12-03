@@ -9,11 +9,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
+import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageUtils;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
@@ -27,7 +27,6 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotB
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.repository.TertiaryToDotBracketRepository;
 
-import javax.servlet.ServletContext;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,22 +37,22 @@ public class TertiaryToDotBracketService {
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
     private final AnalyzedFileService analyzedFileService;
     private final WebClient engineWebClient;
-    private final ServletContext servletContext;
     private final ValidationComponent validationComponent;
+    private final ImageComponent imageComponent;
 
     @Autowired
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
             @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
-            ServletContext servletContext,
-            ValidationComponent validationComponent
+            ValidationComponent validationComponent,
+            ImageComponent imageComponent
     ) {
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
         this.analyzedFileService = analyzedFileService;
         this.engineWebClient = engineWebClient;
-        this.servletContext = servletContext;
         this.validationComponent = validationComponent;
+        this.imageComponent = imageComponent;
     }
 
     public TertiaryToDotBracketMongoEntity analyzeTertiaryToDotBracket(
@@ -163,9 +162,7 @@ public class TertiaryToDotBracketService {
                         .withTitle(engineResponse3D.getTitle());
 
         for (SingleTertiaryModelOutput<ImageInformationByteArray> model : engineResponse3D.getModels()) {
-            String pathToSVGImage = ImageUtils.generateSvgUrl(
-                    servletContext,
-                    model.getOutput2D().getImageInformation().getSvgFile());
+            String pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
 
             output3DBuilder.addModel(
                     SingleTertiaryModelOutput.of(
