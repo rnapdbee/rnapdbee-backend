@@ -1,13 +1,11 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
+import pl.poznan.put.rnapdbee.backend.shared.EngineWebClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
@@ -27,7 +25,6 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotB
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.repository.TertiaryToDotBracketRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,7 +33,7 @@ public class TertiaryToDotBracketService {
 
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
     private final AnalyzedFileService analyzedFileService;
-    private final WebClient engineWebClient;
+    private final EngineWebClient engineWebClient;
     private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
@@ -44,7 +41,7 @@ public class TertiaryToDotBracketService {
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
-            @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
+            EngineWebClient engineWebClient,
             ValidationComponent validationComponent,
             ImageComponent imageComponent
     ) {
@@ -67,7 +64,7 @@ public class TertiaryToDotBracketService {
 
         String filename = validationComponent.validateFilename(contentDispositionHeader);
 
-        EngineResponse3D engineResponse3D = performAnalysisOnEngine(
+        Output3D<ImageInformationByteArray> engineResponse3D = engineWebClient.perform3DAnalysisOnEngine(
                 modelSelection,
                 analysisTool,
                 nonCanonicalHandling,
@@ -125,7 +122,7 @@ public class TertiaryToDotBracketService {
                 .build()
                 .toString();
 
-        EngineResponse3D engineResponse3D = performAnalysisOnEngine(
+        Output3D<ImageInformationByteArray> engineResponse3D = engineWebClient.perform3DAnalysisOnEngine(
                 modelSelection,
                 analysisTool,
                 nonCanonicalHandling,
@@ -156,7 +153,7 @@ public class TertiaryToDotBracketService {
         return tertiaryToDotBracketMongoEntity;
     }
 
-    private Output3D<ImageInformationPath> saveGraphicsWithPath(EngineResponse3D engineResponse3D) {
+    private Output3D<ImageInformationPath> saveGraphicsWithPath(Output3D<ImageInformationByteArray> engineResponse3D) {
         Output3D.Builder<ImageInformationPath> output3DBuilder =
                 new Output3D.Builder<ImageInformationPath>()
                         .withTitle(engineResponse3D.getTitle());
@@ -189,40 +186,5 @@ public class TertiaryToDotBracketService {
             throw new IdNotFoundException(id);
 
         return tertiaryToDotBracketMongoEntity.get();
-    }
-
-    private EngineResponse3D performAnalysisOnEngine(
-            ModelSelection modelSelection,
-            AnalysisTool analysisTool,
-            NonCanonicalHandling nonCanonicalHandling,
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool,
-            String contentDispositionHeader,
-            String fileContent) {
-        return engineWebClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/3d")
-                        .queryParam("modelSelection", modelSelection)
-                        .queryParam("analysisTool", analysisTool)
-                        .queryParam("nonCanonicalHandling", nonCanonicalHandling)
-                        .queryParam("removeIsolated", removeIsolated)
-                        .queryParam("structuralElementsHandling", structuralElementsHandling)
-                        .queryParam("visualizationTool", visualizationTool)
-                        .build())
-                .header("Content-Disposition", contentDispositionHeader)
-                .body(BodyInserters.fromValue(fileContent))
-                .retrieve()
-                .bodyToMono(EngineResponse3D.class)
-                .block();
-    }
-
-    private static class EngineResponse3D extends Output3D<ImageInformationByteArray> {
-        private EngineResponse3D(
-                List<SingleTertiaryModelOutput<ImageInformationByteArray>> models,
-                String title) {
-            super(models, title);
-        }
     }
 }
