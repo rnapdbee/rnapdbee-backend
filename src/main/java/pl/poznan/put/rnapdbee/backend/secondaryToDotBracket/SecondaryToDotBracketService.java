@@ -8,7 +8,7 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.SecondaryToDotBracketRepository;
-import pl.poznan.put.rnapdbee.backend.shared.EngineWebClient;
+import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class SecondaryToDotBracketService {
     private final SecondaryToDotBracketRepository secondaryToDotBracketRepository;
     private final AnalyzedFileService analyzedFileService;
-    private final EngineWebClient engineWebClient;
+    private final EngineClient engineClient;
     private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
@@ -35,13 +35,13 @@ public class SecondaryToDotBracketService {
     private SecondaryToDotBracketService(
             SecondaryToDotBracketRepository secondaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
-            EngineWebClient engineWebClient,
+            EngineClient engineClient,
             ValidationComponent validationComponent,
             ImageComponent imageComponent
     ) {
         this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
         this.analyzedFileService = analyzedFileService;
-        this.engineWebClient = engineWebClient;
+        this.engineClient = engineClient;
         this.validationComponent = validationComponent;
         this.imageComponent = imageComponent;
     }
@@ -55,7 +55,7 @@ public class SecondaryToDotBracketService {
 
         String filename = validationComponent.validateFilename(contentDispositionHeader);
 
-        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineWebClient.perform2DAnalysisOnEngine(
+        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
@@ -109,7 +109,7 @@ public class SecondaryToDotBracketService {
                 .build()
                 .toString();
 
-        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineWebClient.perform2DAnalysisOnEngine(
+        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,

@@ -5,7 +5,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
-import pl.poznan.put.rnapdbee.backend.shared.EngineWebClient;
+import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
@@ -33,7 +33,7 @@ public class TertiaryToDotBracketService {
 
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
     private final AnalyzedFileService analyzedFileService;
-    private final EngineWebClient engineWebClient;
+    private final EngineClient engineClient;
     private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
@@ -41,13 +41,13 @@ public class TertiaryToDotBracketService {
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
             AnalyzedFileService analyzedFileService,
-            EngineWebClient engineWebClient,
+            EngineClient engineClient,
             ValidationComponent validationComponent,
             ImageComponent imageComponent
     ) {
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
         this.analyzedFileService = analyzedFileService;
-        this.engineWebClient = engineWebClient;
+        this.engineClient = engineClient;
         this.validationComponent = validationComponent;
         this.imageComponent = imageComponent;
     }
@@ -64,7 +64,7 @@ public class TertiaryToDotBracketService {
 
         String filename = validationComponent.validateFilename(contentDispositionHeader);
 
-        Output3D<ImageInformationByteArray> engineResponse3D = engineWebClient.perform3DAnalysisOnEngine(
+        Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
                 analysisTool,
                 nonCanonicalHandling,
@@ -122,7 +122,7 @@ public class TertiaryToDotBracketService {
                 .build()
                 .toString();
 
-        Output3D<ImageInformationByteArray> engineResponse3D = engineWebClient.perform3DAnalysisOnEngine(
+        Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
                 analysisTool,
                 nonCanonicalHandling,

@@ -19,7 +19,7 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiary
 import java.util.List;
 
 @Component
-public class EngineWebClient {
+public class EngineClient {
     private static final String PATH_2D = "/2";
     private static final String PATH_3D = "/3";
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";
@@ -33,7 +33,7 @@ public class EngineWebClient {
     private final WebClient engineWebClient;
 
     @Autowired
-    private EngineWebClient(@Autowired @Qualifier("engineWebClient") WebClient engineWebClient) {
+    private EngineClient(@Autowired @Qualifier("engineWebClient") WebClient engineWebClient) {
         this.engineWebClient = engineWebClient;
     }
 
