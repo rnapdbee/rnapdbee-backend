@@ -20,15 +20,6 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi infrastructureApi() {
-        return GroupedOpenApi.builder()
-                .group("Infrastructure")
-                .pathsToMatch("/**")
-                .packagesToScan("pl.poznan.put.rnapdbee.backend.infrastructure")
-                .build();
-    }
-
-    @Bean
     public GroupedOpenApi tertiaryToDotBracketApi() {
         return GroupedOpenApi.builder()
                 .group("TertiaryToDotBracket")

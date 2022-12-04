@@ -1,53 +1,49 @@
 package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.EngineOutput2DResponse;
-import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.ImageUtils;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.SecondaryToDotBracketRepository;
+import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
-import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.AnalyzedFileEntityNotExistException;
-import pl.poznan.put.rnapdbee.backend.shared.exception.FileNameIsNullException;
-import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotExistsException;
-import pl.poznan.put.rnapdbee.backend.shared.repository.AnalyzedFileRepository;
+import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
 
-import javax.servlet.ServletContext;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class SecondaryToDotBracketService {
-
     private final SecondaryToDotBracketRepository secondaryToDotBracketRepository;
-    private final WebClient engineWebClient;
-    private final AnalyzedFileRepository analyzedFileRepository;
-    private final ServletContext servletContext;
+    private final AnalyzedFileService analyzedFileService;
+    private final EngineClient engineClient;
+    private final ValidationComponent validationComponent;
+    private final ImageComponent imageComponent;
 
     @Autowired
     private SecondaryToDotBracketService(
             SecondaryToDotBracketRepository secondaryToDotBracketRepository,
-            @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
-            AnalyzedFileRepository analyzedFileRepository,
-            ServletContext servletContext) {
+            AnalyzedFileService analyzedFileService,
+            EngineClient engineClient,
+            ValidationComponent validationComponent,
+            ImageComponent imageComponent
+    ) {
         this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
-        this.engineWebClient = engineWebClient;
-        this.analyzedFileRepository = analyzedFileRepository;
-        this.servletContext = servletContext;
+        this.analyzedFileService = analyzedFileService;
+        this.engineClient = engineClient;
+        this.validationComponent = validationComponent;
+        this.imageComponent = imageComponent;
     }
 
     public SecondaryToDotBracketMongoEntity analyzeSecondaryToDotBracket(
@@ -57,44 +53,45 @@ public class SecondaryToDotBracketService {
             String contentDispositionHeader,
             String fileContent) {
 
-        String fileName = validateFileName(contentDispositionHeader);
+        String filename = validationComponent.validateFilename(contentDispositionHeader);
 
-        EngineOutput2DResponse engineOutput2DResponse = performAnalysisOnEngine(
+        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
                 contentDispositionHeader,
                 fileContent);
 
-        String pathToSVGImage = ImageUtils.generateSvgUrl(
-                servletContext,
-                engineOutput2DResponse.getImageInformation().getSvgFile()).getRight();
+        String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());
 
         UUID id = IdSupplier.generateId();
 
-        SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = buildEntity(
-                id,
-                engineOutput2DResponse,
-                fileName,
-                removeIsolated,
-                structuralElementsHandling,
-                visualizationTool,
-                pathToSVGImage
-        );
+        SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity =
+                SecondaryToDotBracketMongoEntity.of(
+                        id,
+                        filename,
+                        ResultEntity.of(
+                                SecondaryToDotBracketParams.of(
+                                        removeIsolated,
+                                        structuralElementsHandling,
+                                        visualizationTool
+                                ),
+                                Output2D.of(
+                                        engineOutput2DResponse,
+                                        ImageInformationPath.of(
+                                                engineOutput2DResponse.getImageInformation(),
+                                                pathToSVGImage)
+                                )
+                        )
+                );
 
         secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
-
-        analyzedFileRepository.save(
-                new AnalyzedFileEntity.Builder()
-                        .withId(id)
-                        .withContent(fileContent)
-                        .withContentDisposition(contentDispositionHeader)
-                        .build());
+        analyzedFileService.saveAnalyzedFile(id, fileContent);
 
         return secondaryToDotBracketMongoEntity;
     }
 
-    public SecondaryToDotBracketMongoEntity getResultSecondaryToDotBracket(UUID id) {
+    public SecondaryToDotBracketMongoEntity getResultsSecondaryToDotBracket(UUID id) {
         return findSecondaryToDotBracketDocument(id);
     }
 
@@ -104,134 +101,51 @@ public class SecondaryToDotBracketService {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool) {
 
-        Optional<AnalyzedFileEntity> fileContentToAnalyze = analyzedFileRepository.findById(id);
-        if (fileContentToAnalyze.isEmpty())
-            throw new AnalyzedFileEntityNotExistException(
-                    "file to reanalyze not found");
-
+        AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
 
-        EngineOutput2DResponse engineOutput2DResponse = performAnalysisOnEngine(
+        String contentDispositionHeader = ContentDisposition.builder("attachment")
+                .filename(secondaryToDotBracketMongoEntity.getFilename())
+                .build()
+                .toString();
+
+        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                fileContentToAnalyze.get().getContentDisposition(),
-                fileContentToAnalyze.get().getContent());
+                contentDispositionHeader,
+                analyzedFile.getContent());
 
-        String pathToSVGImage = ImageUtils.generateSvgUrl(
-                servletContext,
-                engineOutput2DResponse.getImageInformation().getSvgFile()).getRight();
+        String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());
 
-        ResultEntity<SecondaryToDotBracketParams, Output2D> resultEntity = buildResultsEntity(
-                engineOutput2DResponse,
-                removeIsolated,
-                structuralElementsHandling,
-                visualizationTool,
-                pathToSVGImage);
+        ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity =
+                ResultEntity.of(
+                        SecondaryToDotBracketParams.of(
+                                removeIsolated,
+                                structuralElementsHandling,
+                                visualizationTool
+                        ),
+                        Output2D.of(
+                                engineOutput2DResponse,
+                                ImageInformationPath.of(
+                                        engineOutput2DResponse.getImageInformation(),
+                                        pathToSVGImage)
+                        )
+                );
 
         secondaryToDotBracketMongoEntity.addResult(resultEntity);
-
         secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
 
         return secondaryToDotBracketMongoEntity;
     }
 
-    public SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {
+    private SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {
         Optional<SecondaryToDotBracketMongoEntity> secondaryToDotBracketMongoEntity =
                 secondaryToDotBracketRepository.findById(id);
 
         if (secondaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotExistsException(String.format("Current id '%s' not found", id));
+            throw new IdNotFoundException(id);
 
         return secondaryToDotBracketMongoEntity.get();
-    }
-
-    private String validateFileName(String contentDisposition) {
-        String fileName = ContentDisposition.parse(contentDisposition).getFilename();
-        if (fileName == null)
-            throw new FileNameIsNullException("filename in 'Content-Disposition' header must not be null");
-
-        return fileName;
-    }
-
-    private ResultEntity<SecondaryToDotBracketParams, Output2D> buildResultsEntity(
-            EngineOutput2DResponse engineOutput2DResponse,
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool,
-            String pathToSVGImage
-    ) {
-        SecondaryToDotBracketParams secondaryToDotBracketParams =
-                new SecondaryToDotBracketParams.Builder()
-                        .withRemoveIsolated(removeIsolated)
-                        .withStructuralElementsHandling(structuralElementsHandling)
-                        .withVisualizationTool(visualizationTool)
-                        .build();
-
-        ImageInformationOutput imageInformationOutput =
-                new ImageInformationOutput.Builder()
-                        .withEngineOutput2DResponse(engineOutput2DResponse.getImageInformation())
-                        .withPathToSVGImage(pathToSVGImage)
-                        .build();
-
-        Output2D output2D =
-                new Output2D.Builder()
-                        .withStrands(engineOutput2DResponse.getStrands())
-                        .withBpSeq(engineOutput2DResponse.getBpSeq())
-                        .withCt(engineOutput2DResponse.getCt())
-                        .withInteractions(engineOutput2DResponse.getInteractions())
-                        .withStructuralElement(engineOutput2DResponse.getStructuralElements())
-                        .withImageInformation(imageInformationOutput)
-                        .build();
-
-        return new ResultEntity.Builder<SecondaryToDotBracketParams, Output2D>()
-                .withParams(secondaryToDotBracketParams)
-                .withOutput(output2D)
-                .build();
-    }
-
-    private SecondaryToDotBracketMongoEntity buildEntity(
-            UUID id,
-            EngineOutput2DResponse engineOutput2DResponse,
-            String fileName,
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool,
-            String pathToSVGImage) {
-
-        ResultEntity<SecondaryToDotBracketParams, Output2D> resultsEntity = buildResultsEntity(
-                engineOutput2DResponse,
-                removeIsolated,
-                structuralElementsHandling,
-                visualizationTool,
-                pathToSVGImage);
-
-        return new SecondaryToDotBracketMongoEntity.Builder()
-                .withId(id)
-                .withFileName(fileName)
-                .withResults(new ArrayList<>(List.of(resultsEntity)))
-                .withCreatedAt(Instant.now())
-                .build();
-    }
-
-    private EngineOutput2DResponse performAnalysisOnEngine(
-            boolean removeIsolated,
-            StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool,
-            String contentDispositionHeader,
-            String fileContent) {
-        return engineWebClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/2d")
-                        .queryParam("removeIsolated", removeIsolated)
-                        .queryParam("structuralElementsHandling", structuralElementsHandling)
-                        .queryParam("visualizationTool", visualizationTool)
-                        .build())
-                .header("Content-Disposition", contentDispositionHeader)
-                .body(BodyInserters.fromValue(fileContent))
-                .retrieve()
-                .bodyToMono(EngineOutput2DResponse.class)
-                .block();
     }
 }

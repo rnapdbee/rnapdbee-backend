@@ -3,27 +3,41 @@ package pl.poznan.put.rnapdbee.backend.shared.domain;
 import java.util.List;
 
 
-public class Output2D {
+public class Output2D<T extends ImageInformationOutput> {
     private final List<Object> strands;
     private final List<String> bpSeq;
     private final List<String> ct;
     private final List<String> interactions;
-    private final Object structuralElements;
-    private final ImageInformationOutput imageInformation;
+    private final StructuralElement structuralElements;
+    private final T imageInformation;
 
-    private Output2D(
+    protected Output2D(
             List<Object> strands,
             List<String> bpSeq,
             List<String> ct,
             List<String> interactions,
-            Object structuralElements,
-            ImageInformationOutput imageInformation) {
+            StructuralElement structuralElements,
+            T imageInformation) {
         this.strands = strands;
         this.bpSeq = bpSeq;
         this.ct = ct;
         this.interactions = interactions;
         this.structuralElements = structuralElements;
         this.imageInformation = imageInformation;
+    }
+
+    public static Output2D<ImageInformationPath> of(
+            Output2D<ImageInformationByteArray> engineOutput2DResponse,
+            ImageInformationPath imageInformationPath
+    ) {
+        return new Output2D.Builder<ImageInformationPath>()
+                .withStrands(engineOutput2DResponse.getStrands())
+                .withBpSeq(engineOutput2DResponse.getBpSeq())
+                .withCt(engineOutput2DResponse.getCt())
+                .withInteractions(engineOutput2DResponse.getInteractions())
+                .withStructuralElement(engineOutput2DResponse.getStructuralElements())
+                .withImageInformation(imageInformationPath)
+                .build();
     }
 
     public List<Object> getStrands() {
@@ -42,55 +56,55 @@ public class Output2D {
         return interactions;
     }
 
-    public Object getStructuralElements() {
+    public StructuralElement getStructuralElements() {
         return structuralElements;
     }
 
-    public ImageInformationOutput getImageInformation() {
+    public T getImageInformation() {
         return imageInformation;
     }
 
-    public static class Builder {
+    public static class Builder<T extends ImageInformationOutput> {
 
         private List<Object> strands;
         private List<String> bpSeq;
         private List<String> ct;
         private List<String> interactions;
-        private Object structuralElements;
-        private ImageInformationOutput imageInformation;
+        private StructuralElement structuralElements;
+        private T imageInformation;
 
-        public Builder withStrands(List<Object> strands) {
+        public Builder<T> withStrands(List<Object> strands) {
             this.strands = strands;
             return this;
         }
 
-        public Builder withBpSeq(List<String> bpSeq) {
+        public Builder<T> withBpSeq(List<String> bpSeq) {
             this.bpSeq = bpSeq;
             return this;
         }
 
-        public Builder withCt(List<String> ct) {
+        public Builder<T> withCt(List<String> ct) {
             this.ct = ct;
             return this;
         }
 
-        public Builder withInteractions(List<String> interactions) {
+        public Builder<T> withInteractions(List<String> interactions) {
             this.interactions = interactions;
             return this;
         }
 
-        public Builder withStructuralElement(Object structuralElements) {
+        public Builder<T> withStructuralElement(StructuralElement structuralElements) {
             this.structuralElements = structuralElements;
             return this;
         }
 
-        public Builder withImageInformation(ImageInformationOutput imageInformation) {
+        public Builder<T> withImageInformation(T imageInformation) {
             this.imageInformation = imageInformation;
             return this;
         }
 
-        public Output2D build() {
-            return new Output2D(
+        public Output2D<T> build() {
+            return new Output2D<>(
                     this.getStrands(),
                     this.getBpSeq(),
                     this.getCt(),
@@ -115,11 +129,11 @@ public class Output2D {
             return interactions;
         }
 
-        public Object getStructuralElements() {
+        public StructuralElement getStructuralElements() {
             return structuralElements;
         }
 
-        public ImageInformationOutput getImageInformation() {
+        public T getImageInformation() {
             return imageInformation;
         }
     }

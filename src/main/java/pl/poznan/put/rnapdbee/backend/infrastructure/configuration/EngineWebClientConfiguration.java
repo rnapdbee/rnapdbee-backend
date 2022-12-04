@@ -14,11 +14,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class EngineWebClientConfiguration {
 
-    final static ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
             .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
             .build();
 
-    public static final ExchangeStrategies EXCHANGE_STRATEGIES = ExchangeStrategies.builder()
+    private static final ExchangeStrategies EXCHANGE_STRATEGIES = ExchangeStrategies.builder()
             .codecs(configurer -> configurer.defaultCodecs()
                     .jackson2JsonDecoder(new Jackson2JsonDecoder(OBJECT_MAPPER)))
             .build();

@@ -17,6 +17,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.TertiaryToDotBracketService;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
 
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class TertiaryToDotBracketController {
 
     @Operation(summary = "Perform a 3d calculation based on the payload")
     @PostMapping(produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> calculateTertiaryToDotBracket(
+    public TertiaryToDotBracketMongoEntity calculateTertiaryToDotBracket(
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
@@ -42,19 +43,27 @@ public class TertiaryToDotBracketController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
-        throw new UnsupportedOperationException();
+        return tertiaryToDotBracketService.analyzeTertiaryToDotBracket(
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool,
+                contentDispositionHeader,
+                fileContent);
     }
 
     @Operation(summary = "Fetch an existing 3d calculation")
     @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<Object> getResultTertiaryToDotBracket(
+    public TertiaryToDotBracketMongoEntity getResultTertiaryToDotBracket(
             @PathVariable("id") UUID id) {
-        throw new UnsupportedOperationException();
+        return tertiaryToDotBracketService.getResultsTertiaryToDotBracket(id);
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> reanalyzeTertiaryToDotBracket(
+    public TertiaryToDotBracketMongoEntity reanalyzeTertiaryToDotBracket(
             @PathVariable("id") UUID id,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
@@ -62,7 +71,14 @@ public class TertiaryToDotBracketController {
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-        throw new UnsupportedOperationException();
+        return tertiaryToDotBracketService.reanalyzeTertiaryToDotBracket(
+                id,
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool);
     }
 
     @Operation(summary = "Perform a 3d calculation based on object fetched from Protein Data Bank")
