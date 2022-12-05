@@ -1,11 +1,9 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
-import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
-import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,8 +36,8 @@ public class OutputMulti<T extends ImageInformationOutput, U extends ConsensualV
         return consensualVisualization;
     }
 
-    public static class Builder<T extends ImageInformationOutput, U extends ConsensualVisualizationPath> {
-        private List<OutputMultiEntry<T>> entries;
+    public static class Builder<T extends ImageInformationOutput, U extends ConsensualVisualization> {
+        private List<OutputMultiEntry<T>> entries = new ArrayList<>();
         private String title;
         private U consensualVisualization;
 

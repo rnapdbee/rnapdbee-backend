@@ -1,13 +1,13 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class ConsensualVisualizationSvgFile extends ConsensualVisualization {
-    @JsonProperty("svgFile")
-    private final byte[] svgFile;
+    private byte[] svgFile;
+
+    private ConsensualVisualizationSvgFile() {
+        super();
+    }
 
     private ConsensualVisualizationSvgFile(byte[] svgFile) {
-        super();
         this.svgFile = svgFile;
     }
 
