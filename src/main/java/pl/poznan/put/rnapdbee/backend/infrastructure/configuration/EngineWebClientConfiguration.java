@@ -23,7 +23,7 @@ public class EngineWebClientConfiguration {
                     .jackson2JsonDecoder(new Jackson2JsonDecoder(OBJECT_MAPPER)))
             .build();
 
-    @Value("${rnapdbee.engine.calculation.host}")
+    @Value("${rnapdbee.engine.global.host}")
     private String engineCalculationUrl;
 
     @Bean("engineWebClient")

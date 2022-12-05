@@ -2,6 +2,7 @@ package pl.poznan.put.rnapdbee.backend.shared;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,8 +21,10 @@ import java.util.List;
 
 @Component
 public class EngineClient {
-    private static final String PATH_2D = "/2";
-    private static final String PATH_3D = "/3";
+    @Value("${rnapdbee.engine.global.2d.path}")
+    private String PATH_2D;
+    @Value("${rnapdbee.engine.global.3d.path}")
+    private String PATH_3D;
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";
     private static final String REMOVE_ISOLATED_PARAM_NAME = "removeIsolated";
     private static final String STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME = "structuralElementsHandling";
