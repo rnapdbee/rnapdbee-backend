@@ -32,6 +32,7 @@ public class EngineClient {
     private static final String ANALYSIS_TOOL_PARAM_NAME = "analysisTool";
     private static final String NON_CANONICAL_HANDLING_PARAM_NAME = "nonCanonicalHandling";
     private static final String INCLUDE_NON_CANONICAL_PARAM_NAME = "includeNonCanonical";
+
     private final WebClient engineWebClient;
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;
