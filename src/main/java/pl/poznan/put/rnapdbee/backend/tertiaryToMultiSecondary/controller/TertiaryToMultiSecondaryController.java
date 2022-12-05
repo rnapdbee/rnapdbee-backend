@@ -48,8 +48,7 @@ public class TertiaryToMultiSecondaryController {
     @GetMapping(path = "/{id}", produces = "application/json")
     public TertiaryToMultiSecondaryMongoEntity getResultTertiaryToMultiSecondary(
             @PathVariable("id") UUID id) {
-//        return tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
-        throw new UnsupportedOperationException();
+        return tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
@@ -59,12 +58,11 @@ public class TertiaryToMultiSecondaryController {
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-//        return tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
-//                id,
-//                includeNonCanonical,
-//                removeIsolated,
-//                visualizationTool);
-        throw new UnsupportedOperationException();
+        return tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
+                id,
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool);
     }
 
     @Operation(summary = "Perform a multi based on object fetched from Protein Data Bank")
