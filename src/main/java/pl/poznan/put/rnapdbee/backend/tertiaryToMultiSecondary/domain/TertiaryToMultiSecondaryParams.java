@@ -13,11 +13,26 @@ public class TertiaryToMultiSecondaryParams {
             ModelSelection modelSelection,
             boolean includeNonCanonical,
             boolean removeIsolated,
-            VisualizationTool visualizationTool) {
+            VisualizationTool visualizationTool
+    ) {
         this.modelSelection = modelSelection;
         this.includeNonCanonical = includeNonCanonical;
         this.removeIsolated = removeIsolated;
         this.visualizationTool = visualizationTool;
+    }
+
+    public static TertiaryToMultiSecondaryParams of(
+            ModelSelection modelSelection,
+            boolean includeNonCanonical,
+            boolean removeIsolated,
+            VisualizationTool visualizationTool
+    ) {
+        return new TertiaryToMultiSecondaryParams.Builder()
+                .withModelSelection(modelSelection)
+                .withIncludeNonCanonical(includeNonCanonical)
+                .withRemoveIsolated(removeIsolated)
+                .withVisualizationTool(visualizationTool)
+                .build();
     }
 
     public ModelSelection getModelSelection() {

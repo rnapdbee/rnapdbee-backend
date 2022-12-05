@@ -6,6 +6,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +19,19 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
             List<ResultEntity<TertiaryToMultiSecondaryParams, Output2D>> results,
             Instant createdAt) {
         super(id, filename, results, createdAt);
+    }
+
+    public static TertiaryToMultiSecondaryMongoEntity of(
+            UUID id,
+            String filename,
+            ResultEntity<TertiaryToMultiSecondaryParams, Output2D> resultEntity
+    ) {
+        return new TertiaryToMultiSecondaryMongoEntity.Builder()
+                .withId(id)
+                .withFilename(filename)
+                .withResults(new ArrayList<>(List.of(resultEntity)))
+                .withCreatedAt(Instant.now())
+                .build();
     }
 
     public static class Builder extends MongoEntity.Builder<Builder, TertiaryToMultiSecondaryParams, Output2D> {
