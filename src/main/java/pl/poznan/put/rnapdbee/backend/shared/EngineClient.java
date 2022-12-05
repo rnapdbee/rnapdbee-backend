@@ -24,11 +24,6 @@ import java.util.List;
 
 @Component
 public class EngineClient {
-    @Value("${rnapdbee.engine.global.2d.path}")
-    private String PATH_2D;
-    @Value("${rnapdbee.engine.global.3d.path}")
-    private String PATH_3D;
-    private static final String PATH_MULTI = "/multi";
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";
     private static final String REMOVE_ISOLATED_PARAM_NAME = "removeIsolated";
     private static final String STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME = "structuralElementsHandling";
@@ -37,8 +32,13 @@ public class EngineClient {
     private static final String ANALYSIS_TOOL_PARAM_NAME = "analysisTool";
     private static final String NON_CANONICAL_HANDLING_PARAM_NAME = "nonCanonicalHandling";
     private static final String INCLUDE_NON_CANONICAL_PARAM_NAME = "includeNonCanonical";
-
     private final WebClient engineWebClient;
+    @Value("${rnapdbee.engine.global.multi.path}")
+    private String PATH_MULTI;
+    @Value("${rnapdbee.engine.global.2d.path}")
+    private String PATH_2D;
+    @Value("${rnapdbee.engine.global.3d.path}")
+    private String PATH_3D;
 
     @Autowired
     private EngineClient(@Autowired @Qualifier("engineWebClient") WebClient engineWebClient) {
