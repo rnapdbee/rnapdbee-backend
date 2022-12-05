@@ -16,7 +16,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHand
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
-import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualization;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationSvgFile;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMultiEntry;
 
@@ -34,6 +34,7 @@ public class EngineClient {
     private static final String INCLUDE_NON_CANONICAL_PARAM_NAME = "includeNonCanonical";
 
     private final WebClient engineWebClient;
+
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;
     @Value("${rnapdbee.engine.global.2d.path}")
@@ -135,11 +136,11 @@ public class EngineClient {
         }
     }
 
-    private static class EngineResponseMulti extends OutputMulti<ImageInformationByteArray> {
+    private static class EngineResponseMulti extends OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> {
         private EngineResponseMulti(
                 List<OutputMultiEntry<ImageInformationByteArray>> entries,
                 String title,
-                ConsensualVisualization consensualVisualization) {
+                ConsensualVisualizationSvgFile consensualVisualization) {
             super(entries, title, consensualVisualization);
         }
     }

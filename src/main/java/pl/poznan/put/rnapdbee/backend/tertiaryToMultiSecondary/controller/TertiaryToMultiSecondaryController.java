@@ -36,7 +36,7 @@ public class TertiaryToMultiSecondaryController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
-        return new tertiaryToMultiSecondaryService.analyzeTertiaryToMultiSecondary(
+        return tertiaryToMultiSecondaryService.analyzeTertiaryToMultiSecondary(
                 includeNonCanonical,
                 removeIsolated,
                 visualizationTool,
@@ -48,7 +48,8 @@ public class TertiaryToMultiSecondaryController {
     @GetMapping(path = "/{id}", produces = "application/json")
     public TertiaryToMultiSecondaryMongoEntity getResultTertiaryToMultiSecondary(
             @PathVariable("id") UUID id) {
-        return new tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
+//        return tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
+        throw new UnsupportedOperationException();
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
@@ -58,11 +59,12 @@ public class TertiaryToMultiSecondaryController {
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-        return new tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
-                id,
-                includeNonCanonical,
-                removeIsolated,
-                visualizationTool);
+//        return tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
+//                id,
+//                includeNonCanonical,
+//                removeIsolated,
+//                visualizationTool);
+        throw new UnsupportedOperationException();
     }
 
     @Operation(summary = "Perform a multi based on object fetched from Protein Data Bank")

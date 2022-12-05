@@ -4,31 +4,14 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 /**
  * DTO class for Consensual Visualization
  */
-public class ConsensualVisualization {
-    private final byte[] svgFile;
+public abstract class ConsensualVisualization {
 
-    private ConsensualVisualization(byte[] svgFile) {
-        this.svgFile = svgFile;
+    public ConsensualVisualization() {
     }
 
-    public byte[] getSvgFile() {
-        return svgFile;
-    }
+    protected abstract static class Builder<B extends Builder<B>> {
+        protected abstract B self();
 
-    public static final class Builder {
-        private byte[] svgFile;
-
-        public Builder withSvgFile(byte[] svgFile) {
-            this.svgFile = svgFile;
-            return this;
-        }
-
-        public ConsensualVisualization build() {
-            return new ConsensualVisualization(this.getSvgFile());
-        }
-
-        public byte[] getSvgFile() {
-            return svgFile;
-        }
+        protected abstract ConsensualVisualization build();
     }
 }

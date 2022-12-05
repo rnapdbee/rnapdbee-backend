@@ -1,7 +1,10 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 
 import java.util.List;
 
@@ -9,15 +12,15 @@ import java.util.List;
 /**
  * DTO class for OutputMulti
  */
-public class OutputMulti<T extends ImageInformationOutput> {
+public class OutputMulti<T extends ImageInformationOutput, U extends ConsensualVisualization> {
     private final List<OutputMultiEntry<T>> entries;
     private final String title;
-    private final ConsensualVisualization consensualVisualization;
+    private final U consensualVisualization;
 
     protected OutputMulti(
             List<OutputMultiEntry<T>> entries,
             String title,
-            ConsensualVisualization consensualVisualization) {
+            U consensualVisualization) {
         this.entries = entries;
         this.title = title;
         this.consensualVisualization = consensualVisualization;
@@ -31,31 +34,36 @@ public class OutputMulti<T extends ImageInformationOutput> {
         return title;
     }
 
-    public ConsensualVisualization getConsensualVisualization() {
+    public U getConsensualVisualization() {
         return consensualVisualization;
     }
 
-    public static class Builder<T extends ImageInformationOutput> {
+    public static class Builder<T extends ImageInformationOutput, U extends ConsensualVisualizationPath> {
         private List<OutputMultiEntry<T>> entries;
         private String title;
-        private ConsensualVisualization consensualVisualization;
+        private U consensualVisualization;
 
-        public Builder<T> withEntries(List<OutputMultiEntry<T>> entries) {
+        public Builder<T, U> withEntries(List<OutputMultiEntry<T>> entries) {
             this.entries = entries;
             return this;
         }
 
-        public Builder<T> withTitle(String title) {
+        public Builder<T, U> addEntry(OutputMultiEntry<T> entry) {
+            this.entries.add(entry);
+            return this;
+        }
+
+        public Builder<T, U> withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder<T> withConsensualVisualization(ConsensualVisualization consensualVisualization) {
+        public Builder<T, U> withConsensualVisualization(U consensualVisualization) {
             this.consensualVisualization = consensualVisualization;
             return this;
         }
 
-        public OutputMulti<T> build() {
+        public OutputMulti<T, U> build() {
             return new OutputMulti<>(
                     this.getEntries(),
                     this.getTitle(),
@@ -70,7 +78,7 @@ public class OutputMulti<T extends ImageInformationOutput> {
             return title;
         }
 
-        public ConsensualVisualization getConsensualVisualization() {
+        public U getConsensualVisualization() {
             return consensualVisualization;
         }
     }

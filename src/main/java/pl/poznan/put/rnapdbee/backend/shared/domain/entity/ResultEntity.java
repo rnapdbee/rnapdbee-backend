@@ -5,6 +5,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParams;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
 public class ResultEntity<T, O> {
 
@@ -36,6 +39,16 @@ public class ResultEntity<T, O> {
         return new ResultEntity.Builder<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>()
                 .withParams(tertiaryToDotBracketParams)
                 .withOutput(output3D)
+                .build();
+    }
+
+    public static ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> of(
+            TertiaryToMultiSecondaryParams tertiaryToMultiSecondaryParams,
+            OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti
+    ) {
+        return new ResultEntity.Builder<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>()
+                .withParams(tertiaryToMultiSecondaryParams)
+                .withOutput(outputMulti)
                 .build();
     }
 
