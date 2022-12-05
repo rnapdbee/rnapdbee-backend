@@ -16,6 +16,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHand
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualization;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMultiEntry;
 
 import java.util.List;
 
@@ -25,6 +28,7 @@ public class EngineClient {
     private String PATH_2D;
     @Value("${rnapdbee.engine.global.3d.path}")
     private String PATH_3D;
+    private static final String PATH_MULTI = "/multi";
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";
     private static final String REMOVE_ISOLATED_PARAM_NAME = "removeIsolated";
     private static final String STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME = "structuralElementsHandling";
@@ -32,6 +36,7 @@ public class EngineClient {
     private static final String MODEL_SELECTION_PARAM_NAME = "modelSelection";
     private static final String ANALYSIS_TOOL_PARAM_NAME = "analysisTool";
     private static final String NON_CANONICAL_HANDLING_PARAM_NAME = "nonCanonicalHandling";
+    private static final String INCLUDE_NON_CANONICAL_PARAM_NAME = "includeNonCanonical";
 
     private final WebClient engineWebClient;
 
@@ -88,6 +93,27 @@ public class EngineClient {
                 .block();
     }
 
+    public EngineResponseMulti performMultiAnalysisOnEngine(
+            boolean includeNonCanonical,
+            boolean removeIsolated,
+            VisualizationTool visualizationTool,
+            String contentDispositionHeader,
+            String fileContent) {
+        return engineWebClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(PATH_MULTI)
+                        .queryParam(INCLUDE_NON_CANONICAL_PARAM_NAME, includeNonCanonical)
+                        .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
+                        .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
+                        .build())
+                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeader)
+                .body(BodyInserters.fromValue(fileContent))
+                .retrieve()
+                .bodyToMono(EngineResponseMulti.class)
+                .block();
+    }
+
     private static class EngineResponse2D extends Output2D<ImageInformationByteArray> {
         private EngineResponse2D(
                 List<Object> strands,
@@ -105,6 +131,15 @@ public class EngineClient {
                 List<SingleTertiaryModelOutput<ImageInformationByteArray>> models,
                 String title) {
             super(models, title);
+        }
+    }
+
+    private static class EngineResponseMulti extends OutputMulti<ImageInformationByteArray> {
+        private EngineResponseMulti(
+                List<OutputMultiEntry<ImageInformationByteArray>> entries,
+                String title,
+                ConsensualVisualization consensualVisualization) {
+            super(entries, title, consensualVisualization);
         }
     }
 }
