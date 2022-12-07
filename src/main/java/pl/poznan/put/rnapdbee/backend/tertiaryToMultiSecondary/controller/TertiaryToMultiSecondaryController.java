@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
 
 import java.util.UUID;
 
@@ -30,30 +30,39 @@ public class TertiaryToMultiSecondaryController {
 
     @Operation(summary = "Perform a 3D to multi 2D calculation")
     @PostMapping(produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> calculateTertiaryToMultiSecondary(
+    public TertiaryToMultiSecondaryMongoEntity calculateTertiaryToMultiSecondary(
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
-        throw new UnsupportedOperationException();
+        return tertiaryToMultiSecondaryService.analyzeTertiaryToMultiSecondary(
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool,
+                contentDispositionHeader,
+                fileContent);
     }
 
     @Operation(summary = "Fetch an existing multi calculation")
     @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<Object> getResultTertiaryToMultiSecondary(
+    public TertiaryToMultiSecondaryMongoEntity getResultTertiaryToMultiSecondary(
             @PathVariable("id") UUID id) {
-        throw new UnsupportedOperationException();
+        return tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
     @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
-    public ResponseEntity<Object> reanalyzeTertiaryToMultiSecondary(
+    public TertiaryToMultiSecondaryMongoEntity reanalyzeTertiaryToMultiSecondary(
             @PathVariable("id") UUID id,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-        throw new UnsupportedOperationException();
+        return tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
+                id,
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool);
     }
 
     @Operation(summary = "Perform a multi based on object fetched from Protein Data Bank")

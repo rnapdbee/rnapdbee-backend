@@ -1,26 +1,42 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Document
-public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToMultiSecondaryParams, Output2D> {
+public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> {
 
     private TertiaryToMultiSecondaryMongoEntity(
             UUID id,
             String filename,
-            List<ResultEntity<TertiaryToMultiSecondaryParams, Output2D>> results,
+            List<ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>> results,
             Instant createdAt) {
         super(id, filename, results, createdAt);
     }
 
-    public static class Builder extends MongoEntity.Builder<Builder, TertiaryToMultiSecondaryParams, Output2D> {
+    public static TertiaryToMultiSecondaryMongoEntity of(
+            UUID id,
+            String filename,
+            ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity
+    ) {
+        return new TertiaryToMultiSecondaryMongoEntity.Builder()
+                .withId(id)
+                .withFilename(filename)
+                .withResults(new ArrayList<>(List.of(resultEntity)))
+                .withCreatedAt(Instant.now())
+                .build();
+    }
+
+    public static class Builder extends MongoEntity.Builder<Builder, TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> {
 
         @Override
         public TertiaryToMultiSecondaryMongoEntity build() {

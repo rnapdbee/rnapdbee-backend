@@ -1,27 +1,32 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 public class TertiaryToMultiSecondaryParams {
-    private final ModelSelection modelSelection;
     private final boolean includeNonCanonical;
     private final boolean removeIsolated;
     private final VisualizationTool visualizationTool;
 
     private TertiaryToMultiSecondaryParams(
-            ModelSelection modelSelection,
             boolean includeNonCanonical,
             boolean removeIsolated,
-            VisualizationTool visualizationTool) {
-        this.modelSelection = modelSelection;
+            VisualizationTool visualizationTool
+    ) {
         this.includeNonCanonical = includeNonCanonical;
         this.removeIsolated = removeIsolated;
         this.visualizationTool = visualizationTool;
     }
 
-    public ModelSelection getModelSelection() {
-        return modelSelection;
+    public static TertiaryToMultiSecondaryParams of(
+            boolean includeNonCanonical,
+            boolean removeIsolated,
+            VisualizationTool visualizationTool
+    ) {
+        return new TertiaryToMultiSecondaryParams.Builder()
+                .withIncludeNonCanonical(includeNonCanonical)
+                .withRemoveIsolated(removeIsolated)
+                .withVisualizationTool(visualizationTool)
+                .build();
     }
 
     public boolean isIncludeNonCanonical() {
@@ -37,15 +42,9 @@ public class TertiaryToMultiSecondaryParams {
     }
 
     public static class Builder {
-        private ModelSelection modelSelection;
         private boolean includeNonCanonical;
         private boolean removeIsolated;
         private VisualizationTool visualizationTool;
-
-        public Builder withModelSelection(ModelSelection modelSelection) {
-            this.modelSelection = modelSelection;
-            return this;
-        }
 
         public Builder withIncludeNonCanonical(boolean includeNonCanonical) {
             this.includeNonCanonical = includeNonCanonical;
@@ -64,14 +63,9 @@ public class TertiaryToMultiSecondaryParams {
 
         public TertiaryToMultiSecondaryParams build() {
             return new TertiaryToMultiSecondaryParams(
-                    this.getModelSelection(),
                     this.isIncludeNonCanonical(),
                     this.isRemoveIsolated(),
                     this.getVisualizationTool());
-        }
-
-        public ModelSelection getModelSelection() {
-            return modelSelection;
         }
 
         public boolean isIncludeNonCanonical() {
