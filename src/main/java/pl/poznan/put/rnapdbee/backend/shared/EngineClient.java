@@ -47,7 +47,7 @@ public class EngineClient {
         this.engineWebClient = engineWebClient;
     }
 
-    public EngineResponse2D perform2DAnalysisOnEngine(
+    public Output2D<ImageInformationByteArray> perform2DAnalysisOnEngine(
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
@@ -68,7 +68,7 @@ public class EngineClient {
                 .block();
     }
 
-    public EngineResponse3D perform3DAnalysisOnEngine(
+    public Output3D<ImageInformationByteArray> perform3DAnalysisOnEngine(
             ModelSelection modelSelection,
             AnalysisTool analysisTool,
             NonCanonicalHandling nonCanonicalHandling,
@@ -95,7 +95,7 @@ public class EngineClient {
                 .block();
     }
 
-    public EngineResponseMulti performMultiAnalysisOnEngine(
+    public OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> performMultiAnalysisOnEngine(
             boolean includeNonCanonical,
             boolean removeIsolated,
             VisualizationTool visualizationTool,
