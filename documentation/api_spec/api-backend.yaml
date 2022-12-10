@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.16"
+  version: "1.0.17"
   title: "RNApdbee Backend"
 
 
@@ -624,6 +624,7 @@ components:
 
     Output2D:
       type: "object"
+      description: "interactions property is undefined in both 3D scenarios."
       properties:
         strands:
           $ref: "#/components/schemas/DotBracket"
@@ -638,6 +639,7 @@ components:
         imageInformation:
           $ref: "#/components/schemas/ImageInformation"
       required:
+        - "strands"
         - "bpSeq"
         - "ct"
         - "structuralElements"
@@ -710,7 +712,7 @@ components:
           $ref: "#/components/schemas/StructuralElementsArray"
         coordinates:
           type: "string"
-          description: "Generated pdb file. Not relevand (null) for 2D analysis"
+          description: "Generated pdb file. Not relevant (null) for 2D and 3D->multi analysis"
           example: "ATOM     33  P     G A   2      17.038   9.250   4.315  1.00  1.00           P"
       required:
         - "stems"
