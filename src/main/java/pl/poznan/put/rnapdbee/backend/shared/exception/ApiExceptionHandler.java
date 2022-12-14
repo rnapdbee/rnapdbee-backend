@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntityNotFoundException;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.InvalidPdbIdException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.domain.FilenameNotSetException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
 
@@ -14,7 +15,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(value = {
             IdNotFoundException.class,
             FilenameNotSetException.class,
-            AnalyzedFileEntityNotFoundException.class}
+            AnalyzedFileEntityNotFoundException.class,
+            InvalidPdbIdException.class}
     )
     public ResponseEntity<ExceptionPattern> handleBadRequestException(
             RuntimeException exception) {

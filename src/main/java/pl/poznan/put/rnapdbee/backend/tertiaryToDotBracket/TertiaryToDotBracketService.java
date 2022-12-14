@@ -153,6 +153,33 @@ public class TertiaryToDotBracketService {
         return tertiaryToDotBracketMongoEntity;
     }
 
+    public TertiaryToDotBracketMongoEntity analyzePdbTertiaryToDotBracket(
+            String pdbId,
+            ModelSelection modelSelection,
+            AnalysisTool analysisTool,
+            NonCanonicalHandling nonCanonicalHandling,
+            boolean removeIsolated,
+            StructuralElementsHandling structuralElementsHandling,
+            VisualizationTool visualizationTool
+    ) {
+        String fileContent = analyzedFileService.downloadPdbFile(pdbId);
+
+        String contentDispositionHeader = ContentDisposition.builder("attachment")
+                .filename(pdbId)
+                .build()
+                .toString();
+
+        return analyzeTertiaryToDotBracket(
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool,
+                contentDispositionHeader,
+                fileContent);
+    }
+
     private Output3D<ImageInformationPath> saveGraphicsWithPath(Output3D<ImageInformationByteArray> engineResponse3D) {
         Output3D.Builder<ImageInformationPath> output3DBuilder =
                 new Output3D.Builder<ImageInformationPath>()

@@ -136,6 +136,27 @@ public class TertiaryToMultiSecondaryService {
         return tertiaryToMultiSecondaryMongoEntity;
     }
 
+    public TertiaryToMultiSecondaryMongoEntity analyzePdbTertiaryToMultiSecondary(
+            String pdbId,
+            boolean includeNonCanonical,
+            boolean removeIsolated,
+            VisualizationTool visualizationTool
+    ) {
+        String fileContent = analyzedFileService.downloadPdbFile(pdbId);
+
+        String contentDispositionHeader = ContentDisposition.builder("attachment")
+                .filename(pdbId)
+                .build()
+                .toString();
+
+        return analyzeTertiaryToMultiSecondary(
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool,
+                contentDispositionHeader,
+                fileContent);
+    }
+
     private OutputMulti<ImageInformationPath, ConsensualVisualizationPath> saveGraphicsWithPath(
             OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti
     ) {
