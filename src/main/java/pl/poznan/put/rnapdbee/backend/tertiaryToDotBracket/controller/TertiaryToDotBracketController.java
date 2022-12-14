@@ -62,7 +62,7 @@ public class TertiaryToDotBracketController {
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
-    @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
+    @PostMapping(path = "/{id}", produces = "application/json")
     public TertiaryToDotBracketMongoEntity reanalyzeTertiaryToDotBracket(
             @PathVariable("id") UUID id,
             @RequestParam("modelSelection") ModelSelection modelSelection,
