@@ -52,7 +52,7 @@ public class TertiaryToMultiSecondaryController {
     }
 
     @Operation(summary = "Reanalyze calculation with different parameters")
-    @PostMapping(path = "/{id}", produces = "application/json", consumes = "text/plain")
+    @PostMapping(path = "/{id}", produces = "application/json")
     public TertiaryToMultiSecondaryMongoEntity reanalyzeTertiaryToMultiSecondary(
             @PathVariable("id") UUID id,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
