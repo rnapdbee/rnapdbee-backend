@@ -1,14 +1,13 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
+import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
@@ -28,27 +27,25 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.repository.TertiaryTo
 import java.util.Optional;
 import java.util.UUID;
 
+import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.getPdbFileExtension;
+
 @Service
-public class TertiaryToDotBracketService {
+public class TertiaryToDotBracketService extends BaseAnalyzeService {
 
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
-    private final AnalyzedFileService analyzedFileService;
     private final EngineClient engineClient;
-    private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
     @Autowired
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
-            AnalyzedFileService analyzedFileService,
             EngineClient engineClient,
-            ValidationComponent validationComponent,
-            ImageComponent imageComponent
+            ImageComponent imageComponent,
+            AnalyzedFileService analyzedFileService
     ) {
+        super(analyzedFileService);
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
-        this.analyzedFileService = analyzedFileService;
         this.engineClient = engineClient;
-        this.validationComponent = validationComponent;
         this.imageComponent = imageComponent;
     }
 
@@ -62,7 +59,7 @@ public class TertiaryToDotBracketService {
             String contentDispositionHeader,
             String fileContent) {
 
-        String filename = validationComponent.validateFilename(contentDispositionHeader);
+        String filename = validateContentDisposition(contentDispositionHeader);
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
@@ -92,7 +89,8 @@ public class TertiaryToDotBracketService {
                                         visualizationTool
                                 ),
                                 output3D
-                        )
+                        ),
+                        false
                 );
 
         tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
@@ -114,13 +112,16 @@ public class TertiaryToDotBracketService {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool
     ) {
-        AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
         TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity = findTertiaryToDotBracketDocument(id);
+        checkDocumentExpiration(tertiaryToDotBracketMongoEntity.getCreatedAt(), id);
 
-        String contentDispositionHeader = ContentDisposition.builder("attachment")
-                .filename(tertiaryToDotBracketMongoEntity.getFilename())
-                .build()
-                .toString();
+        String fileContent = getFileContentToReanalyze(
+                id,
+                tertiaryToDotBracketMongoEntity.getFilename(),
+                tertiaryToDotBracketMongoEntity.isUsePdb());
+
+        String contentDispositionHeader = contentDispositionHeaderBuilder(
+                tertiaryToDotBracketMongoEntity.getFilename());
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
@@ -130,7 +131,7 @@ public class TertiaryToDotBracketService {
                 structuralElementsHandling,
                 visualizationTool,
                 contentDispositionHeader,
-                analyzedFile.getContent());
+                fileContent);
 
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
 
@@ -154,7 +155,7 @@ public class TertiaryToDotBracketService {
     }
 
     public TertiaryToDotBracketMongoEntity analyzePdbTertiaryToDotBracket(
-            String pdbId,
+            String pdbIdLowercase,
             ModelSelection modelSelection,
             AnalysisTool analysisTool,
             NonCanonicalHandling nonCanonicalHandling,
@@ -162,14 +163,14 @@ public class TertiaryToDotBracketService {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool
     ) {
-        String fileContent = analyzedFileService.downloadPdbFile(pdbId);
+        String pdbId = pdbIdLowercase.toUpperCase();
 
-        String contentDispositionHeader = ContentDisposition.builder("attachment")
-                .filename(pdbId)
-                .build()
-                .toString();
+        PdbFileEntity pdbFile = analyzedFileService.getPdbFile(pdbId);
+        String filename = pdbId + getPdbFileExtension();
 
-        return analyzeTertiaryToDotBracket(
+        String contentDispositionHeader = contentDispositionHeaderBuilder(filename);
+
+        Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
                 analysisTool,
                 nonCanonicalHandling,
@@ -177,7 +178,33 @@ public class TertiaryToDotBracketService {
                 structuralElementsHandling,
                 visualizationTool,
                 contentDispositionHeader,
-                fileContent);
+                pdbFile.getContent());
+
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+
+        UUID id = IdSupplier.generateId();
+
+        TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity =
+                TertiaryToDotBracketMongoEntity.of(
+                        id,
+                        filename,
+                        ResultEntity.of(
+                                TertiaryToDotBracketParams.of(
+                                        modelSelection,
+                                        analysisTool,
+                                        nonCanonicalHandling,
+                                        removeIsolated,
+                                        structuralElementsHandling,
+                                        visualizationTool
+                                ),
+                                output3D
+                        ),
+                        true
+                );
+
+        tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
+
+        return tertiaryToDotBracketMongoEntity;
     }
 
     private Output3D<ImageInformationPath> saveGraphicsWithPath(Output3D<ImageInformationByteArray> engineResponse3D) {

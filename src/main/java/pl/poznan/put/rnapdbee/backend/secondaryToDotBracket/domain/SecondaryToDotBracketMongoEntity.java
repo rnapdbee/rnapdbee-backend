@@ -19,7 +19,7 @@ public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDot
             String filename,
             List<ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>>> results,
             Instant createdAt) {
-        super(id, filename, results, createdAt);
+        super(id, filename, results, createdAt, false);
     }
 
     public static SecondaryToDotBracketMongoEntity of(

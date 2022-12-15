@@ -17,21 +17,24 @@ public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBr
             UUID id,
             String filename,
             List<ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>> results,
-            Instant createdAt
+            Instant createdAt,
+            boolean usePdb
     ) {
-        super(id, filename, results, createdAt);
+        super(id, filename, results, createdAt, usePdb);
     }
 
     public static TertiaryToDotBracketMongoEntity of(
             UUID id,
             String filename,
-            ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultEntity
+            ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultEntity,
+            boolean usePdb
     ) {
         return new TertiaryToDotBracketMongoEntity.Builder()
                 .withId(id)
                 .withFilename(filename)
                 .withResults(new ArrayList<>(List.of(resultEntity)))
                 .withCreatedAt(Instant.now())
+                .withUsePdb(usePdb)
                 .build();
     }
 
@@ -43,7 +46,8 @@ public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBr
                     this.getId(),
                     this.getFilename(),
                     this.getResults(),
-                    this.getCreatedAt());
+                    this.getCreatedAt(),
+                    this.isUsePdb());
         }
 
         @Override

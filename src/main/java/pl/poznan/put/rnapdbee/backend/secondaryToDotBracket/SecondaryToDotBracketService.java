@@ -1,7 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
@@ -11,7 +10,7 @@ import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.Secondary
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
+import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
@@ -24,25 +23,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class SecondaryToDotBracketService {
+public class SecondaryToDotBracketService extends BaseAnalyzeService {
     private final SecondaryToDotBracketRepository secondaryToDotBracketRepository;
-    private final AnalyzedFileService analyzedFileService;
     private final EngineClient engineClient;
-    private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
     @Autowired
     private SecondaryToDotBracketService(
             SecondaryToDotBracketRepository secondaryToDotBracketRepository,
-            AnalyzedFileService analyzedFileService,
             EngineClient engineClient,
-            ValidationComponent validationComponent,
-            ImageComponent imageComponent
+            ImageComponent imageComponent,
+            AnalyzedFileService analyzedFileService
     ) {
+        super(analyzedFileService);
         this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
-        this.analyzedFileService = analyzedFileService;
         this.engineClient = engineClient;
-        this.validationComponent = validationComponent;
         this.imageComponent = imageComponent;
     }
 
@@ -53,7 +48,7 @@ public class SecondaryToDotBracketService {
             String contentDispositionHeader,
             String fileContent) {
 
-        String filename = validationComponent.validateFilename(contentDispositionHeader);
+        String filename = validateContentDisposition(contentDispositionHeader);
 
         Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
@@ -103,11 +98,10 @@ public class SecondaryToDotBracketService {
 
         AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
+        checkDocumentExpiration(secondaryToDotBracketMongoEntity.getCreatedAt(), id);
 
-        String contentDispositionHeader = ContentDisposition.builder("attachment")
-                .filename(secondaryToDotBracketMongoEntity.getFilename())
-                .build()
-                .toString();
+        String contentDispositionHeader = contentDispositionHeaderBuilder(
+                secondaryToDotBracketMongoEntity.getFilename());
 
         Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
