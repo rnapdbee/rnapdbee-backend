@@ -165,7 +165,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
     ) {
         String pdbId = pdbIdLowercase.toUpperCase();
 
-        PdbFileEntity pdbFile = analyzedFileService.getPdbFile(pdbId);
+        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
         String filename = pdbId + getPdbFileExtension();
 
         String contentDispositionHeader = contentDispositionHeaderBuilder(filename);

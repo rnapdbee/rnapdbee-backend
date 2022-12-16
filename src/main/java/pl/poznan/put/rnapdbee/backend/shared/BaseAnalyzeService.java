@@ -1,5 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.shared;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
@@ -10,6 +11,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public abstract class BaseAnalyzeService {
+
+    @Value("${document.storage.days}")
+    private int documentStorageDays;
 
     protected final AnalyzedFileService analyzedFileService;
 
@@ -54,7 +58,7 @@ public abstract class BaseAnalyzeService {
     protected void checkDocumentExpiration(
             Instant createdAt,
             UUID id) {
-        if ((int) Duration.between(createdAt, Instant.now()).toDays() >= 14)
+        if ((int) Duration.between(createdAt, Instant.now()).toDays() >= documentStorageDays)
             throw new DocumentExpiredException(id);
     }
 

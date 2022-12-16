@@ -3,10 +3,10 @@ package pl.poznan.put.rnapdbee.backend.analyzedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.AnalyzedFileEntityNotFoundException;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.AnalyzedFileEntityNotFoundException;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.AnalyzedFileRepository;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.PdbFileRepository;
@@ -75,7 +75,7 @@ public class AnalyzedFileService {
         }
     }
 
-    public PdbFileEntity getPdbFile(String pdbId) {
+    public PdbFileEntity fetchPdbStructure(String pdbId) {
         validatePdbId(pdbId);
 
         try {
