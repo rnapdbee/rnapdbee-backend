@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.shared.exception.domain;
+package pl.poznan.put.rnapdbee.backend.shared.exception;
 
 public class FilenameNotSetException extends RuntimeException {
     public static final String CONTENT_DISPOSITION_NOT_SET =

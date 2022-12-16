@@ -2,8 +2,8 @@ package pl.poznan.put.rnapdbee.backend.shared;
 
 import org.springframework.http.ContentDisposition;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.DocumentExpiredException;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.FilenameNotSetException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
 
 import java.time.Duration;
 import java.time.Instant;

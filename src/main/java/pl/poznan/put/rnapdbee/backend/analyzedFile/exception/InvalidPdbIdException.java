@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
+package pl.poznan.put.rnapdbee.backend.analyzedFile.exception;
 
 public class InvalidPdbIdException extends RuntimeException {
     private static final String INVALID_PDB_ID_FORMAT = "Invalid PDBid '%s'";

@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
+package pl.poznan.put.rnapdbee.backend.analyzedFile.exception;
 
 public class PdbFileNotFoundException extends RuntimeException {
     private static final String PDB_FILE_NOT_FOUND_FORMAT = "File '%s.cif' not found";

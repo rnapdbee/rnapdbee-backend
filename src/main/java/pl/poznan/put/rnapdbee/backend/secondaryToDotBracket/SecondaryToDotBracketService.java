@@ -17,7 +17,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
 
 @Component
 public class PdbClient {
