@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.poznan.put.rnapdbee.backend.shared.BaseController;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
@@ -18,7 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/engine/multi")
-public class TertiaryToMultiSecondaryController {
+public class TertiaryToMultiSecondaryController extends BaseController {
 
     private final TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService;
 
@@ -35,11 +36,12 @@ public class TertiaryToMultiSecondaryController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
+        String filename = validateContentDisposition(contentDispositionHeader);
         return tertiaryToMultiSecondaryService.analyzeTertiaryToMultiSecondary(
                 includeNonCanonical,
                 removeIsolated,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
     }
 

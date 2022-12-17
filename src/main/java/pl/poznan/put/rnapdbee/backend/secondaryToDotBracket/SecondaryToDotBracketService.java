@@ -7,10 +7,10 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.SecondaryToDotBracketRepository;
+import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
@@ -45,16 +45,14 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
-
-        String filename = validateContentDisposition(contentDispositionHeader);
 
         Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
 
         String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());
@@ -100,14 +98,11 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
         checkDocumentExpiration(secondaryToDotBracketMongoEntity.getCreatedAt(), id);
 
-        String contentDispositionHeader = contentDispositionHeaderBuilder(
-                secondaryToDotBracketMongoEntity.getFilename());
-
         Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                secondaryToDotBracketMongoEntity.getFilename(),
                 analyzedFile.getContent());
 
         String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());

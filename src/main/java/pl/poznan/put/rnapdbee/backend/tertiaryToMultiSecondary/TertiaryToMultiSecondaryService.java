@@ -25,8 +25,7 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.repository.Tertia
 import java.util.Optional;
 import java.util.UUID;
 
-import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.getPdbFileExtension;
-
+import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
 
 @Service
 public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
@@ -52,17 +51,15 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
             boolean includeNonCanonical,
             boolean removeIsolated,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
-
-        String filename = validateContentDisposition(contentDispositionHeader);
 
         OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti =
                 engineClient.performMultiAnalysisOnEngine(
                         includeNonCanonical,
                         removeIsolated,
                         visualizationTool,
-                        contentDispositionHeader,
+                        filename,
                         fileContent);
 
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
@@ -108,15 +105,12 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                 tertiaryToMultiSecondaryMongoEntity.getFilename(),
                 tertiaryToMultiSecondaryMongoEntity.isUsePdb());
 
-        String contentDispositionHeader = contentDispositionHeaderBuilder(
-                tertiaryToMultiSecondaryMongoEntity.getFilename());
-
         OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti =
                 engineClient.performMultiAnalysisOnEngine(
                         includeNonCanonical,
                         removeIsolated,
                         visualizationTool,
-                        contentDispositionHeader,
+                        tertiaryToMultiSecondaryMongoEntity.getFilename(),
                         fileContent);
 
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
@@ -145,17 +139,15 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
     ) {
         String pdbId = pdbIdLowercase.toUpperCase();
 
-            PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
-        String filename = pdbId + getPdbFileExtension();
-
-        String contentDispositionHeader = contentDispositionHeaderBuilder(filename);
+        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
+        String filename = pdbId + PDB_FILE_EXTENSION;
 
         OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti =
                 engineClient.performMultiAnalysisOnEngine(
                         includeNonCanonical,
                         removeIsolated,
                         visualizationTool,
-                        contentDispositionHeader,
+                        filename,
                         pdbFile.getContent());
 
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);

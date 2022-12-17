@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.poznan.put.rnapdbee.backend.shared.BaseController;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/engine/3d")
-public class TertiaryToDotBracketController {
+public class TertiaryToDotBracketController extends BaseController {
 
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
 
@@ -42,6 +43,7 @@ public class TertiaryToDotBracketController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
+        String filename = validateContentDisposition(contentDispositionHeader);
         return tertiaryToDotBracketService.analyzeTertiaryToDotBracket(
                 modelSelection,
                 analysisTool,
@@ -49,7 +51,7 @@ public class TertiaryToDotBracketController {
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
     }
 

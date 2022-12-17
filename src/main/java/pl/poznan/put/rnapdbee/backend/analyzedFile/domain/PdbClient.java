@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbNotAvailableException;
 
 @Component
 public class PdbClient {
@@ -17,15 +18,20 @@ public class PdbClient {
         this.pdbWebClient = pdbWebClient;
     }
 
-    public String performPdbRequest(String pdbId, String fileExtension) {
+    public byte[] performPdbRequest(
+            String pdbId,
+            String fileExtension) {
         return pdbWebClient
                 .get()
                 .uri(pdbId + fileExtension)
                 .retrieve()
-                .onStatus(HttpStatus::isError, response -> {
+                .onStatus(HttpStatus::is4xxClientError, response -> {
                     throw new PdbFileNotFoundException(pdbId);
                 })
-                .bodyToMono(String.class)
+                .onStatus(HttpStatus::is5xxServerError, response -> {
+                    throw new PdbNotAvailableException();
+                })
+                .bodyToMono(byte[].class)
                 .block();
     }
 }
