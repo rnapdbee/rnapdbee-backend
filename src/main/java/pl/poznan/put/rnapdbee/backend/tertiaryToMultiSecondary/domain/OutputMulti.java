@@ -1,7 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * DTO class for OutputMulti
  */
-public class OutputMulti<T extends ImageInformationOutput, U extends ConsensualVisualization> {
+public class OutputMulti<T extends ImageInformation, U extends ConsensualVisualization> {
     private final List<OutputMultiEntry<T>> entries;
     private final String title;
     private final U consensualVisualization;
@@ -36,7 +36,7 @@ public class OutputMulti<T extends ImageInformationOutput, U extends ConsensualV
         return consensualVisualization;
     }
 
-    public static class Builder<T extends ImageInformationOutput, U extends ConsensualVisualization> {
+    public static class Builder<T extends ImageInformation, U extends ConsensualVisualization> {
         private List<OutputMultiEntry<T>> entries = new ArrayList<>();
         private String title;
         private U consensualVisualization;

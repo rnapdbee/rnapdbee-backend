@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
-import pl.poznan.put.rnapdbee.backend.shared.domain.StructuralElement;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.SingleStrand;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.StructuralElement;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -118,7 +119,7 @@ public class EngineClient {
 
     private static class EngineResponse2D extends Output2D<ImageInformationByteArray> {
         private EngineResponse2D(
-                List<Object> strands,
+                List<SingleStrand> strands,
                 List<String> bpSeq,
                 List<String> ct,
                 List<String> interactions,

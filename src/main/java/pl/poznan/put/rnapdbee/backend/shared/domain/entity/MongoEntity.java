@@ -51,7 +51,7 @@ public abstract class MongoEntity<T, O> {
 
     protected abstract static class Builder<B extends Builder<B, T, O>, T, O> {
         private UUID id;
-        private String filename = "";
+        private String filename;
         private List<ResultEntity<T, O>> results = new ArrayList<>();
         private Instant createdAt = Instant.now();
 

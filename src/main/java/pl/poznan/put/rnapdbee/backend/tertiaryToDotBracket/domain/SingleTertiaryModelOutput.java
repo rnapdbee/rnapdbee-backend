@@ -1,36 +1,37 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformation;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair.BasePair;
 
 import java.util.List;
 
 /**
  * DTO class for SingleTertiaryModelOutput
  */
-public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
+public class SingleTertiaryModelOutput<T extends ImageInformation> {
     private final Integer modelNumber;
     private final Output2D<T> output2D;
     private final List<String> messages;
-    private final List<Object> canonicalInteractions;
-    private final List<Object> nonCanonicalInteractions;
-    private final List<Object> interStrandInteractions;
-    private final List<Object> stackingInteractions;
-    private final List<Object> basePhosphateInteractions;
-    private final List<Object> baseRiboseInteractions;
+    private final List<BasePair> canonicalInteractions;
+    private final List<BasePair> nonCanonicalInteractions;
+    private final List<BasePair> interStrandInteractions;
+    private final List<BasePair> stackingInteractions;
+    private final List<BasePair> basePhosphateInteractions;
+    private final List<BasePair> baseRiboseInteractions;
 
     private SingleTertiaryModelOutput(
             Integer modelNumber,
             Output2D<T> output2D,
             List<String> messages,
-            List<Object> canonicalInteractions,
-            List<Object> nonCanonicalInteractions,
-            List<Object> interStrandInteractions,
-            List<Object> stackingInteractions,
-            List<Object> basePhosphateInteractions,
-            List<Object> baseRiboseInteractions) {
+            List<BasePair> canonicalInteractions,
+            List<BasePair> nonCanonicalInteractions,
+            List<BasePair> interStrandInteractions,
+            List<BasePair> stackingInteractions,
+            List<BasePair> basePhosphateInteractions,
+            List<BasePair> baseRiboseInteractions) {
         this.modelNumber = modelNumber;
         this.output2D = output2D;
         this.messages = messages;
@@ -67,27 +68,27 @@ public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
         return messages;
     }
 
-    public List<Object> getCanonicalInteractions() {
+    public List<BasePair> getCanonicalInteractions() {
         return canonicalInteractions;
     }
 
-    public List<Object> getNonCanonicalInteractions() {
+    public List<BasePair> getNonCanonicalInteractions() {
         return nonCanonicalInteractions;
     }
 
-    public List<Object> getInterStrandInteractions() {
+    public List<BasePair> getInterStrandInteractions() {
         return interStrandInteractions;
     }
 
-    public List<Object> getStackingInteractions() {
+    public List<BasePair> getStackingInteractions() {
         return stackingInteractions;
     }
 
-    public List<Object> getBasePhosphateInteractions() {
+    public List<BasePair> getBasePhosphateInteractions() {
         return basePhosphateInteractions;
     }
 
-    public List<Object> getBaseRiboseInteractions() {
+    public List<BasePair> getBaseRiboseInteractions() {
         return baseRiboseInteractions;
     }
 
@@ -95,16 +96,16 @@ public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
         return modelNumber;
     }
 
-    public static class Builder<T extends ImageInformationOutput> {
+    public static class Builder<T extends ImageInformation> {
         private Integer modelNumber;
         private Output2D<T> output2D;
         private List<String> messages;
-        private List<Object> canonicalInteractions;
-        private List<Object> nonCanonicalInteractions;
-        private List<Object> interStrandInteractions;
-        private List<Object> stackingInteractions;
-        private List<Object> basePhosphateInteractions;
-        private List<Object> baseRiboseInteractions;
+        private List<BasePair> canonicalInteractions;
+        private List<BasePair> nonCanonicalInteractions;
+        private List<BasePair> interStrandInteractions;
+        private List<BasePair> stackingInteractions;
+        private List<BasePair> basePhosphateInteractions;
+        private List<BasePair> baseRiboseInteractions;
 
         public Builder<T> setModelNumber(Integer modelNumber) {
             this.modelNumber = modelNumber;
@@ -121,32 +122,32 @@ public class SingleTertiaryModelOutput<T extends ImageInformationOutput> {
             return this;
         }
 
-        public Builder<T> setCanonicalInteractions(List<Object> canonicalInteractions) {
+        public Builder<T> setCanonicalInteractions(List<BasePair> canonicalInteractions) {
             this.canonicalInteractions = canonicalInteractions;
             return this;
         }
 
-        public Builder<T> setNonCanonicalInteractions(List<Object> nonCanonicalInteractions) {
+        public Builder<T> setNonCanonicalInteractions(List<BasePair> nonCanonicalInteractions) {
             this.nonCanonicalInteractions = nonCanonicalInteractions;
             return this;
         }
 
-        public Builder<T> setInterStrandInteractions(List<Object> interStrandInteractions) {
+        public Builder<T> setInterStrandInteractions(List<BasePair> interStrandInteractions) {
             this.interStrandInteractions = interStrandInteractions;
             return this;
         }
 
-        public Builder<T> setStackingInteractions(List<Object> stackingInteractions) {
+        public Builder<T> setStackingInteractions(List<BasePair> stackingInteractions) {
             this.stackingInteractions = stackingInteractions;
             return this;
         }
 
-        public Builder<T> setBasePhosphateInteractions(List<Object> basePhosphateInteractions) {
+        public Builder<T> setBasePhosphateInteractions(List<BasePair> basePhosphateInteractions) {
             this.basePhosphateInteractions = basePhosphateInteractions;
             return this;
         }
 
-        public Builder<T> setBaseRiboseInteractions(List<Object> baseRiboseInteractions) {
+        public Builder<T> setBaseRiboseInteractions(List<BasePair> baseRiboseInteractions) {
             this.baseRiboseInteractions = baseRiboseInteractions;
             return this;
         }

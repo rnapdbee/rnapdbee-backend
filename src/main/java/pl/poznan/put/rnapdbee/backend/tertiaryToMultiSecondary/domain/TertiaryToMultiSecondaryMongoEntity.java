@@ -1,9 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 

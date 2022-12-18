@@ -1,8 +1,11 @@
-package pl.poznan.put.rnapdbee.backend.shared.domain;
+package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
-public class ImageInformationPath extends ImageInformationOutput {
+/**
+ * DTO class representing structure of image information response and entity.
+ */
+public class ImageInformationPath extends ImageInformation {
     private final String pathToSVGImage;
 
     private ImageInformationPath(
@@ -28,7 +31,7 @@ public class ImageInformationPath extends ImageInformationOutput {
         return pathToSVGImage;
     }
 
-    public static class Builder extends ImageInformationOutput.Builder<Builder> {
+    public static class Builder extends ImageInformation.Builder<Builder> {
 
         private String pathToSVGImage;
 
