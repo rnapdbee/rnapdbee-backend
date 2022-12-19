@@ -26,7 +26,7 @@ public abstract class BaseAnalyzeService {
         String extensionsPattern = "(?<!^)[.]" + (removeAllExtensions ? ".*" : "[^.]*$");
 
         return Optional.ofNullable(filename)
-                .filter(String::isEmpty)
+                .filter(f -> !f.isEmpty())
                 .map(f -> f.replaceAll(extensionsPattern, ""))
                 .orElseThrow(FilenameNotSetException::new);
     }
