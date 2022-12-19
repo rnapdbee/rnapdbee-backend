@@ -1,9 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 
@@ -19,20 +17,24 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
             UUID id,
             String filename,
             List<ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>> results,
-            Instant createdAt) {
-        super(id, filename, results, createdAt);
+            Instant createdAt,
+            boolean usePdb
+    ) {
+        super(id, filename, results, createdAt, usePdb);
     }
 
     public static TertiaryToMultiSecondaryMongoEntity of(
             UUID id,
             String filename,
-            ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity
+            ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity,
+            boolean usePdb
     ) {
         return new TertiaryToMultiSecondaryMongoEntity.Builder()
                 .withId(id)
                 .withFilename(filename)
                 .withResults(new ArrayList<>(List.of(resultEntity)))
                 .withCreatedAt(Instant.now())
+                .withUsePdb(usePdb)
                 .build();
     }
 
@@ -44,7 +46,8 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
                     this.getId(),
                     this.getFilename(),
                     this.getResults(),
-                    this.getCreatedAt());
+                    this.getCreatedAt(),
+                    this.isUsePdb());
         }
 
         @Override

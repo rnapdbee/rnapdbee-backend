@@ -1,14 +1,13 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
+import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
@@ -18,7 +17,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
@@ -28,27 +27,25 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.repository.TertiaryTo
 import java.util.Optional;
 import java.util.UUID;
 
+import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
+
 @Service
-public class TertiaryToDotBracketService {
+public class TertiaryToDotBracketService extends BaseAnalyzeService {
 
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
-    private final AnalyzedFileService analyzedFileService;
     private final EngineClient engineClient;
-    private final ValidationComponent validationComponent;
     private final ImageComponent imageComponent;
 
     @Autowired
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
-            AnalyzedFileService analyzedFileService,
             EngineClient engineClient,
-            ValidationComponent validationComponent,
-            ImageComponent imageComponent
+            ImageComponent imageComponent,
+            AnalyzedFileService analyzedFileService
     ) {
+        super(analyzedFileService);
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
-        this.analyzedFileService = analyzedFileService;
         this.engineClient = engineClient;
-        this.validationComponent = validationComponent;
         this.imageComponent = imageComponent;
     }
 
@@ -59,10 +56,8 @@ public class TertiaryToDotBracketService {
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
-
-        String filename = validationComponent.validateFilename(contentDispositionHeader);
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
@@ -71,7 +66,7 @@ public class TertiaryToDotBracketService {
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
 
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
@@ -92,7 +87,8 @@ public class TertiaryToDotBracketService {
                                         visualizationTool
                                 ),
                                 output3D
-                        )
+                        ),
+                        false
                 );
 
         tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
@@ -114,13 +110,13 @@ public class TertiaryToDotBracketService {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool
     ) {
-        AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
         TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity = findTertiaryToDotBracketDocument(id);
+        checkDocumentExpiration(tertiaryToDotBracketMongoEntity.getCreatedAt(), id);
 
-        String contentDispositionHeader = ContentDisposition.builder("attachment")
-                .filename(tertiaryToDotBracketMongoEntity.getFilename())
-                .build()
-                .toString();
+        String fileContent = getFileContentToReanalyze(
+                id,
+                tertiaryToDotBracketMongoEntity.getFilename(),
+                tertiaryToDotBracketMongoEntity.isUsePdb());
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
@@ -129,8 +125,8 @@ public class TertiaryToDotBracketService {
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
-                analyzedFile.getContent());
+                tertiaryToDotBracketMongoEntity.getFilename(),
+                fileContent);
 
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
 
@@ -148,6 +144,57 @@ public class TertiaryToDotBracketService {
                 );
 
         tertiaryToDotBracketMongoEntity.addResult(resultEntity);
+        tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
+
+        return tertiaryToDotBracketMongoEntity;
+    }
+
+    public TertiaryToDotBracketMongoEntity analyzePdbTertiaryToDotBracket(
+            String pdbIdLowercase,
+            ModelSelection modelSelection,
+            AnalysisTool analysisTool,
+            NonCanonicalHandling nonCanonicalHandling,
+            boolean removeIsolated,
+            StructuralElementsHandling structuralElementsHandling,
+            VisualizationTool visualizationTool
+    ) {
+        String pdbId = pdbIdLowercase.toUpperCase();
+
+        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
+        String filename = pdbId + PDB_FILE_EXTENSION;
+
+        Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool,
+                filename,
+                pdbFile.getContent());
+
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+
+        UUID id = IdSupplier.generateId();
+
+        TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity =
+                TertiaryToDotBracketMongoEntity.of(
+                        id,
+                        filename,
+                        ResultEntity.of(
+                                TertiaryToDotBracketParams.of(
+                                        modelSelection,
+                                        analysisTool,
+                                        nonCanonicalHandling,
+                                        removeIsolated,
+                                        structuralElementsHandling,
+                                        visualizationTool
+                                ),
+                                output3D
+                        ),
+                        true
+                );
+
         tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
 
         return tertiaryToDotBracketMongoEntity;

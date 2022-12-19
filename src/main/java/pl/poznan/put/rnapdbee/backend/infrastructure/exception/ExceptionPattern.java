@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.shared.exception;
+package pl.poznan.put.rnapdbee.backend.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 

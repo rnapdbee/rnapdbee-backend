@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.SecondaryToDotBracketService;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
+import pl.poznan.put.rnapdbee.backend.shared.BaseController;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
@@ -22,7 +23,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("api/v1/engine/2d")
-public class SecondaryToDotBracketController {
+public class SecondaryToDotBracketController extends BaseController {
 
     private final SecondaryToDotBracketService secondaryToDotBracketService;
 
@@ -39,11 +40,12 @@ public class SecondaryToDotBracketController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
+        String filename = validateContentDisposition(contentDispositionHeader);
         return secondaryToDotBracketService.analyzeSecondaryToDotBracket(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
     }
 

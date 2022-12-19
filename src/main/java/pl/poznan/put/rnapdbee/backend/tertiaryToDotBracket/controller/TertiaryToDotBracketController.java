@@ -2,7 +2,6 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.poznan.put.rnapdbee.backend.shared.BaseController;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/engine/3d")
-public class TertiaryToDotBracketController {
+public class TertiaryToDotBracketController extends BaseController {
 
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
 
@@ -43,6 +43,7 @@ public class TertiaryToDotBracketController {
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
             @RequestBody String fileContent) {
+        String filename = validateContentDisposition(contentDispositionHeader);
         return tertiaryToDotBracketService.analyzeTertiaryToDotBracket(
                 modelSelection,
                 analysisTool,
@@ -50,7 +51,7 @@ public class TertiaryToDotBracketController {
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
-                contentDispositionHeader,
+                filename,
                 fileContent);
     }
 
@@ -83,7 +84,7 @@ public class TertiaryToDotBracketController {
 
     @Operation(summary = "Perform a 3d calculation based on object fetched from Protein Data Bank")
     @PostMapping(path = "/pdb/{pdbId}", produces = "application/json")
-    public ResponseEntity<Object> calculatePDBTertiaryToDotBracket(
+    public TertiaryToDotBracketMongoEntity calculatePDBTertiaryToDotBracket(
             @PathVariable("pdbId") String pdbId,
             @RequestParam("modelSelection") ModelSelection modelSelection,
             @RequestParam("analysisTool") AnalysisTool analysisTool,
@@ -91,6 +92,13 @@ public class TertiaryToDotBracketController {
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
-        throw new UnsupportedOperationException();
+        return tertiaryToDotBracketService.analyzePdbTertiaryToDotBracket(
+                pdbId,
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool);
     }
 }
