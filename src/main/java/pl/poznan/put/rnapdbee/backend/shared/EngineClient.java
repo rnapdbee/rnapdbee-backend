@@ -62,7 +62,7 @@ public class EngineClient {
                         .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeaderBuilder(filename))
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponse2D.class)
@@ -89,7 +89,7 @@ public class EngineClient {
                         .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeaderBuilder(filename))
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponse3D.class)
@@ -110,14 +110,14 @@ public class EngineClient {
                         .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeaderBuilder(filename))
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponseMulti.class)
                 .block();
     }
 
-    private String contentDispositionHeaderBuilder(String filename) {
+    private String prepareContentDispositionHeader(String filename) {
         return ContentDisposition.builder("attachment")
                 .filename(filename)
                 .build()
