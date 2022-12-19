@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
+package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
+package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,15 +9,15 @@ public class BasePair {
     @JsonProperty("interactionType")
     String interactionType;
     @JsonProperty("saenger")
-    Saenger saenger;
+    String saenger;
     @JsonProperty("leontisWesthof")
-    LeontisWesthof leontisWesthof;
+    String leontisWesthof;
     @JsonProperty("bPh")
-    BPh bPh;
+    String bPh;
     @JsonProperty("br")
-    BR br;
+    String br;
     @JsonProperty("stackingTopology")
-    StackingTopology stackingTopology;
+    String stackingTopology;
     @JsonProperty("leftResidue")
     NamedResidue leftResidue;
     @JsonProperty("rightResidue")

@@ -1,10 +1,9 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformation;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
-import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair.BasePair;
 
 import java.util.List;
 
