@@ -18,7 +18,7 @@ public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBr
             String filename,
             List<ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>> results,
             Instant createdAt,
-            boolean usePdb
+            Boolean usePdb
     ) {
         super(id, filename, results, createdAt, usePdb);
     }
@@ -27,7 +27,7 @@ public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBr
             UUID id,
             String filename,
             ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultEntity,
-            boolean usePdb
+            Boolean usePdb
     ) {
         return new TertiaryToDotBracketMongoEntity.Builder()
                 .withId(id)

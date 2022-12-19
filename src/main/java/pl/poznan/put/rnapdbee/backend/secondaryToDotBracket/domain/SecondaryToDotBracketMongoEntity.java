@@ -1,10 +1,10 @@
 package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,8 +18,10 @@ public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDot
             UUID id,
             String filename,
             List<ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>>> results,
-            Instant createdAt) {
-        super(id, filename, results, createdAt, false);
+            Instant createdAt,
+            Boolean usePdb
+    ) {
+        super(id, filename, results, createdAt, usePdb);
     }
 
     public static SecondaryToDotBracketMongoEntity of(
@@ -43,7 +45,8 @@ public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDot
                     this.getId(),
                     this.getFilename(),
                     this.getResults(),
-                    this.getCreatedAt());
+                    this.getCreatedAt(),
+                    this.isUsePdb());
         }
 
         @Override

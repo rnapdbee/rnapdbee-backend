@@ -18,7 +18,7 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
             String filename,
             List<ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>> results,
             Instant createdAt,
-            boolean usePdb
+            Boolean usePdb
     ) {
         super(id, filename, results, createdAt, usePdb);
     }
@@ -27,7 +27,7 @@ public class TertiaryToMultiSecondaryMongoEntity extends MongoEntity<TertiaryToM
             UUID id,
             String filename,
             ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity,
-            boolean usePdb
+            Boolean usePdb
     ) {
         return new TertiaryToMultiSecondaryMongoEntity.Builder()
                 .withId(id)

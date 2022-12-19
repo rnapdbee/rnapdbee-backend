@@ -16,14 +16,14 @@ public abstract class MongoEntity<T, O> {
     @JsonIgnore
     protected final Instant createdAt;
     @JsonIgnore
-    protected final boolean usePdb;
+    protected final Boolean usePdb;
 
     protected MongoEntity(
             UUID id,
             String filename,
             List<ResultEntity<T, O>> results,
             Instant createdAt,
-            boolean usePdb) {
+            Boolean usePdb) {
         this.id = id;
         this.filename = filename;
         this.results = results;
@@ -52,7 +52,7 @@ public abstract class MongoEntity<T, O> {
         return createdAt;
     }
 
-    public boolean isUsePdb() {
+    public Boolean isUsePdb() {
         return usePdb;
     }
 
@@ -62,7 +62,7 @@ public abstract class MongoEntity<T, O> {
         private List<ResultEntity<T, O>> results = new ArrayList<>();
         private Instant createdAt = Instant.now();
 
-        private boolean usePdb;
+        private Boolean usePdb;
 
         protected abstract B self();
 
@@ -90,7 +90,7 @@ public abstract class MongoEntity<T, O> {
             return self();
         }
 
-        public B withUsePdb(boolean usePdb) {
+        public B withUsePdb(Boolean usePdb) {
             this.usePdb = usePdb;
             return self();
         }
@@ -113,7 +113,7 @@ public abstract class MongoEntity<T, O> {
             return createdAt;
         }
 
-        public boolean isUsePdb() {
+        public Boolean isUsePdb() {
             return usePdb;
         }
     }
