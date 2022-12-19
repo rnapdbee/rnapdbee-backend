@@ -3,6 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -52,7 +53,7 @@ public class EngineClient {
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
         return engineWebClient
                 .post()
@@ -62,7 +63,7 @@ public class EngineClient {
                         .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeader)
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponse2D.class)
@@ -76,7 +77,7 @@ public class EngineClient {
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
         return engineWebClient
                 .post()
@@ -89,7 +90,7 @@ public class EngineClient {
                         .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeader)
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponse3D.class)
@@ -100,7 +101,7 @@ public class EngineClient {
             boolean includeNonCanonical,
             boolean removeIsolated,
             VisualizationTool visualizationTool,
-            String contentDispositionHeader,
+            String filename,
             String fileContent) {
         return engineWebClient
                 .post()
@@ -110,11 +111,18 @@ public class EngineClient {
                         .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
                         .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
                         .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, contentDispositionHeader)
+                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                 .body(BodyInserters.fromValue(fileContent))
                 .retrieve()
                 .bodyToMono(EngineResponseMulti.class)
                 .block();
+    }
+
+    private String prepareContentDispositionHeader(String filename) {
+        return ContentDisposition.builder("attachment")
+                .filename(filename)
+                .build()
+                .toString();
     }
 
     private static class EngineResponse2D extends Output2D<ImageInformationByteArray> {
