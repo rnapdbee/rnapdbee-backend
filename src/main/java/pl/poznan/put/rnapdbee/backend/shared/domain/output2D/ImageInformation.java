@@ -1,14 +1,16 @@
-package pl.poznan.put.rnapdbee.backend.shared.domain;
+package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
-
-public abstract class ImageInformationOutput {
+/**
+ * DTO class representing structure of image information.
+ */
+public abstract class ImageInformation {
     protected final VisualizationTool successfulVisualizationTool;
     protected final VisualizationTool failedVisualizationTool;
     protected final String drawingResult;
 
-    protected ImageInformationOutput(
+    protected ImageInformation(
             VisualizationTool successfulVisualizationTool,
             VisualizationTool failedVisualizationTool,
             String drawingResult) {
@@ -43,7 +45,7 @@ public abstract class ImageInformationOutput {
             return self();
         }
 
-        protected abstract ImageInformationOutput build();
+        protected abstract ImageInformation build();
 
         public VisualizationTool getSuccessfulVisualizationTool() {
             return successfulVisualizationTool;

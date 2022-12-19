@@ -8,10 +8,10 @@ import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
@@ -62,7 +62,9 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         fileContent);
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -113,7 +115,9 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         tertiaryToMultiSecondaryMongoEntity.getFilename(),
                         fileContent);
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity =
                 ResultEntity.of(
@@ -150,7 +154,9 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         pdbFile.getContent());
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -175,7 +181,8 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
     }
 
     private OutputMulti<ImageInformationPath, ConsensualVisualizationPath> saveGraphicsWithPath(
-            OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti
+            OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti,
+            VisualizationTool visualizationTool
     ) {
         OutputMulti.Builder<ImageInformationPath, ConsensualVisualizationPath> outputMultiBuilder =
                 new OutputMulti.Builder<ImageInformationPath, ConsensualVisualizationPath>()
@@ -187,9 +194,12 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                                 engineResponseMulti.getConsensualVisualization().getSvgFile())));
 
         for (OutputMultiEntry<ImageInformationByteArray> model : engineResponseMulti.getEntries()) {
+            String pathToSVGImage;
 
-            String pathToSVGImage = imageComponent.generateSvgUrl(
-                    model.getOutput2D().getImageInformation().getSvgFile());
+            if (visualizationTool == VisualizationTool.NONE)
+                pathToSVGImage = null;
+            else
+                pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
 
             outputMultiBuilder.addEntry(
                     OutputMultiEntry.of(

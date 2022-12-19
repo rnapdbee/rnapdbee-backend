@@ -8,10 +8,10 @@ import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationByteArray;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -69,7 +69,9 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
-        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
+                engineResponse3D,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -128,7 +130,9 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 tertiaryToDotBracketMongoEntity.getFilename(),
                 fileContent);
 
-        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
+                engineResponse3D,
+                visualizationTool);
 
         ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultEntity =
                 ResultEntity.of(
@@ -173,7 +177,9 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 pdbFile.getContent());
 
-        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
+                engineResponse3D,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -200,13 +206,21 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
         return tertiaryToDotBracketMongoEntity;
     }
 
-    private Output3D<ImageInformationPath> saveGraphicsWithPath(Output3D<ImageInformationByteArray> engineResponse3D) {
+    private Output3D<ImageInformationPath> saveGraphicsWithPath(
+            Output3D<ImageInformationByteArray> engineResponse3D,
+            VisualizationTool visualizationTool
+    ) {
         Output3D.Builder<ImageInformationPath> output3DBuilder =
                 new Output3D.Builder<ImageInformationPath>()
                         .withTitle(engineResponse3D.getTitle());
 
         for (SingleTertiaryModelOutput<ImageInformationByteArray> model : engineResponse3D.getModels()) {
-            String pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
+            String pathToSVGImage;
+
+            if (visualizationTool == VisualizationTool.NONE)
+                pathToSVGImage = null;
+            else
+                pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
 
             output3DBuilder.addModel(
                     SingleTertiaryModelOutput.of(

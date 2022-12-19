@@ -1,9 +1,9 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformation;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * OutputMultiEntry
  */
-public class OutputMultiEntry<T extends ImageInformationOutput> {
+public class OutputMultiEntry<T extends ImageInformation> {
     private final Output2D<T> output2D;
     private final List<AnalysisTool> adapterEnums;
 
@@ -40,7 +40,7 @@ public class OutputMultiEntry<T extends ImageInformationOutput> {
         return adapterEnums;
     }
 
-    public static class Builder<T extends ImageInformationOutput> {
+    public static class Builder<T extends ImageInformation> {
         private Output2D<T> output2D;
 
         private List<AnalysisTool> adapterEnums;

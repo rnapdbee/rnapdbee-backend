@@ -1,11 +1,14 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationOutput;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Output3D<T extends ImageInformationOutput> {
+/**
+ * DTO class representing tertiary structure analysis.
+ */
+public class Output3D<T extends ImageInformation> {
     private final List<SingleTertiaryModelOutput<T>> models;
     private final String title;
 
@@ -24,7 +27,7 @@ public class Output3D<T extends ImageInformationOutput> {
         return title;
     }
 
-    public static class Builder<T extends ImageInformationOutput> {
+    public static class Builder<T extends ImageInformation> {
         private List<SingleTertiaryModelOutput<T>> models = new ArrayList<>();
         private String title;
 

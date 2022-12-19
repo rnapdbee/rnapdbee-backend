@@ -1,10 +1,12 @@
-package pl.poznan.put.rnapdbee.backend.shared.domain;
+package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 
 import java.util.List;
 
-
-public class Output2D<T extends ImageInformationOutput> {
-    private final List<Object> strands;
+/**
+ * DTO class representing secondary structure analysis.
+ */
+public class Output2D<T extends ImageInformation> {
+    private final List<SingleStrand> strands;
     private final List<String> bpSeq;
     private final List<String> ct;
     private final List<String> interactions;
@@ -12,7 +14,7 @@ public class Output2D<T extends ImageInformationOutput> {
     private final T imageInformation;
 
     protected Output2D(
-            List<Object> strands,
+            List<SingleStrand> strands,
             List<String> bpSeq,
             List<String> ct,
             List<String> interactions,
@@ -40,7 +42,7 @@ public class Output2D<T extends ImageInformationOutput> {
                 .build();
     }
 
-    public List<Object> getStrands() {
+    public List<SingleStrand> getStrands() {
         return strands;
     }
 
@@ -64,16 +66,16 @@ public class Output2D<T extends ImageInformationOutput> {
         return imageInformation;
     }
 
-    public static class Builder<T extends ImageInformationOutput> {
+    public static class Builder<T extends ImageInformation> {
 
-        private List<Object> strands;
+        private List<SingleStrand> strands;
         private List<String> bpSeq;
         private List<String> ct;
         private List<String> interactions;
         private StructuralElement structuralElements;
         private T imageInformation;
 
-        public Builder<T> withStrands(List<Object> strands) {
+        public Builder<T> withStrands(List<SingleStrand> strands) {
             this.strands = strands;
             return this;
         }
@@ -113,7 +115,7 @@ public class Output2D<T extends ImageInformationOutput> {
                     this.getImageInformation());
         }
 
-        public List<Object> getStrands() {
+        public List<SingleStrand> getStrands() {
             return strands;
         }
 

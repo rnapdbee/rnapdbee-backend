@@ -1,7 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.poznan.put.rnapdbee.backend.shared.domain.ImageInformationPath;
+import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 
