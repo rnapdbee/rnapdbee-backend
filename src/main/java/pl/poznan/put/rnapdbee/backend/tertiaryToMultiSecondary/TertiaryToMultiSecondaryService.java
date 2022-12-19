@@ -154,7 +154,9 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         pdbFile.getContent());
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 

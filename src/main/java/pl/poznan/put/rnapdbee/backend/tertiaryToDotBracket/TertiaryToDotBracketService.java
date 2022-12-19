@@ -177,7 +177,9 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 pdbFile.getContent());
 
-        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(engineResponse3D);
+        Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
+                engineResponse3D,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
