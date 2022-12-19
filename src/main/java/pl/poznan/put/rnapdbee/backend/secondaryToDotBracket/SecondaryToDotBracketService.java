@@ -12,10 +12,10 @@ import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.ValidationComponent;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
-import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.shared.exception.domain.IdNotFoundException;
@@ -55,14 +55,14 @@ public class SecondaryToDotBracketService {
 
         String filename = validationComponent.validateFilename(contentDispositionHeader);
 
-        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
+        Output2D<ImageInformationByteArray> engineResponse2D = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
                 contentDispositionHeader,
                 fileContent);
 
-        String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());
+        String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -77,9 +77,9 @@ public class SecondaryToDotBracketService {
                                         visualizationTool
                                 ),
                                 Output2D.of(
-                                        engineOutput2DResponse,
+                                        engineResponse2D,
                                         ImageInformationPath.of(
-                                                engineOutput2DResponse.getImageInformation(),
+                                                engineResponse2D.getImageInformation(),
                                                 pathToSVGImage)
                                 )
                         )
@@ -109,14 +109,14 @@ public class SecondaryToDotBracketService {
                 .build()
                 .toString();
 
-        Output2D<ImageInformationByteArray> engineOutput2DResponse = engineClient.perform2DAnalysisOnEngine(
+        Output2D<ImageInformationByteArray> engineResponse2D = engineClient.perform2DAnalysisOnEngine(
                 removeIsolated,
                 structuralElementsHandling,
                 visualizationTool,
                 contentDispositionHeader,
                 analyzedFile.getContent());
 
-        String pathToSVGImage = imageComponent.generateSvgUrl(engineOutput2DResponse.getImageInformation().getSvgFile());
+        String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity =
                 ResultEntity.of(
@@ -126,9 +126,9 @@ public class SecondaryToDotBracketService {
                                 visualizationTool
                         ),
                         Output2D.of(
-                                engineOutput2DResponse,
+                                engineResponse2D,
                                 ImageInformationPath.of(
-                                        engineOutput2DResponse.getImageInformation(),
+                                        engineResponse2D.getImageInformation(),
                                         pathToSVGImage)
                         )
                 );
@@ -137,6 +137,16 @@ public class SecondaryToDotBracketService {
         secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
 
         return secondaryToDotBracketMongoEntity;
+    }
+
+    private String saveGraphicWithPath(
+            Output2D<ImageInformationByteArray> engineResponse2D,
+            VisualizationTool visualizationTool
+    ) {
+        if (visualizationTool == VisualizationTool.NONE)
+            return null;
+        else
+            return imageComponent.generateSvgUrl(engineResponse2D.getImageInformation().getSvgFile());
     }
 
     private SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {

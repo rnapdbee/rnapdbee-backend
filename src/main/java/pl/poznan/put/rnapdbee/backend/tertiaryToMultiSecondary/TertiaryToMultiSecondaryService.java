@@ -68,7 +68,9 @@ public class TertiaryToMultiSecondaryService {
                         contentDispositionHeader,
                         fileContent);
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         UUID id = IdSupplier.generateId();
 
@@ -118,7 +120,9 @@ public class TertiaryToMultiSecondaryService {
                         contentDispositionHeader,
                         analyzedFile.getContent());
 
-        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(engineResponseMulti);
+        OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
+                engineResponseMulti,
+                visualizationTool);
 
         ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity =
                 ResultEntity.of(
@@ -137,7 +141,8 @@ public class TertiaryToMultiSecondaryService {
     }
 
     private OutputMulti<ImageInformationPath, ConsensualVisualizationPath> saveGraphicsWithPath(
-            OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti
+            OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti,
+            VisualizationTool visualizationTool
     ) {
         OutputMulti.Builder<ImageInformationPath, ConsensualVisualizationPath> outputMultiBuilder =
                 new OutputMulti.Builder<ImageInformationPath, ConsensualVisualizationPath>()
@@ -149,9 +154,12 @@ public class TertiaryToMultiSecondaryService {
                                 engineResponseMulti.getConsensualVisualization().getSvgFile())));
 
         for (OutputMultiEntry<ImageInformationByteArray> model : engineResponseMulti.getEntries()) {
+            String pathToSVGImage;
 
-            String pathToSVGImage = imageComponent.generateSvgUrl(
-                    model.getOutput2D().getImageInformation().getSvgFile());
+            if (visualizationTool == VisualizationTool.NONE)
+                pathToSVGImage = null;
+            else
+                pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
 
             outputMultiBuilder.addEntry(
                     OutputMultiEntry.of(
