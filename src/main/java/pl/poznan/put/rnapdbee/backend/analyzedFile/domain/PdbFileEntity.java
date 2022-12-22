@@ -46,10 +46,6 @@ public class PdbFileEntity {
         private Instant createdAt;
 
         public Builder withId(String id) {
-            if (id.length() != 4) {
-                throw new InvalidPdbIdException(id);
-            }
-
             this.id = id;
             return this;
         }

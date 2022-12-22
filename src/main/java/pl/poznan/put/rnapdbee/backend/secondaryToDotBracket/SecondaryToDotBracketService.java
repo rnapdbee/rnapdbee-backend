@@ -11,6 +11,7 @@ import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
@@ -24,21 +25,19 @@ import java.util.UUID;
 
 @Service
 public class SecondaryToDotBracketService extends BaseAnalyzeService {
+
     private final SecondaryToDotBracketRepository secondaryToDotBracketRepository;
-    private final EngineClient engineClient;
-    private final ImageComponent imageComponent;
 
     @Autowired
     private SecondaryToDotBracketService(
             SecondaryToDotBracketRepository secondaryToDotBracketRepository,
             EngineClient engineClient,
             ImageComponent imageComponent,
-            AnalyzedFileService analyzedFileService
+            AnalyzedFileService analyzedFileService,
+            MessageProvider messageProvider
     ) {
-        super(analyzedFileService);
+        super(engineClient, imageComponent, analyzedFileService, messageProvider);
         this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
-        this.engineClient = engineClient;
-        this.imageComponent = imageComponent;
     }
 
     public SecondaryToDotBracketMongoEntity analyzeSecondaryToDotBracket(
@@ -143,7 +142,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 secondaryToDotBracketRepository.findById(id);
 
         if (secondaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotFoundException(id);
+            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
 
         return secondaryToDotBracketMongoEntity.get();
     }

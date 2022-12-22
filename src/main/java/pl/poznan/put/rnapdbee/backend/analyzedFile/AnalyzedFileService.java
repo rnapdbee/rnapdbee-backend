@@ -12,6 +12,7 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundExce
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileUnzipException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.AnalyzedFileRepository;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.PdbFileRepository;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,22 +32,26 @@ public class AnalyzedFileService {
     private final AnalyzedFileRepository analyzedFileRepository;
     private final PdbFileRepository pdbFileRepository;
     private final PdbClient pdbClient;
+    private final MessageProvider messageProvider;
 
     @Autowired
     private AnalyzedFileService(
             AnalyzedFileRepository analyzedFileRepository,
             PdbFileRepository pdbFileRepository,
-            PdbClient pdbClient
+            PdbClient pdbClient,
+            MessageProvider messageProvider
     ) {
         this.analyzedFileRepository = analyzedFileRepository;
         this.pdbFileRepository = pdbFileRepository;
         this.pdbClient = pdbClient;
+        this.messageProvider = messageProvider;
     }
 
     public AnalyzedFileEntity findAnalyzedFile(UUID id) {
         Optional<AnalyzedFileEntity> analyzedFile = analyzedFileRepository.findById(id);
         if (analyzedFile.isEmpty())
-            throw new AnalyzedFileEntityNotFoundException();
+            throw new AnalyzedFileEntityNotFoundException(
+                    messageProvider.getMessage("api.exception.file.not.found"));
 
         return analyzedFile.get();
     }
@@ -54,7 +59,8 @@ public class AnalyzedFileService {
     public PdbFileEntity findPdbFile(String id) {
         Optional<PdbFileEntity> pdbFile = pdbFileRepository.findById(id);
         if (pdbFile.isEmpty())
-            throw new PdbFileNotFoundException(id);
+            throw new PdbFileNotFoundException(
+                    messageProvider.getMessage("api.exception.pdb.file.not.found.format"), id);
 
         return pdbFile.get();
     }
@@ -102,7 +108,8 @@ public class AnalyzedFileService {
 
             return IOUtils.toString(inputStream, Charset.defaultCharset());
         } catch (IOException e) {
-            throw new PdbFileUnzipException(pdbId);
+            throw new PdbFileUnzipException(
+                    messageProvider.getMessage("api.exception.pdb.file.unzip.format"), pdbId);
         }
     }
 
@@ -114,7 +121,8 @@ public class AnalyzedFileService {
 
     private void validatePdbId(String pdbId) {
         if (pdbId.length() != 4) {
-            throw new InvalidPdbIdException(pdbId);
+            throw new InvalidPdbIdException(
+                    messageProvider.getMessage("api.exception.invalid.pdb.id.format"), pdbId);
         }
     }
 }

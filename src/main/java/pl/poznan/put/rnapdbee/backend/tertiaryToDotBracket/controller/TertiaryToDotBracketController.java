@@ -1,6 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.poznan.put.rnapdbee.backend.shared.BaseController;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
@@ -21,6 +23,9 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotB
 
 import java.util.UUID;
 
+/**
+ * Controller class for the Tertiary To Dot Bracket API.
+ */
 @RestController
 @RequestMapping("api/v1/engine/3d")
 public class TertiaryToDotBracketController extends BaseController {
@@ -28,7 +33,12 @@ public class TertiaryToDotBracketController extends BaseController {
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
 
     @Autowired
-    private TertiaryToDotBracketController(TertiaryToDotBracketService tertiaryToDotBracketService) {
+    private TertiaryToDotBracketController(
+            MessageProvider messageProvider,
+            Logger logger,
+            TertiaryToDotBracketService tertiaryToDotBracketService
+    ) {
+        super(messageProvider, logger);
         this.tertiaryToDotBracketService = tertiaryToDotBracketService;
     }
 
@@ -42,7 +52,23 @@ public class TertiaryToDotBracketController extends BaseController {
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
-            @RequestBody String fileContent) {
+            @RequestBody String fileContent
+    ) {
+        logger.info(String.format("Analyze 3D -> (...) for content-disposition header: [%s] with params: [" +
+                        "modelSelection = %s, " +
+                        "analysisTool = %s, " +
+                        "nonCanonicalHandling = %s, " +
+                        "removeIsolated = %s, " +
+                        "structuralElementsHandling = %s, " +
+                        "visualizationTool = %s]",
+                contentDispositionHeader,
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool));
+
         String filename = validateContentDisposition(contentDispositionHeader);
         return tertiaryToDotBracketService.analyzeTertiaryToDotBracket(
                 modelSelection,
@@ -58,7 +84,10 @@ public class TertiaryToDotBracketController extends BaseController {
     @Operation(summary = "Fetch an existing 3d calculation")
     @GetMapping(path = "/{id}", produces = "application/json")
     public TertiaryToDotBracketMongoEntity getResultTertiaryToDotBracket(
-            @PathVariable("id") UUID id) {
+            @PathVariable("id") UUID id
+    ) {
+        logger.info(String.format("Fetch 3D -> (...) results with id: [%s]", id));
+
         return tertiaryToDotBracketService.getResultsTertiaryToDotBracket(id);
     }
 
@@ -71,7 +100,23 @@ public class TertiaryToDotBracketController extends BaseController {
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool
+    ) {
+        logger.info(String.format("Reanalyze 3D -> (...) for id: [%s] with params: [" +
+                        "modelSelection = %s, " +
+                        "analysisTool = %s, " +
+                        "nonCanonicalHandling = %s, " +
+                        "removeIsolated = %s, " +
+                        "structuralElementsHandling = %s, " +
+                        "visualizationTool = %s]",
+                id,
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool));
+
         return tertiaryToDotBracketService.reanalyzeTertiaryToDotBracket(
                 id,
                 modelSelection,
@@ -91,7 +136,23 @@ public class TertiaryToDotBracketController extends BaseController {
             @RequestParam("nonCanonicalHandling") NonCanonicalHandling nonCanonicalHandling,
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("structuralElementsHandling") StructuralElementsHandling structuralElementsHandling,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool
+    ) {
+        logger.info(String.format("PDB Analyze 3D -> (...) for PDBId: [%s] with params: [" +
+                        "modelSelection = %s, " +
+                        "analysisTool = %s, " +
+                        "nonCanonicalHandling = %s, " +
+                        "removeIsolated = %s, " +
+                        "structuralElementsHandling = %s, " +
+                        "visualizationTool = %s]",
+                pdbId,
+                modelSelection,
+                analysisTool,
+                nonCanonicalHandling,
+                removeIsolated,
+                structuralElementsHandling,
+                visualizationTool));
+
         return tertiaryToDotBracketService.analyzePdbTertiaryToDotBracket(
                 pdbId,
                 modelSelection,

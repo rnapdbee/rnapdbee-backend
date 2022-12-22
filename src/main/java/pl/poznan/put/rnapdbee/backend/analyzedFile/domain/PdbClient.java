@@ -7,15 +7,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbNotAvailableException;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 
 @Component
 public class PdbClient {
 
     private final WebClient pdbWebClient;
+    private final MessageProvider messageProvider;
 
     @Autowired
-    private PdbClient(@Autowired @Qualifier("pdbWebClient") WebClient pdbWebClient) {
+    private PdbClient(
+            @Autowired @Qualifier("pdbWebClient") WebClient pdbWebClient,
+            MessageProvider messageProvider
+    ) {
         this.pdbWebClient = pdbWebClient;
+        this.messageProvider = messageProvider;
     }
 
     public byte[] performPdbRequest(
@@ -26,10 +32,12 @@ public class PdbClient {
                 .uri(pdbId + fileExtension)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, response -> {
-                    throw new PdbFileNotFoundException(pdbId);
+                    throw new PdbFileNotFoundException(
+                            messageProvider.getMessage("api.exception.pdb.file.not.found.format"), pdbId);
                 })
                 .onStatus(HttpStatus::is5xxServerError, response -> {
-                    throw new PdbNotAvailableException();
+                    throw new PdbNotAvailableException(
+                            messageProvider.getMessage("api.exception.pdb.not.available.format"));
                 })
                 .bodyToMono(byte[].class)
                 .block();

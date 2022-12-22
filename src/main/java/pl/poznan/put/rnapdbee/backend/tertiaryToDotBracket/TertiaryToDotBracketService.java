@@ -8,6 +8,7 @@ import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
@@ -33,20 +34,17 @@ import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PD
 public class TertiaryToDotBracketService extends BaseAnalyzeService {
 
     private final TertiaryToDotBracketRepository tertiaryToDotBracketRepository;
-    private final EngineClient engineClient;
-    private final ImageComponent imageComponent;
 
     @Autowired
     private TertiaryToDotBracketService(
             TertiaryToDotBracketRepository tertiaryToDotBracketRepository,
             EngineClient engineClient,
             ImageComponent imageComponent,
-            AnalyzedFileService analyzedFileService
+            AnalyzedFileService analyzedFileService,
+            MessageProvider messageProvider
     ) {
-        super(analyzedFileService);
+        super(engineClient, imageComponent, analyzedFileService, messageProvider);
         this.tertiaryToDotBracketRepository = tertiaryToDotBracketRepository;
-        this.engineClient = engineClient;
-        this.imageComponent = imageComponent;
     }
 
     public TertiaryToDotBracketMongoEntity analyzeTertiaryToDotBracket(
@@ -244,7 +242,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 tertiaryToDotBracketRepository.findById(id);
 
         if (tertiaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotFoundException(id);
+            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
 
         return tertiaryToDotBracketMongoEntity.get();
     }

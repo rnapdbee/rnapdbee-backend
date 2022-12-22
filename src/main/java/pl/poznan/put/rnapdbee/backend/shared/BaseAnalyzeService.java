@@ -12,12 +12,24 @@ import java.util.UUID;
 
 public abstract class BaseAnalyzeService {
 
+    protected final EngineClient engineClient;
+    protected final ImageComponent imageComponent;
     protected final AnalyzedFileService analyzedFileService;
+    protected final MessageProvider messageProvider;
+
     @Value("${document.storage.days}")
     private int documentStorageDays;
 
-    protected BaseAnalyzeService(AnalyzedFileService analyzedFileService) {
+    protected BaseAnalyzeService(
+            EngineClient engineClient,
+            ImageComponent imageComponent,
+            AnalyzedFileService analyzedFileService,
+            MessageProvider messageProvider
+    ) {
+        this.engineClient = engineClient;
+        this.imageComponent = imageComponent;
         this.analyzedFileService = analyzedFileService;
+        this.messageProvider = messageProvider;
     }
 
     protected String removeFileExtension(
@@ -28,14 +40,16 @@ public abstract class BaseAnalyzeService {
         return Optional.ofNullable(filename)
                 .filter(f -> !f.isEmpty())
                 .map(f -> f.replaceAll(extensionsPattern, ""))
-                .orElseThrow(FilenameNotSetException::new);
+                .orElseThrow(() -> new FilenameNotSetException(
+                        messageProvider.getMessage("api.exception.filename.not.set")));
     }
 
     protected void checkDocumentExpiration(
             Instant createdAt,
             UUID id) {
         if ((int) Duration.between(createdAt, Instant.now()).toDays() >= documentStorageDays)
-            throw new DocumentExpiredException(id);
+            throw new DocumentExpiredException(
+                    messageProvider.getMessage("api.exception.document.expired.format"), id);
     }
 
     protected String getFileContentToReanalyze(
