@@ -1,35 +1,35 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 public class ConsensualVisualizationPath extends ConsensualVisualization {
-    private final String pathToSvgImage;
+    private final String pathToSVGImage;
 
-    private ConsensualVisualizationPath(String pathToSvgImage) {
-        this.pathToSvgImage = pathToSvgImage;
+    private ConsensualVisualizationPath(String pathToSVGImage) {
+        this.pathToSVGImage = pathToSVGImage;
     }
 
     public static ConsensualVisualizationPath of(
-            String pathToSvgImage
+            String pathToSVGImage
     ) {
         return new ConsensualVisualizationPath.Builder()
-                .withPathToSvgImage(pathToSvgImage)
+                .withPathToSVGImage(pathToSVGImage)
                 .build();
     }
 
-    public String getPathToSvgImage() {
-        return pathToSvgImage;
+    public String getPathToSVGImage() {
+        return pathToSVGImage;
     }
 
     public static class Builder extends ConsensualVisualization.Builder<Builder> {
-        private String pathToSvgImage;
+        private String pathToSVGImage;
 
-        public Builder withPathToSvgImage(String pathToSvgImage) {
-            this.pathToSvgImage = pathToSvgImage;
+        public Builder withPathToSVGImage(String pathToSVGImage) {
+            this.pathToSVGImage = pathToSVGImage;
             return self();
         }
 
         @Override
         public ConsensualVisualizationPath build() {
-            return new ConsensualVisualizationPath(this.getPathToSvgImage());
+            return new ConsensualVisualizationPath(this.getPathToSVGImage());
         }
 
         @Override
@@ -37,8 +37,8 @@ public class ConsensualVisualizationPath extends ConsensualVisualization {
             return this;
         }
 
-        public String getPathToSvgImage() {
-            return pathToSvgImage;
+        public String getPathToSVGImage() {
+            return pathToSVGImage;
         }
     }
 }
