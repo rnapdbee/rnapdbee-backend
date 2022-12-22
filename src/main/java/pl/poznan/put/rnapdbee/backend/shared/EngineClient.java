@@ -24,6 +24,9 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMult
 
 import java.util.List;
 
+/**
+ * Engine client class responsible for communication with the rnapdbee-engine service.
+ */
 @Component
 public class EngineClient {
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";

@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 /**
- * DTO class representing structure of image information response and entity.
+ * Class representing structure of image information response and entity.
  */
 public class ImageInformationPath extends ImageInformation {
     private final String pathToSVGImage;

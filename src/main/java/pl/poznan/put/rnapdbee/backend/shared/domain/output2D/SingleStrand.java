@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * DTO class representing single Strand
+ * Class representing single Strand.
  */
 public class SingleStrand {
     @JsonProperty("name")

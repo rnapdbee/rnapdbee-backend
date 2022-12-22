@@ -2,7 +2,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.param;
 
 
 /**
- * enum for VisualizationTools
+ * Enum for VisualizationTools.
  */
 public enum VisualizationTool {
     VARNA,

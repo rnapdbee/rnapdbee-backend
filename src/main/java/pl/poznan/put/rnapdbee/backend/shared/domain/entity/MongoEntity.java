@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Mongo document design for storing analysis data.
+ *
+ * @param <T> analysis parameters
+ * @param <O> analysis results, output from engine service
+ */
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;

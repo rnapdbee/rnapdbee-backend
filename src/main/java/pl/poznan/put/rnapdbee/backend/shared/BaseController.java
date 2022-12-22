@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.springframework.http.ContentDisposition;
 import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
 
+/**
+ * Base controller class.
+ */
 public abstract class BaseController {
 
     protected final MessageProvider messageProvider;

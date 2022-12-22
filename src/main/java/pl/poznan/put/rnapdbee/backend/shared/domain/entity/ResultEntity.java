@@ -9,6 +9,12 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.Consensual
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
+/**
+ * Class representing result of one analysis.
+ *
+ * @param <T> analysis parameters
+ * @param <O> analysis results, output from engine service
+ */
 public class ResultEntity<T, O> {
 
     private final T params;

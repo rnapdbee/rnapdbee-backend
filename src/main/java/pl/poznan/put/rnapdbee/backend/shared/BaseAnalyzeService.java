@@ -10,6 +10,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Base analyze service class containing reusable methods.
+ */
 public abstract class BaseAnalyzeService {
 
     protected final EngineClient engineClient;

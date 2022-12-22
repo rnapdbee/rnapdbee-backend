@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Component managing creation of image resources
+ * Component managing creation of image resources.
  */
 @Component
 public class ImageComponent {
