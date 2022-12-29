@@ -4,9 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import pl.poznan.put.rnapdbee.backend.infrastructure.exception.ExceptionPattern;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.SingleStrand;
@@ -16,11 +20,14 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.ModelSelection;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
+import pl.poznan.put.rnapdbee.backend.shared.exception.EngineNotAvailableException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.EngineReturnedException;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationSvgFile;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMultiEntry;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -40,6 +47,8 @@ public class EngineClient {
 
     private final WebClient engineWebClient;
 
+    private final MessageProvider messageProvider;
+
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;
     @Value("${rnapdbee.engine.global.2d.path}")
@@ -48,8 +57,27 @@ public class EngineClient {
     private String PATH_3D;
 
     @Autowired
-    private EngineClient(@Autowired @Qualifier("engineWebClient") WebClient engineWebClient) {
+    private EngineClient(
+            @Autowired @Qualifier("engineWebClient") WebClient engineWebClient,
+            MessageProvider messageProvider
+    ) {
         this.engineWebClient = engineWebClient;
+        this.messageProvider = messageProvider;
+    }
+
+    private static Mono<? extends Throwable> errorHandler(
+            ClientResponse clientResponse,
+            MessageProvider messageProvider
+    ) {
+        if (clientResponse.statusCode().is5xxServerError())
+            return Mono.error(new EngineNotAvailableException(
+                    messageProvider.getMessage("api.exception.engine.not.available")));
+
+        return clientResponse.bodyToMono(ExceptionPattern.class)
+                .flatMap(exception -> Mono.error(new EngineReturnedException(
+                        exception.getMessage(),
+                        exception.getStatus(),
+                        exception.getError())));
     }
 
     public Output2D<ImageInformationByteArray> perform2DAnalysisOnEngine(
@@ -57,20 +85,27 @@ public class EngineClient {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
             String filename,
-            String fileContent) {
-        return engineWebClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PATH_2D)
-                        .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
-                        .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
-                        .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
-                        .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
-                .body(BodyInserters.fromValue(fileContent))
-                .retrieve()
-                .bodyToMono(EngineResponse2D.class)
-                .block();
+            String fileContent
+    ) {
+        try {
+            return engineWebClient
+                    .post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(PATH_2D)
+                            .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
+                            .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
+                            .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
+                            .build())
+                    .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
+                    .body(BodyInserters.fromValue(fileContent))
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .bodyToMono(EngineResponse2D.class)
+                    .block();
+        } catch (WebClientRequestException e) {
+            throw new EngineNotAvailableException(
+                    messageProvider.getMessage("api.exception.engine.not.available"));
+        }
     }
 
     public Output3D<ImageInformationByteArray> perform3DAnalysisOnEngine(
@@ -81,23 +116,30 @@ public class EngineClient {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool,
             String filename,
-            String fileContent) {
-        return engineWebClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PATH_3D)
-                        .queryParam(MODEL_SELECTION_PARAM_NAME, modelSelection)
-                        .queryParam(ANALYSIS_TOOL_PARAM_NAME, analysisTool)
-                        .queryParam(NON_CANONICAL_HANDLING_PARAM_NAME, nonCanonicalHandling)
-                        .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
-                        .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
-                        .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
-                        .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
-                .body(BodyInserters.fromValue(fileContent))
-                .retrieve()
-                .bodyToMono(EngineResponse3D.class)
-                .block();
+            String fileContent
+    ) {
+        try {
+            return engineWebClient
+                    .post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(PATH_3D)
+                            .queryParam(MODEL_SELECTION_PARAM_NAME, modelSelection)
+                            .queryParam(ANALYSIS_TOOL_PARAM_NAME, analysisTool)
+                            .queryParam(NON_CANONICAL_HANDLING_PARAM_NAME, nonCanonicalHandling)
+                            .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
+                            .queryParam(STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME, structuralElementsHandling)
+                            .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
+                            .build())
+                    .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
+                    .body(BodyInserters.fromValue(fileContent))
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .bodyToMono(EngineResponse3D.class)
+                    .block();
+        } catch (WebClientRequestException e) {
+            throw new EngineNotAvailableException(
+                    messageProvider.getMessage("api.exception.engine.not.available"));
+        }
     }
 
     public OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> performMultiAnalysisOnEngine(
@@ -105,20 +147,27 @@ public class EngineClient {
             boolean removeIsolated,
             VisualizationTool visualizationTool,
             String filename,
-            String fileContent) {
-        return engineWebClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(PATH_MULTI)
-                        .queryParam(INCLUDE_NON_CANONICAL_PARAM_NAME, includeNonCanonical)
-                        .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
-                        .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
-                        .build())
-                .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
-                .body(BodyInserters.fromValue(fileContent))
-                .retrieve()
-                .bodyToMono(EngineResponseMulti.class)
-                .block();
+            String fileContent
+    ) {
+        try {
+            return engineWebClient
+                    .post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(PATH_MULTI)
+                            .queryParam(INCLUDE_NON_CANONICAL_PARAM_NAME, includeNonCanonical)
+                            .queryParam(REMOVE_ISOLATED_PARAM_NAME, removeIsolated)
+                            .queryParam(VISUALIZATION_TOOL_PARAM_NAME, visualizationTool)
+                            .build())
+                    .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
+                    .body(BodyInserters.fromValue(fileContent))
+                    .retrieve()
+                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .bodyToMono(EngineResponseMulti.class)
+                    .block();
+        } catch (WebClientRequestException e) {
+            throw new EngineNotAvailableException(
+                    messageProvider.getMessage("api.exception.engine.not.available"));
+        }
     }
 
     private String prepareContentDispositionHeader(String filename) {
