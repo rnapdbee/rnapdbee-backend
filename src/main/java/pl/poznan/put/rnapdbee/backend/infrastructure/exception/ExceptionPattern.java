@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Class representing api exception pattern
+ */
 public class ExceptionPattern {
 
     private String message;
@@ -55,5 +58,14 @@ public class ExceptionPattern {
 
     public ZonedDateTime getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{message='%s', status='%s', error='%s', timestamp='%s'}",
+                message,
+                status,
+                error,
+                timestamp);
     }
 }

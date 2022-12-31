@@ -3,6 +3,9 @@ package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
+/**
+ * Class representing secondary to dot bracket analysis params
+ */
 public class SecondaryToDotBracketParams {
     private final boolean removeIsolated;
     private final StructuralElementsHandling structuralElementsHandling;

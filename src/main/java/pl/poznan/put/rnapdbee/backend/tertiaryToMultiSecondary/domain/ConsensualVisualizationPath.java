@@ -1,5 +1,8 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
+/**
+ * Class representing structure of Consensual Visualization response and entity.
+ */
 public class ConsensualVisualizationPath extends ConsensualVisualization {
     private final String pathToSvgImage;
 

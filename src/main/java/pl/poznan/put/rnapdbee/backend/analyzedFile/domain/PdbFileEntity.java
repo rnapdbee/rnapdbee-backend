@@ -1,18 +1,21 @@
 package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdException;
 
 import javax.persistence.Id;
 import java.time.Instant;
 
-
+/**
+ * Class representing analyzed file downloaded from Protein Data Bank
+ */
 @Document
 public class PdbFileEntity {
+    /**
+     * filename without extension
+     */
     @Id
     private final String id;
     private final String content;
-
     private Instant createdAt;
 
     private PdbFileEntity(

@@ -2,6 +2,9 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
+/**
+ * Class representing tertiary to multi secondary analysis params
+ */
 public class TertiaryToMultiSecondaryParams {
     private final boolean includeNonCanonical;
     private final boolean removeIsolated;

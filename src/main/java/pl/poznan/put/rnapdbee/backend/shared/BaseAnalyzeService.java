@@ -1,5 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.shared;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
@@ -19,6 +21,7 @@ public abstract class BaseAnalyzeService {
     protected final ImageComponent imageComponent;
     protected final AnalyzedFileService analyzedFileService;
     protected final MessageProvider messageProvider;
+    protected final Logger logger = LoggerFactory.getLogger(BaseAnalyzeService.class);
 
     @Value("${document.storage.days}")
     private int documentStorageDays;
@@ -43,16 +46,23 @@ public abstract class BaseAnalyzeService {
         return Optional.ofNullable(filename)
                 .filter(f -> !f.isEmpty())
                 .map(f -> f.replaceAll(extensionsPattern, ""))
-                .orElseThrow(() -> new FilenameNotSetException(
-                        messageProvider.getMessage("api.exception.filename.not.set")));
+                .orElseThrow(() -> {
+                    logger.error("Filename not set exception occurred while removing the file extension.");
+
+                    throw new FilenameNotSetException(
+                            messageProvider.getMessage("api.exception.filename.not.set"));
+                });
     }
 
     protected void checkDocumentExpiration(
             Instant createdAt,
             UUID id) {
-        if ((int) Duration.between(createdAt, Instant.now()).toDays() >= documentStorageDays)
+        if ((int) Duration.between(createdAt, Instant.now()).toDays() >= documentStorageDays) {
+            logger.error(String.format("Document with id '%s' expired, creation timestamp: [%s]", id, createdAt));
+
             throw new DocumentExpiredException(
                     messageProvider.getMessage("api.exception.document.expired.format"), id);
+        }
     }
 
     protected String getFileContentToReanalyze(

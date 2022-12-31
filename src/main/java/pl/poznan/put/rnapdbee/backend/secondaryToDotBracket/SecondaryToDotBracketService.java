@@ -23,6 +23,9 @@ import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service class responsible for managing secondary to dot bracket scenario analysis
+ */
 @Service
 public class SecondaryToDotBracketService extends BaseAnalyzeService {
 
@@ -54,6 +57,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
+        logger.info("Saving analysis results.");
         String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         UUID id = IdSupplier.generateId();
@@ -104,6 +108,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 secondaryToDotBracketMongoEntity.getFilename(),
                 analyzedFile.getContent());
 
+        logger.info("Saving reanalysis results.");
         String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity =
@@ -141,8 +146,10 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
         Optional<SecondaryToDotBracketMongoEntity> secondaryToDotBracketMongoEntity =
                 secondaryToDotBracketRepository.findById(id);
 
-        if (secondaryToDotBracketMongoEntity.isEmpty())
+        if (secondaryToDotBracketMongoEntity.isEmpty()) {
+            logger.error(String.format("Current id '%s' not found.", id));
             throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+        }
 
         return secondaryToDotBracketMongoEntity.get();
     }

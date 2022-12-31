@@ -1,6 +1,8 @@
 package pl.poznan.put.rnapdbee.backend.analyzedFile;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
@@ -23,6 +25,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Service class responsible for managing analysis files uploaded by the user and downloaded from Protein Data Bank
+ */
 @Service
 public class AnalyzedFileService {
 
@@ -33,6 +38,7 @@ public class AnalyzedFileService {
     private final PdbFileRepository pdbFileRepository;
     private final PdbClient pdbClient;
     private final MessageProvider messageProvider;
+    private final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
 
     @Autowired
     private AnalyzedFileService(
@@ -49,18 +55,24 @@ public class AnalyzedFileService {
 
     public AnalyzedFileEntity findAnalyzedFile(UUID id) {
         Optional<AnalyzedFileEntity> analyzedFile = analyzedFileRepository.findById(id);
-        if (analyzedFile.isEmpty())
+        if (analyzedFile.isEmpty()) {
+            logger.error(String.format("File with id: [%s] to reanalyze not found in analyzedFileRepository.", id));
+
             throw new AnalyzedFileEntityNotFoundException(
                     messageProvider.getMessage("api.exception.file.not.found"));
+        }
 
         return analyzedFile.get();
     }
 
     public PdbFileEntity findPdbFile(String id) {
         Optional<PdbFileEntity> pdbFile = pdbFileRepository.findById(id);
-        if (pdbFile.isEmpty())
+        if (pdbFile.isEmpty()) {
+            logger.error(String.format("File '%s.cif' from Protein Data Bank not found in pdbFileRepository.", id));
+
             throw new PdbFileNotFoundException(
                     messageProvider.getMessage("api.exception.pdb.file.not.found.format"), id);
+        }
 
         return pdbFile.get();
     }
@@ -108,6 +120,8 @@ public class AnalyzedFileService {
 
             return IOUtils.toString(inputStream, Charset.defaultCharset());
         } catch (IOException e) {
+            logger.error(String.format("Pdb file '%s.cif.gz' unzip problem.", pdbId), e);
+
             throw new PdbFileUnzipException(
                     messageProvider.getMessage("api.exception.pdb.file.unzip.format"), pdbId);
         }
@@ -121,6 +135,8 @@ public class AnalyzedFileService {
 
     private void validatePdbId(String pdbId) {
         if (pdbId.length() != 4) {
+            logger.error(String.format("Invalid PDB id: '%s', 4 characters required in id.", pdbId));
+
             throw new InvalidPdbIdException(
                     messageProvider.getMessage("api.exception.invalid.pdb.id.format"), pdbId);
         }

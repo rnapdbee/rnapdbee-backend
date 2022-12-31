@@ -1,5 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.shared;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,8 +48,8 @@ public class EngineClient {
     private static final String INCLUDE_NON_CANONICAL_PARAM_NAME = "includeNonCanonical";
 
     private final WebClient engineWebClient;
-
     private final MessageProvider messageProvider;
+    private final Logger logger = LoggerFactory.getLogger(EngineClient.class);
 
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;
@@ -65,21 +67,6 @@ public class EngineClient {
         this.messageProvider = messageProvider;
     }
 
-    private static Mono<? extends Throwable> errorHandler(
-            ClientResponse clientResponse,
-            MessageProvider messageProvider
-    ) {
-        if (clientResponse.statusCode().is5xxServerError())
-            return Mono.error(new EngineNotAvailableException(
-                    messageProvider.getMessage("api.exception.engine.not.available")));
-
-        return clientResponse.bodyToMono(ExceptionPattern.class)
-                .flatMap(exception -> Mono.error(new EngineReturnedException(
-                        exception.getMessage(),
-                        exception.getStatus(),
-                        exception.getError())));
-    }
-
     public Output2D<ImageInformationByteArray> perform2DAnalysisOnEngine(
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
@@ -87,6 +74,7 @@ public class EngineClient {
             String filename,
             String fileContent
     ) {
+        logger.info("Performing 2D analysis on engine.");
         try {
             return engineWebClient
                     .post()
@@ -103,6 +91,7 @@ public class EngineClient {
                     .bodyToMono(EngineResponse2D.class)
                     .block();
         } catch (WebClientRequestException e) {
+            logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
                     messageProvider.getMessage("api.exception.engine.not.available"));
         }
@@ -118,6 +107,7 @@ public class EngineClient {
             String filename,
             String fileContent
     ) {
+        logger.info("Performing 3D analysis on engine.");
         try {
             return engineWebClient
                     .post()
@@ -137,6 +127,7 @@ public class EngineClient {
                     .bodyToMono(EngineResponse3D.class)
                     .block();
         } catch (WebClientRequestException e) {
+            logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
                     messageProvider.getMessage("api.exception.engine.not.available"));
         }
@@ -149,6 +140,7 @@ public class EngineClient {
             String filename,
             String fileContent
     ) {
+        logger.info("Performing Multi analysis on engine.");
         try {
             return engineWebClient
                     .post()
@@ -165,9 +157,26 @@ public class EngineClient {
                     .bodyToMono(EngineResponseMulti.class)
                     .block();
         } catch (WebClientRequestException e) {
+            logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
                     messageProvider.getMessage("api.exception.engine.not.available"));
         }
+    }
+
+    private static Mono<? extends Throwable> errorHandler(
+            ClientResponse clientResponse,
+            MessageProvider messageProvider
+    ) {
+        if (clientResponse.statusCode().is5xxServerError()) {
+            return Mono.error(new EngineNotAvailableException(
+                    messageProvider.getMessage("api.exception.engine.not.available")));
+        }
+
+        return clientResponse.bodyToMono(ExceptionPattern.class)
+                .flatMap(exception -> Mono.error(new EngineReturnedException(
+                        exception.getMessage(),
+                        exception.getStatus(),
+                        exception.getError())));
     }
 
     private String prepareContentDispositionHeader(String filename) {

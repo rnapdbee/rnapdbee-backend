@@ -9,7 +9,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
 import java.util.List;
 
 /**
- * OutputMultiEntry
+ * Class representing Output Multi Entry
  */
 public class OutputMultiEntry<T extends ImageInformation> {
     private final Output2D<T> output2D;

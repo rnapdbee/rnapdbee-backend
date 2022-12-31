@@ -1,7 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,10 +34,9 @@ public class TertiaryToDotBracketController extends BaseController {
     @Autowired
     private TertiaryToDotBracketController(
             MessageProvider messageProvider,
-            Logger logger,
             TertiaryToDotBracketService tertiaryToDotBracketService
     ) {
-        super(messageProvider, logger);
+        super(messageProvider);
         this.tertiaryToDotBracketService = tertiaryToDotBracketService;
     }
 

@@ -78,10 +78,6 @@ public abstract class MongoEntity<T, O> {
         }
 
         public B withFilename(String filename) {
-            if (filename.isBlank()) {
-                throw new IllegalArgumentException();
-            }
-
             this.filename = filename;
             return self();
         }

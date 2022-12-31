@@ -1,5 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -10,11 +12,15 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundExce
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbNotAvailableException;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 
+/**
+ * Class representing Protein Data Bank Http Client
+ */
 @Component
 public class PdbClient {
 
     private final WebClient pdbWebClient;
     private final MessageProvider messageProvider;
+    private final Logger logger = LoggerFactory.getLogger(PdbClient.class);
 
     @Autowired
     private PdbClient(
@@ -34,16 +40,22 @@ public class PdbClient {
                     .uri(pdbId + fileExtension)
                     .retrieve()
                     .onStatus(HttpStatus::is4xxClientError, response -> {
+                        logger.error(String.format("File '%s%s' not found in Protein Data Bank.", pdbId, fileExtension));
+
                         throw new PdbFileNotFoundException(
                                 messageProvider.getMessage("api.exception.pdb.file.not.found.format"), pdbId);
                     })
                     .onStatus(HttpStatus::is5xxServerError, response -> {
+                        logger.error("Protein Data Bank not available.");
+
                         throw new PdbNotAvailableException(
                                 messageProvider.getMessage("api.exception.pdb.not.available"));
                     })
                     .bodyToMono(byte[].class)
                     .block();
         } catch (WebClientRequestException e) {
+            logger.error("Protein Data Bank not available.");
+
             throw new PdbNotAvailableException(
                     messageProvider.getMessage("api.exception.pdb.not.available"));
         }

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 /**
- * DTO class for OutputMulti
+ * Class representing Multi structure analysis.
  */
 public class OutputMulti<T extends ImageInformation, U extends ConsensualVisualization> {
     private final List<OutputMultiEntry<T>> entries;

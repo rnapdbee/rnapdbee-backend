@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestInterceptor.class);
     private static final String UNKNOWN_ID = "UNKNOWN";
     private final MessageProvider messageProvider;
 
@@ -59,7 +59,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                     UUID.fromString(id);
                     return id;
                 } catch (IllegalArgumentException e) {
-                    LOGGER.error(String.format("Pre handled UUID: '%s' non-parsable.", id));
+                    logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id));
                     throw new IdNotFoundException(
                             messageProvider.getMessage("api.exception.id.not.found.format"), id);
                 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DTO class representing tertiary structure analysis.
+ * Class representing tertiary structure analysis.
  */
 public class Output3D<T extends ImageInformation> {
     private final List<SingleTertiaryModelOutput<T>> models;

@@ -1,7 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +30,9 @@ public class TertiaryToMultiSecondaryController extends BaseController {
     @Autowired
     private TertiaryToMultiSecondaryController(
             MessageProvider messageProvider,
-            Logger logger,
             TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService
     ) {
-        super(messageProvider, logger);
+        super(messageProvider);
         this.tertiaryToMultiSecondaryService = tertiaryToMultiSecondaryService;
     }
 

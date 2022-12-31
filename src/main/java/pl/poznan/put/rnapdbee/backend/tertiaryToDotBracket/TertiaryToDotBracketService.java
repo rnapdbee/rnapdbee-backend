@@ -30,6 +30,9 @@ import java.util.UUID;
 
 import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
 
+/**
+ * Service class responsible for managing tertiary to dot bracket scenario analysis
+ */
 @Service
 public class TertiaryToDotBracketService extends BaseAnalyzeService {
 
@@ -67,6 +70,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
+        logger.info("Saving analysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
                 engineResponse3D,
                 visualizationTool);
@@ -128,6 +132,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 tertiaryToDotBracketMongoEntity.getFilename(),
                 fileContent);
 
+        logger.info("Saving reanalysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
                 engineResponse3D,
                 visualizationTool);
@@ -175,6 +180,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 pdbFile.getContent());
 
+        logger.info("Saving pdb file analysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
                 engineResponse3D,
                 visualizationTool);
@@ -241,8 +247,10 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
         Optional<TertiaryToDotBracketMongoEntity> tertiaryToDotBracketMongoEntity =
                 tertiaryToDotBracketRepository.findById(id);
 
-        if (tertiaryToDotBracketMongoEntity.isEmpty())
+        if (tertiaryToDotBracketMongoEntity.isEmpty()) {
+            logger.error(String.format("Current id '%s' not found.", id));
             throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+        }
 
         return tertiaryToDotBracketMongoEntity.get();
     }

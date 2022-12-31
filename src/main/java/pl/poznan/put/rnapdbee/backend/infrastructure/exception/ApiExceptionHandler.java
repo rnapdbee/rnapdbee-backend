@@ -1,6 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.infrastructure.exception;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,18 +18,21 @@ import pl.poznan.put.rnapdbee.backend.shared.exception.EngineReturnedException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
 
+import java.util.Objects;
+
+/**
+ * Class responsible for handling api exceptions
+ */
 @ControllerAdvice
 public class ApiExceptionHandler {
 
     private final MessageProvider messageProvider;
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     public ApiExceptionHandler(
-            MessageProvider messageProvider,
-            Logger logger
+            MessageProvider messageProvider
     ) {
         this.messageProvider = messageProvider;
-        this.logger = logger;
     }
 
     @ExceptionHandler(value = {
@@ -72,13 +76,16 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(EngineReturnedException.class)
     public ResponseEntity<ExceptionPattern> handleEngineReturnedException(EngineReturnedException exception) {
-        HttpStatus httpStatus = HttpStatus.resolve(exception.getStatus());
+        HttpStatus httpStatus = Objects.requireNonNullElse(
+                HttpStatus.resolve(exception.getStatus()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
 
         ExceptionPattern exceptionPattern = new ExceptionPattern(
                 exception.getMessage(),
                 exception.getStatus(),
                 exception.getError());
 
+        logger.error(String.format("Exception response: %s", exceptionPattern));
         return new ResponseEntity<>(exceptionPattern, httpStatus);
     }
 
@@ -98,6 +105,7 @@ public class ApiExceptionHandler {
                 message,
                 httpStatus);
 
+        logger.error(String.format("Exception response: %s", exceptionPattern));
         return new ResponseEntity<>(exceptionPattern, httpStatus);
     }
 

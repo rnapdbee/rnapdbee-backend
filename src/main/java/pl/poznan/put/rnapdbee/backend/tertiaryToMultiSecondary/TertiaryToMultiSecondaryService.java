@@ -28,6 +28,9 @@ import java.util.UUID;
 
 import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
 
+/**
+ * Service class responsible for managing tertiary to multi secondary scenario analysis
+ */
 @Service
 public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
 
@@ -60,6 +63,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         fileContent);
 
+        logger.info("Saving analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
@@ -113,6 +117,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         tertiaryToMultiSecondaryMongoEntity.getFilename(),
                         fileContent);
 
+        logger.info("Saving reanalysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
@@ -152,6 +157,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         pdbFile.getContent());
 
+        logger.info("Saving pdb file analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
@@ -220,8 +226,10 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
         Optional<TertiaryToMultiSecondaryMongoEntity> tertiaryToMultiSecondaryMongoEntity =
                 tertiaryToMultiSecondaryRepository.findById(id);
 
-        if (tertiaryToMultiSecondaryMongoEntity.isEmpty())
+        if (tertiaryToMultiSecondaryMongoEntity.isEmpty()) {
+            logger.error(String.format("Current id '%s' not found.", id));
             throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+        }
 
         return tertiaryToMultiSecondaryMongoEntity.get();
     }

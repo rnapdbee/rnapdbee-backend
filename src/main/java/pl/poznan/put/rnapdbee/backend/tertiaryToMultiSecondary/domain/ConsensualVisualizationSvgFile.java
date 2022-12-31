@@ -1,5 +1,8 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
+/**
+ * Class representing structure of Consensual Visualization output from engine analyze.
+ */
 public class ConsensualVisualizationSvgFile extends ConsensualVisualization {
     private byte[] svgFile;
 
