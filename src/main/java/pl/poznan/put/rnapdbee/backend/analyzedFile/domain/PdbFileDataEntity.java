@@ -6,33 +6,26 @@ import javax.persistence.Id;
 import java.time.Instant;
 
 /**
- * Class representing analyzed file downloaded from Protein Data Bank
+ * Class representing data of analyzed file downloaded from Protein Data Bank
  */
 @Document
-public class PdbFileEntity {
+public class PdbFileDataEntity {
     /**
      * filename without extension
      */
     @Id
     private final String id;
-    private final String content;
     private Instant createdAt;
 
-    private PdbFileEntity(
+    private PdbFileDataEntity(
             String id,
-            String content,
             Instant createdAt) {
         this.id = id;
-        this.content = content;
         this.createdAt = createdAt;
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public Instant getCreatedAt() {
@@ -45,16 +38,10 @@ public class PdbFileEntity {
 
     public static class Builder {
         private String id;
-        private String content;
         private Instant createdAt;
 
         public Builder withId(String id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder withContent(String content) {
-            this.content = content;
             return this;
         }
 
@@ -63,10 +50,9 @@ public class PdbFileEntity {
             return this;
         }
 
-        public PdbFileEntity build() {
-            return new PdbFileEntity(
+        public PdbFileDataEntity build() {
+            return new PdbFileDataEntity(
                     this.id,
-                    this.content,
                     this.createdAt);
         }
     }

@@ -3,7 +3,6 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
 import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
@@ -59,6 +58,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
             VisualizationTool visualizationTool,
             String filename,
             String fileContent) {
+        analyzedFileService.saveAnalyzedFile(IdSupplier.generateId(), filename, fileContent);
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
@@ -70,12 +70,12 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
+        UUID id = IdSupplier.generateId();
+
         logger.info("Saving analysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
                 engineResponse3D,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity =
                 TertiaryToDotBracketMongoEntity.of(
@@ -96,7 +96,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 );
 
         tertiaryToDotBracketRepository.save(tertiaryToDotBracketMongoEntity);
-        analyzedFileService.saveAnalyzedFile(id, fileContent);
+        analyzedFileService.saveAnalyzedFile(id, filename, fileContent);
 
         return tertiaryToDotBracketMongoEntity;
     }
@@ -167,7 +167,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
     ) {
         String pdbId = pdbIdLowercase.toUpperCase();
 
-        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
+        String pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
         String filename = pdbId + PDB_FILE_EXTENSION;
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
@@ -178,7 +178,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService {
                 structuralElementsHandling,
                 visualizationTool,
                 filename,
-                pdbFile.getContent());
+                pdbFile);
 
         logger.info("Saving pdb file analysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(

@@ -3,7 +3,6 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
 import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
@@ -63,12 +62,12 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         fileContent);
 
+        UUID id = IdSupplier.generateId();
+
         logger.info("Saving analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity =
                 TertiaryToMultiSecondaryMongoEntity.of(
@@ -86,7 +85,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                 );
 
         tertiaryToMultiSecondaryRepository.save(tertiaryToMultiSecondaryMongoEntity);
-        analyzedFileService.saveAnalyzedFile(id, fileContent);
+        analyzedFileService.saveAnalyzedFile(id, filename, fileContent);
 
         return tertiaryToMultiSecondaryMongoEntity;
     }
@@ -146,7 +145,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
     ) {
         String pdbId = pdbIdLowercase.toUpperCase();
 
-        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
+        String pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
         String filename = pdbId + PDB_FILE_EXTENSION;
 
         OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti =
@@ -155,7 +154,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         removeIsolated,
                         visualizationTool,
                         filename,
-                        pdbFile.getContent());
+                        pdbFile);
 
         logger.info("Saving pdb file analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(

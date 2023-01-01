@@ -3,7 +3,6 @@ package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.SecondaryToDotBracketRepository;
@@ -57,10 +56,10 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
+        UUID id = IdSupplier.generateId();
+
         logger.info("Saving analysis results.");
         String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity =
                 SecondaryToDotBracketMongoEntity.of(
@@ -82,7 +81,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 );
 
         secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
-        analyzedFileService.saveAnalyzedFile(id, fileContent);
+        analyzedFileService.saveAnalyzedFile(id, filename, fileContent);
 
         return secondaryToDotBracketMongoEntity;
     }
@@ -97,7 +96,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
             StructuralElementsHandling structuralElementsHandling,
             VisualizationTool visualizationTool) {
 
-        AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
+        String analyzedFile = analyzedFileService.findAnalyzedFile(id);
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
         checkDocumentExpiration(secondaryToDotBracketMongoEntity.getCreatedAt(), id);
 
@@ -106,7 +105,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 structuralElementsHandling,
                 visualizationTool,
                 secondaryToDotBracketMongoEntity.getFilename(),
-                analyzedFile.getContent());
+                analyzedFile);
 
         logger.info("Saving reanalysis results.");
         String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);

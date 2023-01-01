@@ -5,15 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbClient;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileDataEntity;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.AnalyzedFileEntityNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileUnzipException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.AnalyzedFileRepository;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.PdbFileRepository;
+import pl.poznan.put.rnapdbee.backend.analyzedFile.repository.PdbFileDataRepository;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 
 import java.io.ByteArrayInputStream;
@@ -35,7 +34,7 @@ public class AnalyzedFileService {
     private static final String ARCHIVE_FILE_EXTENSION = ".gz";
 
     private final AnalyzedFileRepository analyzedFileRepository;
-    private final PdbFileRepository pdbFileRepository;
+    private final PdbFileDataRepository pdbFileDataRepository;
     private final PdbClient pdbClient;
     private final MessageProvider messageProvider;
     private final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
@@ -43,70 +42,70 @@ public class AnalyzedFileService {
     @Autowired
     private AnalyzedFileService(
             AnalyzedFileRepository analyzedFileRepository,
-            PdbFileRepository pdbFileRepository,
+            PdbFileDataRepository pdbFileDataRepository,
             PdbClient pdbClient,
             MessageProvider messageProvider
     ) {
         this.analyzedFileRepository = analyzedFileRepository;
-        this.pdbFileRepository = pdbFileRepository;
+        this.pdbFileDataRepository = pdbFileDataRepository;
         this.pdbClient = pdbClient;
         this.messageProvider = messageProvider;
     }
 
-    public AnalyzedFileEntity findAnalyzedFile(UUID id) {
-        Optional<AnalyzedFileEntity> analyzedFile = analyzedFileRepository.findById(id);
-        if (analyzedFile.isEmpty()) {
+    public String findAnalyzedFile(UUID id) {
+        String analyzedFile = analyzedFileRepository.findById(id.toString());
+        if (analyzedFile == null) {
             logger.error(String.format("File with id: [%s] to reanalyze not found in analyzedFileRepository.", id));
 
             throw new AnalyzedFileEntityNotFoundException(
                     messageProvider.getMessage("api.exception.file.not.found"));
         }
 
-        return analyzedFile.get();
+        return analyzedFile;
     }
 
-    public PdbFileEntity findPdbFile(String id) {
-        Optional<PdbFileEntity> pdbFile = pdbFileRepository.findById(id);
-        if (pdbFile.isEmpty()) {
-            logger.error(String.format("File '%s.cif' from Protein Data Bank not found in pdbFileRepository.", id));
+    public String findPdbFile(String id) {
+        String pdbFile = analyzedFileRepository.findById(id);
+        if (pdbFile == null) {
+            logger.error(String.format("File '%s.cif' from Protein Data Bank not found in analyzedFileRepository.", id));
 
             throw new PdbFileNotFoundException(
                     messageProvider.getMessage("api.exception.pdb.file.not.found.format"), id);
         }
 
-        return pdbFile.get();
+        return pdbFile;
     }
 
     public void saveAnalyzedFile(
             UUID id,
-            String content
-    ) {
-        analyzedFileRepository.save(new AnalyzedFileEntity.Builder()
-                .withId(id)
-                .withContent(content)
-                .build());
+            String filename,
+            String content) {
+        analyzedFileRepository.save(id.toString(), filename, content);
     }
 
-    public PdbFileEntity fetchPdbStructure(String pdbId) {
+    public String fetchPdbStructure(String pdbId) {
         validatePdbId(pdbId);
-        Optional<PdbFileEntity> optionalPdbFile = pdbFileRepository.findById(pdbId);
+        String pdbFile = analyzedFileRepository.findById(pdbId);
 
-        if (optionalPdbFile.isEmpty()) {
+        if (pdbFile == null) {
             String fileContent = downloadPdbFile(pdbId);
+            analyzedFileRepository.save(pdbId, pdbId + PDB_FILE_EXTENSION, fileContent);
 
-            PdbFileEntity pdbFile = new PdbFileEntity.Builder()
-                    .withId(pdbId)
-                    .withContent(fileContent)
-                    .withCreatedAt(Instant.now())
-                    .build();
-            pdbFileRepository.save(pdbFile);
+            PdbFileDataEntity pdbFileDataEntity = new PdbFileDataEntity.Builder().withId(pdbId).withCreatedAt(Instant.now()).build();
+            pdbFileDataRepository.save(pdbFileDataEntity);
 
-            return pdbFile;
-
+            return fileContent;
         } else {
-            PdbFileEntity pdbFile = optionalPdbFile.get();
-            pdbFile.setCreatedAt(Instant.now());
-            pdbFileRepository.save(pdbFile);
+            Optional<PdbFileDataEntity> optionalPdbFileData = pdbFileDataRepository.findById(pdbId);
+
+            if (optionalPdbFileData.isEmpty()) {
+                logger.warn("File Data '%s.cif' from Protein Data Bank not found in pdbFileDataRepository.");
+                return pdbFile;
+            }
+
+            PdbFileDataEntity pdbFileDataEntity = optionalPdbFileData.get();
+            pdbFileDataEntity.setCreatedAt(Instant.now());
+            pdbFileDataRepository.save(pdbFileDataEntity);
 
             return pdbFile;
         }
@@ -128,6 +127,7 @@ public class AnalyzedFileService {
     }
 
     private String downloadPdbFile(String pdbId) {
+        logger.info(String.format("Downloading file with pdbId: [%s] form Protein Data Bank", pdbId));
         String fileExtension = PDB_FILE_EXTENSION + ARCHIVE_FILE_EXTENSION;
         byte[] pdbResponse = pdbClient.performPdbRequest(pdbId, fileExtension);
         return unzipPdbFile(pdbResponse, pdbId);

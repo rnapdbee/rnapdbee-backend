@@ -71,10 +71,9 @@ public abstract class BaseAnalyzeService {
             boolean usePdb
     ) {
         if (usePdb) {
-            return analyzedFileService.findPdbFile(
-                    removeFileExtension(filename, true)).getContent();
+            return analyzedFileService.findPdbFile(removeFileExtension(filename, true));
         } else {
-            return analyzedFileService.findAnalyzedFile(id).getContent();
+            return analyzedFileService.findAnalyzedFile(id);
         }
     }
 }
