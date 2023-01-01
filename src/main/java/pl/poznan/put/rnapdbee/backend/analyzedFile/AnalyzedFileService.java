@@ -91,7 +91,10 @@ public class AnalyzedFileService {
             String fileContent = downloadPdbFile(pdbId);
             analyzedFileRepository.save(pdbId, pdbId + PDB_FILE_EXTENSION, fileContent);
 
-            PdbFileDataEntity pdbFileDataEntity = new PdbFileDataEntity.Builder().withId(pdbId).withCreatedAt(Instant.now()).build();
+            PdbFileDataEntity pdbFileDataEntity = new PdbFileDataEntity.Builder()
+                    .withId(pdbId)
+                    .withCreatedAt(Instant.now())
+                    .build();
             pdbFileDataRepository.save(pdbFileDataEntity);
 
             return fileContent;

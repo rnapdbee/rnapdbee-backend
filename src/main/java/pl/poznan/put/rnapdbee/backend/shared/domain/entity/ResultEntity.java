@@ -1,6 +1,8 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
+import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
@@ -9,6 +11,9 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.Consensual
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
+import javax.persistence.Id;
+import java.util.UUID;
+
 /**
  * Class representing result of one analysis.
  *
@@ -16,14 +21,19 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryTo
  * @param <O> analysis results, output from engine service
  */
 public class ResultEntity<T, O> {
+    @Id
+    @JsonIgnore
+    private UUID id;
+    private T params;
+    private O output;
 
-    private final T params;
-
-    private final O output;
+    public ResultEntity() {
+    }
 
     private ResultEntity(
             T params,
             O output) {
+        this.id = IdSupplier.generateId();
         this.params = params;
         this.output = output;
     }
@@ -56,6 +66,10 @@ public class ResultEntity<T, O> {
                 .withParams(tertiaryToMultiSecondaryParams)
                 .withOutput(outputMulti)
                 .build();
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public T getParams() {

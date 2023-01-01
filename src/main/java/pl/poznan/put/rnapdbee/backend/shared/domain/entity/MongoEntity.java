@@ -97,6 +97,11 @@ public abstract class MongoEntity<T, O> {
             return self();
         }
 
+        public void addResult(
+                ResultEntity<T, O> newResult) {
+            this.results.add(newResult);
+        }
+
         protected abstract MongoEntity<T, O> build();
 
         public UUID getId() {

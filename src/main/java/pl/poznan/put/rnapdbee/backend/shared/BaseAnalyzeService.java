@@ -4,23 +4,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
+import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
+import pl.poznan.put.rnapdbee.backend.shared.repository.AnalysisDataRepository;
+import pl.poznan.put.rnapdbee.backend.shared.repository.ResultRepository;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Base analyze service class containing reusable methods.
  */
-public abstract class BaseAnalyzeService {
+public abstract class BaseAnalyzeService<T, O, E> {
 
     protected final EngineClient engineClient;
     protected final ImageComponent imageComponent;
     protected final AnalyzedFileService analyzedFileService;
     protected final MessageProvider messageProvider;
+    protected final AnalysisDataRepository<T, O> analysisDataRepository;
+    protected final ResultRepository<T, O> resultRepository;
+
+
     protected final Logger logger = LoggerFactory.getLogger(BaseAnalyzeService.class);
 
     @Value("${document.storage.days}")
@@ -30,12 +42,16 @@ public abstract class BaseAnalyzeService {
             EngineClient engineClient,
             ImageComponent imageComponent,
             AnalyzedFileService analyzedFileService,
-            MessageProvider messageProvider
+            MessageProvider messageProvider,
+            AnalysisDataRepository<T, O> analysisDataRepository,
+            ResultRepository<T, O> resultRepository
     ) {
         this.engineClient = engineClient;
         this.imageComponent = imageComponent;
         this.analyzedFileService = analyzedFileService;
         this.messageProvider = messageProvider;
+        this.analysisDataRepository = analysisDataRepository;
+        this.resultRepository = resultRepository;
     }
 
     protected String removeFileExtension(
@@ -76,4 +92,62 @@ public abstract class BaseAnalyzeService {
             return analyzedFileService.findAnalyzedFile(id);
         }
     }
+
+    protected <E extends MongoEntity<T, O>> void saveMongoEntity(
+            E mongoEntity
+    ) {
+        List<UUID> resultsIds = new ArrayList<>();
+
+        for (ResultEntity<T, O> result : mongoEntity.getResults()) {
+            resultRepository.save(result);
+            resultsIds.add(result.getId());
+        }
+
+        AnalysisData analysisData = new AnalysisData.Builder()
+                .withId(mongoEntity.getId())
+                .withFilename(mongoEntity.getFilename())
+                .withResults(resultsIds)
+                .withCreatedAt(mongoEntity.getCreatedAt())
+                .withUsePdb(mongoEntity.isUsePdb())
+                .build();
+
+        analysisDataRepository.save(analysisData);
+    }
+
+    protected void saveNewResultEntity(
+            UUID id,
+            ResultEntity<T, O> resultEntity
+    ) {
+        AnalysisData analysisData = findAnalysisDataDocument(id);
+        analysisData.addResult(resultEntity.getId());
+        analysisDataRepository.save(analysisData);
+        resultRepository.save(resultEntity);
+    }
+
+    protected AnalysisData findAnalysisDataDocument(UUID id) {
+        Optional<AnalysisData> optionalAnalysisData = analysisDataRepository.findById(id);
+
+        if (optionalAnalysisData.isEmpty()) {
+            logger.error(String.format("Current id '%s' not found.", id));
+            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+        }
+
+        return optionalAnalysisData.get();
+    }
+
+    protected ResultEntity<T, O> findResultEntityDocument(
+            UUID resultId,
+            UUID id
+    ) {
+        Optional<ResultEntity<T, O>> optionalResultEntity = resultRepository.findById(resultId);
+
+        if (optionalResultEntity.isEmpty()) {
+            logger.error(String.format("Current id '%s' not found.", id));
+            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+        }
+
+        return optionalResultEntity.get();
+    }
+
+    public abstract E findDocument(UUID id);
 }
