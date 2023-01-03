@@ -10,7 +10,7 @@ import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.Secondary
 import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
-import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;

@@ -21,6 +21,7 @@ services:
     build: .
     image: rnapdbee-backend-image
     environment:
+      - spring_svg_images_directory_path=/images
       - spring_data_mongodb_authentication-database=admin
       - spring_data_mongodb_username=rnapdbee
       - spring_data_mongodb_password=a1s2d3f4
@@ -32,7 +33,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - rnapdbee-backend-volume:/resources/tmp
+      - rnapdbee-backend-volume:/images
 
 volumes:
   rnapdbee-mongoDB-volume:
