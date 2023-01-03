@@ -13,8 +13,6 @@ services:
       - "27017:27017"
     volumes:
       - rnapdbee-mongoDB-volume:/data/db
-    networks:
-      - rnapdbee-network
 
   backend:
     container_name: rnapdbee-backend-container
@@ -35,12 +33,13 @@ services:
       - "8080:8080"
     volumes:
       - rnapdbee-backend-volume:/resources/tmp
-    networks:
-      - rnapdbee-network
 
 volumes:
   rnapdbee-mongoDB-volume:
   rnapdbee-backend-volume:
 
 networks:
-  rnapdbee-network:
+  default:
+    name: rnapdbee-network
+    external: true
+
