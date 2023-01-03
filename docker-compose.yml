@@ -19,7 +19,7 @@ services:
     depends_on:
       - mongoDB
     build: .
-    image: rnapdbee-backend-image
+#    image: rnapdbee-backend-image
     environment:
       - spring_svg_images_directory_path=/images
       - spring_data_mongodb_authentication-database=admin

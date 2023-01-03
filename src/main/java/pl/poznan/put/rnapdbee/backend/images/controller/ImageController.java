@@ -15,12 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @RestController
-public class ImagesController {
+public class ImageController {
 
     @Value("${spring.svg.images.directory.path}")
     private String imagesPath;
 
-    @GetMapping("/images/{name}")
+    @GetMapping("/image/{name}")
     public ResponseEntity<Resource> getSvgImage(@PathVariable String name) throws IOException {
         String inputFile = String.format("%s/%s", imagesPath, name);
         Path path = new File(inputFile).toPath();
