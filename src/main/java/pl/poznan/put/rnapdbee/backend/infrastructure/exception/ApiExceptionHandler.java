@@ -94,7 +94,7 @@ public class ApiExceptionHandler {
         logger.error(String.format("Unknown error occurred: %s", exception.getMessage()), exception);
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return prepareResponseEntity(messageProvider.getMessage("api.exception.unknown.error"), httpStatus);
+        return prepareResponseEntity(messageProvider.getMessage(MessageProvider.Message.UNKNOWN_ERROR), httpStatus);
     }
 
     private ResponseEntity<ExceptionPattern> prepareResponseEntity(

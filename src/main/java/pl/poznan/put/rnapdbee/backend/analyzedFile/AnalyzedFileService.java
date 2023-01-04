@@ -65,7 +65,7 @@ public class AnalyzedFileService {
             logger.error(String.format("File with id: [%s] to reanalyze not found in analyzedFileRepository.", id));
 
             throw new AnalyzedFileEntityNotFoundException(
-                    messageProvider.getMessage("api.exception.file.not.found"));
+                    messageProvider.getMessage(MessageProvider.Message.FILE_NOT_FOUND));
         }
 
         return analyzedFile;
@@ -77,7 +77,7 @@ public class AnalyzedFileService {
             logger.error(String.format("File '%s.cif' from Protein Data Bank not found in analyzedFileRepository.", id));
 
             throw new PdbFileNotFoundException(
-                    messageProvider.getMessage("api.exception.pdb.file.not.found.format"), id);
+                    messageProvider.getMessage(MessageProvider.Message.PDB_FILE_NOT_FOUND_FORMAT), id);
         }
 
         return pdbFile;
@@ -153,7 +153,7 @@ public class AnalyzedFileService {
             logger.error(String.format("Pdb file '%s.cif.gz' unzip problem.", pdbId), e);
 
             throw new PdbFileUnzipException(
-                    messageProvider.getMessage("api.exception.pdb.file.unzip.format"), pdbId);
+                    messageProvider.getMessage(MessageProvider.Message.PDB_FILE_UNZIP_FORMAT), pdbId);
         }
     }
 
@@ -169,7 +169,7 @@ public class AnalyzedFileService {
             logger.error(String.format("Invalid PDB id: '%s', 4 characters required in id.", pdbId));
 
             throw new InvalidPdbIdException(
-                    messageProvider.getMessage("api.exception.invalid.pdb.id.format"), pdbId);
+                    messageProvider.getMessage(MessageProvider.Message.INVALID_PDB_ID_FORMAT), pdbId);
         }
     }
 }

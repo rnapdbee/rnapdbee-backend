@@ -24,7 +24,7 @@ public abstract class BaseController {
             logger.error("Content-disposition header not set.");
 
             throw new FilenameNotSetException(
-                    messageProvider.getMessage("api.exception.content.disposition.not.set"));
+                    messageProvider.getMessage(MessageProvider.Message.CONTENT_DISPOSITION_NOT_SET));
         }
 
         try {
@@ -33,7 +33,7 @@ public abstract class BaseController {
                 logger.error("Filename not set.");
 
                 throw new FilenameNotSetException(
-                        messageProvider.getMessage("api.exception.filename.not.set"));
+                        messageProvider.getMessage(MessageProvider.Message.FILENAME_NOT_SET));
             }
             return filename;
 
@@ -41,7 +41,7 @@ public abstract class BaseController {
             logger.error("Filename non-parsable.");
 
             throw new FilenameNotSetException(
-                    messageProvider.getMessage("api.exception.filename.not.parsable"));
+                    messageProvider.getMessage(MessageProvider.Message.FILENAME_NOT_PARSABLE));
         }
     }
 }

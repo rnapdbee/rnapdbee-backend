@@ -76,7 +76,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
                     logger.error("Filename not set exception occurred while removing the file extension.");
 
                     throw new FilenameNotSetException(
-                            messageProvider.getMessage("api.exception.filename.not.set"));
+                            messageProvider.getMessage(MessageProvider.Message.FILENAME_NOT_SET));
                 });
     }
 
@@ -87,7 +87,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
             logger.error(String.format("Document with id '%s' expired, creation timestamp: [%s]", id, createdAt));
 
             throw new DocumentExpiredException(
-                    messageProvider.getMessage("api.exception.document.expired.format"), id);
+                    messageProvider.getMessage(MessageProvider.Message.DOCUMENT_EXPIRED_FORMAT), id);
         }
     }
 
@@ -140,7 +140,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
         if (optionalAnalysisData.isEmpty() || !optionalAnalysisData.get().getScenario().equals(scenario)) {
             logger.error(String.format("Current id '%s' not found.", id));
-            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+            throw new IdNotFoundException(messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
         }
 
         return optionalAnalysisData.get();
@@ -154,7 +154,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
         if (optionalResultEntity.isEmpty()) {
             logger.error(String.format("Current id '%s' not found.", id));
-            throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
+            throw new IdNotFoundException(messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
         }
 
         return optionalResultEntity.get();

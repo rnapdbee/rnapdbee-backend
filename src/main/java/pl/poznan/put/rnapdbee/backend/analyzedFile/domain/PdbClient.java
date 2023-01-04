@@ -43,13 +43,13 @@ public class PdbClient {
                         logger.error(String.format("File '%s%s' not found in Protein Data Bank.", pdbId, fileExtension));
 
                         throw new PdbFileNotFoundException(
-                                messageProvider.getMessage("api.exception.pdb.file.not.found.format"), pdbId);
+                                messageProvider.getMessage(MessageProvider.Message.PDB_FILE_NOT_FOUND_FORMAT), pdbId);
                     })
                     .onStatus(HttpStatus::is5xxServerError, response -> {
                         logger.error("Protein Data Bank not available.");
 
                         throw new PdbNotAvailableException(
-                                messageProvider.getMessage("api.exception.pdb.not.available"));
+                                messageProvider.getMessage(MessageProvider.Message.PDB_NOT_AVAILABLE));
                     })
                     .bodyToMono(byte[].class)
                     .block();
@@ -57,7 +57,7 @@ public class PdbClient {
             logger.error("Protein Data Bank not available.");
 
             throw new PdbNotAvailableException(
-                    messageProvider.getMessage("api.exception.pdb.not.available"));
+                    messageProvider.getMessage(MessageProvider.Message.PDB_NOT_AVAILABLE));
         }
     }
 }

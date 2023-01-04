@@ -93,7 +93,7 @@ public class EngineClient {
         } catch (WebClientRequestException e) {
             logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
-                    messageProvider.getMessage("api.exception.engine.not.available"));
+                    messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE));
         }
     }
 
@@ -129,7 +129,7 @@ public class EngineClient {
         } catch (WebClientRequestException e) {
             logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
-                    messageProvider.getMessage("api.exception.engine.not.available"));
+                    messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE));
         }
     }
 
@@ -159,7 +159,7 @@ public class EngineClient {
         } catch (WebClientRequestException e) {
             logger.error("Calculation engine not available.", e);
             throw new EngineNotAvailableException(
-                    messageProvider.getMessage("api.exception.engine.not.available"));
+                    messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE));
         }
     }
 
@@ -169,7 +169,7 @@ public class EngineClient {
     ) {
         if (clientResponse.statusCode().is5xxServerError()) {
             return Mono.error(new EngineNotAvailableException(
-                    messageProvider.getMessage("api.exception.engine.not.available")));
+                    messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE)));
         }
 
         return clientResponse.bodyToMono(ExceptionPattern.class)

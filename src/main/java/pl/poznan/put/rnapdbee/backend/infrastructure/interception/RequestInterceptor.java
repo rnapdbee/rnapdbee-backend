@@ -61,7 +61,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 } catch (IllegalArgumentException e) {
                     logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id));
                     throw new IdNotFoundException(
-                            messageProvider.getMessage("api.exception.id.not.found.format"), id);
+                            messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
                 }
             } else if (parts.length == 7) {
                 String id = parts[parts.length - 1];
