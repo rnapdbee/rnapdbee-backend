@@ -7,6 +7,7 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
 import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
@@ -23,15 +24,15 @@ import java.util.UUID;
 /**
  * Base analyze service class containing reusable methods.
  */
-public abstract class BaseAnalyzeService<T, O, E> {
+public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
     protected final EngineClient engineClient;
     protected final ImageComponent imageComponent;
     protected final AnalyzedFileService analyzedFileService;
     protected final MessageProvider messageProvider;
-    protected final AnalysisDataRepository<T, O> analysisDataRepository;
+    protected final AnalysisDataRepository analysisDataRepository;
     protected final ResultRepository<T, O> resultRepository;
-
+    protected final Scenario scenario;
 
     protected final Logger logger = LoggerFactory.getLogger(BaseAnalyzeService.class);
 
@@ -43,15 +44,24 @@ public abstract class BaseAnalyzeService<T, O, E> {
             ImageComponent imageComponent,
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
-            AnalysisDataRepository<T, O> analysisDataRepository,
-            ResultRepository<T, O> resultRepository
-    ) {
+            AnalysisDataRepository analysisDataRepository,
+            ResultRepository<T, O> resultRepository,
+            Scenario scenario) {
         this.engineClient = engineClient;
         this.imageComponent = imageComponent;
         this.analyzedFileService = analyzedFileService;
         this.messageProvider = messageProvider;
         this.analysisDataRepository = analysisDataRepository;
         this.resultRepository = resultRepository;
+        this.scenario = scenario;
+    }
+
+    public abstract E findDocument(UUID id);
+
+    public void deleteExpiredResults(List<UUID> expiredResultsIds) {
+        for (UUID expiredResultId : expiredResultsIds) {
+            resultRepository.deleteById(expiredResultId);
+        }
     }
 
     protected String removeFileExtension(
@@ -93,7 +103,7 @@ public abstract class BaseAnalyzeService<T, O, E> {
         }
     }
 
-    protected <E extends MongoEntity<T, O>> void saveMongoEntity(
+    protected void saveMongoEntity(
             E mongoEntity
     ) {
         List<UUID> resultsIds = new ArrayList<>();
@@ -109,6 +119,7 @@ public abstract class BaseAnalyzeService<T, O, E> {
                 .withResults(resultsIds)
                 .withCreatedAt(mongoEntity.getCreatedAt())
                 .withUsePdb(mongoEntity.isUsePdb())
+                .withScenario(scenario)
                 .build();
 
         analysisDataRepository.save(analysisData);
@@ -127,7 +138,7 @@ public abstract class BaseAnalyzeService<T, O, E> {
     protected AnalysisData findAnalysisDataDocument(UUID id) {
         Optional<AnalysisData> optionalAnalysisData = analysisDataRepository.findById(id);
 
-        if (optionalAnalysisData.isEmpty()) {
+        if (optionalAnalysisData.isEmpty() || !optionalAnalysisData.get().getScenario().equals(scenario)) {
             logger.error(String.format("Current id '%s' not found.", id));
             throw new IdNotFoundException(messageProvider.getMessage("api.exception.id.not.found.format"), id);
         }
@@ -148,6 +159,4 @@ public abstract class BaseAnalyzeService<T, O, E> {
 
         return optionalResultEntity.get();
     }
-
-    public abstract E findDocument(UUID id);
 }

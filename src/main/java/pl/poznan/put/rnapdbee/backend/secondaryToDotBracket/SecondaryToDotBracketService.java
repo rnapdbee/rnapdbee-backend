@@ -12,6 +12,7 @@ import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
@@ -34,7 +35,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
             ImageComponent imageComponent,
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
-            AnalysisDataRepository<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> analysisDataRepository,
+            AnalysisDataRepository analysisDataRepository,
             ResultRepository<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultRepository
     ) {
         super(engineClient,
@@ -42,7 +43,8 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
                 analyzedFileService,
                 messageProvider,
                 analysisDataRepository,
-                resultRepository);
+                resultRepository,
+                Scenario.SCENARIO_2D);
     }
 
     public SecondaryToDotBracketMongoEntity analyzeSecondaryToDotBracket(

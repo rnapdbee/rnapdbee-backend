@@ -10,6 +10,7 @@ import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
@@ -41,7 +42,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
             ImageComponent imageComponent,
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
-            AnalysisDataRepository<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> analysisDataRepository,
+            AnalysisDataRepository analysisDataRepository,
             ResultRepository<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultRepository
     ) {
         super(engineClient,
@@ -49,7 +50,8 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
                 analyzedFileService,
                 messageProvider,
                 analysisDataRepository,
-                resultRepository);
+                resultRepository,
+                Scenario.SCENARIO_3D);
     }
 
     public TertiaryToDotBracketMongoEntity analyzeTertiaryToDotBracket(
@@ -183,12 +185,12 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
                 filename,
                 pdbFile);
 
+        UUID id = IdSupplier.generateId();
+
         logger.info("Saving pdb file analysis results.");
         Output3D<ImageInformationPath> output3D = saveGraphicsWithPath(
                 engineResponse3D,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToDotBracketMongoEntity tertiaryToDotBracketMongoEntity =
                 TertiaryToDotBracketMongoEntity.of(

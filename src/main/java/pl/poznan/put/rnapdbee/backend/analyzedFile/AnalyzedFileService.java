@@ -4,6 +4,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbClient;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileDataEntity;
@@ -19,7 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -38,6 +43,8 @@ public class AnalyzedFileService {
     private final PdbClient pdbClient;
     private final MessageProvider messageProvider;
     private final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
+    @Value("${document.storage.days}")
+    private int documentStorageDays;
 
     @Autowired
     private AnalyzedFileService(
@@ -81,6 +88,27 @@ public class AnalyzedFileService {
             String filename,
             String content) {
         analyzedFileRepository.save(id.toString(), filename, content);
+    }
+
+    public void deleteAnalyzedFile(UUID id) {
+        analyzedFileRepository.delete(id.toString());
+    }
+
+    public void deleteExpiredPdbFiles() {
+        List<PdbFileDataEntity> pdbFileDataList = pdbFileDataRepository.findAll(Sort.by("createdAt"));
+        List<String> expiredPdbFilesIds = new ArrayList<>();
+
+        for (PdbFileDataEntity pdbFileData : pdbFileDataList) {
+            if ((int) Duration.between(pdbFileData.getCreatedAt(), Instant.now()).toDays() >= documentStorageDays) {
+                String expiredFileId = pdbFileData.getId();
+                expiredPdbFilesIds.add(expiredFileId);
+                analyzedFileRepository.delete(expiredFileId);
+            } else {
+                break;
+            }
+        }
+
+        pdbFileDataRepository.deleteAllById(expiredPdbFilesIds);
     }
 
     public String fetchPdbStructure(String pdbId) {

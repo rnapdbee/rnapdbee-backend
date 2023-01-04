@@ -63,6 +63,9 @@ public class RequestInterceptor implements HandlerInterceptor {
                     throw new IdNotFoundException(
                             messageProvider.getMessage("api.exception.id.not.found.format"), id);
                 }
+            } else if (parts.length == 7) {
+                String id = parts[parts.length - 1];
+                return id.toUpperCase();
             } else
                 return UNKNOWN_ID;
         }

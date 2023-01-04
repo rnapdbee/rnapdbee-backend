@@ -10,6 +10,7 @@ import pl.poznan.put.rnapdbee.backend.shared.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
@@ -39,7 +40,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
             ImageComponent imageComponent,
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
-            AnalysisDataRepository<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> analysisDataRepository,
+            AnalysisDataRepository analysisDataRepository,
             ResultRepository<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultRepository
     ) {
         super(engineClient,
@@ -47,7 +48,8 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                 analyzedFileService,
                 messageProvider,
                 analysisDataRepository,
-                resultRepository);
+                resultRepository,
+                Scenario.SCENARIO_MULTI);
     }
 
     public TertiaryToMultiSecondaryMongoEntity analyzeTertiaryToMultiSecondary(
@@ -159,12 +161,12 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                         filename,
                         pdbFile);
 
+        UUID id = IdSupplier.generateId();
+
         logger.info("Saving pdb file analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity =
                 TertiaryToMultiSecondaryMongoEntity.of(

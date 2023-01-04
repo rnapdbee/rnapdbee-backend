@@ -5,5 +5,5 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 
 import java.util.UUID;
 
-public interface AnalysisDataRepository<T, O> extends MongoRepository<AnalysisData, UUID> {
+public interface AnalysisDataRepository extends MongoRepository<AnalysisData, UUID> {
 }

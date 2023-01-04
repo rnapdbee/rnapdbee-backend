@@ -12,18 +12,21 @@ public class AnalysisData {
     private final Instant createdAt;
     private final Boolean usePdb;
     private final List<UUID> results;
+    private final Scenario scenario;
 
     private AnalysisData(
             UUID id,
             String filename,
             List<UUID> results,
             Instant createdAt,
-            Boolean usePdb) {
+            Boolean usePdb,
+            Scenario scenario) {
         this.id = id;
         this.filename = filename;
         this.results = results;
         this.createdAt = createdAt;
         this.usePdb = usePdb;
+        this.scenario = scenario;
     }
 
     public void addResult(
@@ -51,12 +54,17 @@ public class AnalysisData {
         return createdAt;
     }
 
+    public Scenario getScenario() {
+        return scenario;
+    }
+
     public static class Builder {
         private UUID id;
         private String filename;
         private List<UUID> results;
         private Instant createdAt = Instant.now();
         private Boolean usePdb;
+        private Scenario scenario;
 
         public Builder withId(UUID id) {
             this.id = id;
@@ -83,13 +91,19 @@ public class AnalysisData {
             return this;
         }
 
+        public Builder withScenario(Scenario scenario) {
+            this.scenario = scenario;
+            return this;
+        }
+
         public AnalysisData build() {
             return new AnalysisData(
                     this.id,
                     this.filename,
                     this.results,
                     this.createdAt,
-                    this.usePdb);
+                    this.usePdb,
+                    this.scenario);
         }
     }
 }

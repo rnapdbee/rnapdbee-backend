@@ -15,7 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 @Repository
 public class AnalyzedFileRepository {
@@ -55,5 +54,9 @@ public class AnalyzedFileRepository {
             logger.error("Error occurred during converting InputStream to String.", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public void delete(String id) {
+        gridFsTemplate.delete(Query.query(Criteria.where("_id").is(id)));
     }
 }
