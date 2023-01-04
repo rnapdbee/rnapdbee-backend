@@ -6,9 +6,13 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 
 @Configuration
@@ -25,12 +29,19 @@ public class EngineWebClientConfiguration {
 
     @Value("${rnapdbee.engine.global.host}")
     private String engineCalculationUrl;
+    @Value("${rnapdbee.engine.response.timeout.seconds}")
+    private Integer engineResponseTimeoutSeconds;
 
     @Bean("engineWebClient")
     public WebClient engineWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder
                 .exchangeStrategies(EXCHANGE_STRATEGIES)
                 .baseUrl(engineCalculationUrl)
+                .clientConnector(
+                        new ReactorClientHttpConnector(HttpClient
+                                .create()
+                                .responseTimeout(Duration.ofSeconds(engineResponseTimeoutSeconds)))
+                )
                 .build();
     }
 }

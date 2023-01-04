@@ -6,6 +6,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
+/**
+ * Class representing tertiary to dot bracket analysis params
+ */
 public class TertiaryToDotBracketParams {
     private final ModelSelection modelSelection;
     private final AnalysisTool analysisTool;

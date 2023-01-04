@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Class representing tertiary to dot bracket scenario analysis data
+ */
 @Document
 public class TertiaryToDotBracketMongoEntity extends MongoEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> {
 

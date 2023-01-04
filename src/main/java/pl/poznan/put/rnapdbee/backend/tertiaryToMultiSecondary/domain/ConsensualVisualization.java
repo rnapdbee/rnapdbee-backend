@@ -1,8 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
-
 /**
- * DTO class for Consensual Visualization
+ * Class representing structure of Consensual Visualization
  */
 public abstract class ConsensualVisualization {
     protected abstract static class Builder<B extends Builder<B>> {

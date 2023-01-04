@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 /**
- * DTO class representing structure of image information.
+ * Class representing structure of image information.
  */
 public abstract class ImageInformation {
     protected final VisualizationTool successfulVisualizationTool;

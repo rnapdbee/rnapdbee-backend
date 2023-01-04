@@ -2,13 +2,17 @@ package pl.poznan.put.rnapdbee.backend.infrastructure.exception;
 
 import org.springframework.http.HttpStatus;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+/**
+ * Class representing api exception pattern
+ */
 public class ExceptionPattern {
-    private final String message;
-    private final HttpStatus httpStatus;
-    private final ZonedDateTime timestamp;
+
+    private String message;
+    private Integer status;
+    private String error;
+    private ZonedDateTime timestamp;
 
     /**
      * ApiException class constructor
@@ -18,21 +22,50 @@ public class ExceptionPattern {
      */
     public ExceptionPattern(
             String message,
-            HttpStatus httpStatus) {
+            HttpStatus httpStatus
+    ) {
         this.message = message;
-        this.httpStatus = httpStatus;
-        this.timestamp = ZonedDateTime.now(ZoneId.of("Z"));
+        this.status = httpStatus.value();
+        this.error = httpStatus.getReasonPhrase();
+        this.timestamp = ZonedDateTime.now();
+    }
+
+    private ExceptionPattern() {
+    }
+
+    public ExceptionPattern(
+            String message,
+            Integer status,
+            String error
+    ) {
+        this.message = message;
+        this.status = status;
+        this.error = error;
+        this.timestamp = ZonedDateTime.now();
     }
 
     public String getMessage() {
         return message;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public Integer getStatus() {
+        return status;
+    }
+
+    public String getError() {
+        return error;
     }
 
     public ZonedDateTime getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{message='%s', status='%s', error='%s', timestamp='%s'}",
+                message,
+                status,
+                error,
+                timestamp);
     }
 }

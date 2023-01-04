@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 import java.util.List;
 
 /**
- * DTO class representing secondary structure analysis.
+ * Class representing secondary structure analysis.
  */
 public class Output2D<T extends ImageInformation> {
     private final List<SingleStrand> strands;
