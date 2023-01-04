@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.SecondaryToDotBracketService;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
-import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.repository.AnalysisDataRepository;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.TertiaryToDotBracketService;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
@@ -62,13 +61,16 @@ public class ExpirationScheduler {
                 expiredAnalysisDataIds.add(expiredAnalysisId);
                 analyzedFileService.deleteAnalyzedFile(expiredAnalysisId);
 
-                Scenario analysisScenario = analysis.getScenario();
-                if (analysisScenario.equals(Scenario.SCENARIO_2D)) {
-                    secondaryToDotBracketService.deleteExpiredResults(analysis.getResults());
-                } else if (analysisScenario.equals(Scenario.SCENARIO_3D)) {
-                    tertiaryToDotBracketService.deleteExpiredResults(analysis.getResults());
-                } else if (analysisScenario.equals(Scenario.SCENARIO_MULTI)) {
-                    tertiaryToMultiSecondaryService.deleteExpiredResults(analysis.getResults());
+                switch (analysis.getScenario()) {
+                    case SCENARIO_2D:
+                        secondaryToDotBracketService.deleteExpiredResults(analysis.getResults());
+                        break;
+                    case SCENARIO_3D:
+                        tertiaryToDotBracketService.deleteExpiredResults(analysis.getResults());
+                        break;
+                    case SCENARIO_MULTI:
+                        tertiaryToMultiSecondaryService.deleteExpiredResults(analysis.getResults());
+                        break;
                 }
             } else {
                 break;
