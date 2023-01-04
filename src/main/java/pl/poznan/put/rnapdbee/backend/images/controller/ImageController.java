@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RestController
+@RestController("/image")
 public class ImageController {
 
     private final Logger logger = LoggerFactory.getLogger(ImageController.class);
@@ -24,7 +24,7 @@ public class ImageController {
     @Value("${spring.svg.images.directory.path}")
     private String imagesPath;
 
-    @GetMapping("/image/{name}")
+    @GetMapping("/{name}")
     public ResponseEntity<Resource> getSvgImage(@PathVariable String name) {
         logger.info(String.format("GET request for svg image with name: [%s]", name));
         String inputFile = String.format("%s/%s", imagesPath, name);

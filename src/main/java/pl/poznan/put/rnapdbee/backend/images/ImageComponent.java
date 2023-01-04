@@ -18,7 +18,8 @@ public class ImageComponent {
 
     public String generateSvgUrl(final byte[] image) {
         final File imageFile = exportImage(image);
-        return String.format("/image/%s", imageFile.getName());
+        String imageControllerGetPath = "/image";
+        return String.format("%s/%s", imageControllerGetPath, imageFile.getName());
     }
 
     private File exportImage(final byte[] image) {
