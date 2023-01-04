@@ -39,7 +39,5 @@ volumes:
   rnapdbee-backend-volume:
 
 networks:
-  default:
-    name: rnapdbee-network
+  rnapdbee-network:
     external: true
-
