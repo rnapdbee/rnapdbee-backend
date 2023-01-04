@@ -8,7 +8,7 @@ services:
     environment:
       # Username and password can not be changed after volume creation, saved in volume!
       - MONGO_INITDB_ROOT_USERNAME=rnapdbee
-      - MONGO_INITDB_ROOT_PASSWORD=a1s2d3f4
+      - MONGO_INITDB_ROOT_PASSWORD=Xdy0s3XvTLBxACdJrAfb
     ports:
       - "27017:27017"
     volumes:
@@ -24,7 +24,7 @@ services:
       - spring_svg_images_directory_path=/images
       - spring_data_mongodb_authentication-database=admin
       - spring_data_mongodb_username=rnapdbee
-      - spring_data_mongodb_password=a1s2d3f4
+      - spring_data_mongodb_password=Xdy0s3XvTLBxACdJrAfb
       - spring_data_mongodb_database=backend-db
       - spring_data_mongodb_port=27017
       - spring_data_mongodb_host=rnapdbee-mongoDB-container
