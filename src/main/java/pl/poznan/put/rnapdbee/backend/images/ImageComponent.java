@@ -16,7 +16,7 @@ import java.io.IOException;
 public class ImageComponent {
     private final Logger logger = LoggerFactory.getLogger(ImageComponent.class);
 
-    @Value("${spring.svg.images.directory.path}")
+    @Value("${svg.images.directory.path}")
     private String imagesPath;
 
     public String generateSvgUrl(final byte[] image) {

@@ -21,7 +21,7 @@ public class ImageController {
 
     private final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
-    @Value("${spring.svg.images.directory.path}")
+    @Value("${svg.images.directory.path}")
     private String imagesPath;
 
     @GetMapping("/{name}")
