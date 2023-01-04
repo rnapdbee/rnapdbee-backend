@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
 
@@ -19,6 +19,7 @@ services:
     depends_on:
       - mongoDB
     build: .
+    image: rnapdbee-backend-image
     environment:
       - spring_svg_images_directory_path=/images
       - spring_data_mongodb_authentication-database=admin
@@ -39,5 +40,6 @@ volumes:
   rnapdbee-backend-volume:
 
 networks:
-  rnapdbee-network:
+  default:
+    name: rnapdbee-network
     external: true
