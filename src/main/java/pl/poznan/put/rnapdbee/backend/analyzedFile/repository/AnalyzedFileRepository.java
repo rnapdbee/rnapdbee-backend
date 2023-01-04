@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Repository
 public class AnalyzedFileRepository {
@@ -41,15 +42,15 @@ public class AnalyzedFileRepository {
         gridFsTemplate.store(upload);
     }
 
-    public String findById(String id) {
+    public Optional<String> findById(String id) {
         GridFSFile file = gridFsTemplate.findOne(Query.query(Criteria.where("_id").is(id)));
         if (file == null)
-            return null;
+            return Optional.empty();
 
         GridFsResource resource = gridFsTemplate.getResource(file);
 
         try {
-            return new String(resource.getContent().readAllBytes(), StandardCharsets.UTF_8);
+            return Optional.of(new String(resource.getContent().readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             logger.error("Error occurred during converting InputStream to String.", e);
             throw new RuntimeException(e);

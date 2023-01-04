@@ -60,27 +60,29 @@ public class AnalyzedFileService {
     }
 
     public String findAnalyzedFile(UUID id) {
-        String analyzedFile = analyzedFileRepository.findById(id.toString());
-        if (analyzedFile == null) {
+        Optional<String> optionalAnalyzedFile = analyzedFileRepository.findById(id.toString());
+
+        if (optionalAnalyzedFile.isEmpty()) {
             logger.error(String.format("File with id: [%s] to reanalyze not found in analyzedFileRepository.", id));
 
             throw new AnalyzedFileEntityNotFoundException(
                     messageProvider.getMessage(MessageProvider.Message.FILE_NOT_FOUND));
         }
 
-        return analyzedFile;
+        return optionalAnalyzedFile.get();
     }
 
     public String findPdbFile(String id) {
-        String pdbFile = analyzedFileRepository.findById(id);
-        if (pdbFile == null) {
+        Optional<String> optionalPdbFile = analyzedFileRepository.findById(id);
+
+        if (optionalPdbFile.isEmpty()) {
             logger.error(String.format("File '%s.cif' from Protein Data Bank not found in analyzedFileRepository.", id));
 
             throw new PdbFileNotFoundException(
                     messageProvider.getMessage(MessageProvider.Message.PDB_FILE_NOT_FOUND_FORMAT), id);
         }
 
-        return pdbFile;
+        return optionalPdbFile.get();
     }
 
     public void saveAnalyzedFile(
@@ -113,9 +115,9 @@ public class AnalyzedFileService {
 
     public String fetchPdbStructure(String pdbId) {
         validatePdbId(pdbId);
-        String pdbFile = analyzedFileRepository.findById(pdbId);
+        Optional<String> optionalPdbFile = analyzedFileRepository.findById(pdbId);
 
-        if (pdbFile == null) {
+        if (optionalPdbFile.isEmpty()) {
             String fileContent = downloadPdbFile(pdbId);
             analyzedFileRepository.save(pdbId, pdbId + PDB_FILE_EXTENSION, fileContent);
 
@@ -131,14 +133,21 @@ public class AnalyzedFileService {
 
             if (optionalPdbFileData.isEmpty()) {
                 logger.warn("File Data '%s.cif' from Protein Data Bank not found in pdbFileDataRepository.");
-                return pdbFile;
+
+                PdbFileDataEntity pdbFileDataEntity = new PdbFileDataEntity.Builder()
+                        .withId(pdbId)
+                        .withCreatedAt(Instant.now())
+                        .build();
+                pdbFileDataRepository.save(pdbFileDataEntity);
+
+                return optionalPdbFile.get();
             }
 
             PdbFileDataEntity pdbFileDataEntity = optionalPdbFileData.get();
             pdbFileDataEntity.setCreatedAt(Instant.now());
             pdbFileDataRepository.save(pdbFileDataEntity);
 
-            return pdbFile;
+            return optionalPdbFile.get();
         }
     }
 
