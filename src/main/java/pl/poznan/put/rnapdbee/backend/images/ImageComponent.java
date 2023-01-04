@@ -1,12 +1,11 @@
-package pl.poznan.put.rnapdbee.backend.shared;
+package pl.poznan.put.rnapdbee.backend.images;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,21 +14,19 @@ import java.io.IOException;
  */
 @Component
 public class ImageComponent {
-    private final ServletContext servletContext;
     private final Logger logger = LoggerFactory.getLogger(ImageComponent.class);
 
-    @Autowired
-    private ImageComponent(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+    @Value("${svg.images.directory.path}")
+    private String imagesPath;
 
     public String generateSvgUrl(final byte[] image) {
         final File imageFile = exportImage(image);
-        return String.format("%s/resources/tmp/%s", servletContext.getContextPath(), imageFile.getName());
+        String imageControllerPath = "/image";
+        return String.format("%s/%s", imageControllerPath, imageFile.getName());
     }
 
     private File exportImage(final byte[] image) {
-        final File directory = new File(servletContext.getRealPath("resources/tmp"));
+        final File directory = new File(imagesPath);
 
         try {
             FileUtils.forceMkdir(directory);

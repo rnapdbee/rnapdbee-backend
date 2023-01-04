@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
+import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.MongoEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
