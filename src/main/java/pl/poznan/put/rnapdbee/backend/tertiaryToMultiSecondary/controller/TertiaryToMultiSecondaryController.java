@@ -11,12 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.poznan.put.rnapdbee.backend.shared.BaseController;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
 
 import java.util.UUID;
 
+/**
+ * Controller class for the Tertiary To Multi Secondary API.
+ */
 @RestController
 @RequestMapping("api/v1/engine/multi")
 public class TertiaryToMultiSecondaryController extends BaseController {
@@ -24,7 +28,11 @@ public class TertiaryToMultiSecondaryController extends BaseController {
     private final TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService;
 
     @Autowired
-    private TertiaryToMultiSecondaryController(TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService) {
+    private TertiaryToMultiSecondaryController(
+            MessageProvider messageProvider,
+            TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService
+    ) {
+        super(messageProvider);
         this.tertiaryToMultiSecondaryService = tertiaryToMultiSecondaryService;
     }
 
@@ -35,7 +43,17 @@ public class TertiaryToMultiSecondaryController extends BaseController {
             @RequestParam("removeIsolated") boolean removeIsolated,
             @RequestParam("visualizationTool") VisualizationTool visualizationTool,
             @RequestHeader("Content-Disposition") String contentDispositionHeader,
-            @RequestBody String fileContent) {
+            @RequestBody String fileContent
+    ) {
+        logger.info(String.format("Analyze 3D -> multi 2D for content-disposition header: [%s] with params: [" +
+                        "includeNonCanonical = %s, " +
+                        "removeIsolated = %s, " +
+                        "visualizationTool = %s]",
+                contentDispositionHeader,
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool));
+
         String filename = validateContentDisposition(contentDispositionHeader);
         return tertiaryToMultiSecondaryService.analyzeTertiaryToMultiSecondary(
                 includeNonCanonical,
@@ -48,7 +66,10 @@ public class TertiaryToMultiSecondaryController extends BaseController {
     @Operation(summary = "Fetch an existing multi calculation")
     @GetMapping(path = "/{id}", produces = "application/json")
     public TertiaryToMultiSecondaryMongoEntity getResultTertiaryToMultiSecondary(
-            @PathVariable("id") UUID id) {
+            @PathVariable("id") UUID id
+    ) {
+        logger.info(String.format("Fetch 3D -> multi 2D results with id: [%s]", id));
+
         return tertiaryToMultiSecondaryService.getResultsTertiaryToMultiSecondary(id);
     }
 
@@ -58,7 +79,17 @@ public class TertiaryToMultiSecondaryController extends BaseController {
             @PathVariable("id") UUID id,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool
+    ) {
+        logger.info(String.format("Reanalyze 3D -> multi 2D for id: [%s] with params: [" +
+                        "includeNonCanonical = %s, " +
+                        "removeIsolated = %s, " +
+                        "visualizationTool = %s]",
+                id,
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool));
+
         return tertiaryToMultiSecondaryService.reanalyzeTertiaryToMultiSecondary(
                 id,
                 includeNonCanonical,
@@ -72,7 +103,17 @@ public class TertiaryToMultiSecondaryController extends BaseController {
             @PathVariable("pdbId") String pdbId,
             @RequestParam("includeNonCanonical") boolean includeNonCanonical,
             @RequestParam("removeIsolated") boolean removeIsolated,
-            @RequestParam("visualizationTool") VisualizationTool visualizationTool) {
+            @RequestParam("visualizationTool") VisualizationTool visualizationTool
+    ) {
+        logger.info(String.format("PDB Analyze 3D -> multi 2D for PDBId: [%s]; with params: [" +
+                        "includeNonCanonical = %s, " +
+                        "removeIsolated = %s, " +
+                        "visualizationTool = %s]",
+                pdbId,
+                includeNonCanonical,
+                removeIsolated,
+                visualizationTool));
+
         return tertiaryToMultiSecondaryService.analyzePdbTertiaryToMultiSecondary(
                 pdbId,
                 includeNonCanonical,

@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Mongo document design for storing analysis data.
+ *
+ * @param <T> analysis parameters
+ * @param <O> analysis results, output from engine service
+ */
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;
@@ -72,10 +78,6 @@ public abstract class MongoEntity<T, O> {
         }
 
         public B withFilename(String filename) {
-            if (filename.isBlank()) {
-                throw new IllegalArgumentException();
-            }
-
             this.filename = filename;
             return self();
         }
@@ -93,6 +95,11 @@ public abstract class MongoEntity<T, O> {
         public B withUsePdb(Boolean usePdb) {
             this.usePdb = usePdb;
             return self();
+        }
+
+        public void addResult(
+                ResultEntity<T, O> newResult) {
+            this.results.add(newResult);
         }
 
         protected abstract MongoEntity<T, O> build();

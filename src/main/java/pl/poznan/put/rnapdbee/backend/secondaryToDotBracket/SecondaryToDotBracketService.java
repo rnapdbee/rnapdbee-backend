@@ -3,42 +3,48 @@ package pl.poznan.put.rnapdbee.backend.secondaryToDotBracket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.AnalyzedFileEntity;
+import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
-import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.repository.SecondaryToDotBracketRepository;
 import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
-import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.StructuralElementsHandling;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
+import pl.poznan.put.rnapdbee.backend.shared.repository.AnalysisDataRepository;
+import pl.poznan.put.rnapdbee.backend.shared.repository.ResultRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service class responsible for managing secondary to dot bracket scenario analysis
+ */
 @Service
-public class SecondaryToDotBracketService extends BaseAnalyzeService {
-    private final SecondaryToDotBracketRepository secondaryToDotBracketRepository;
-    private final EngineClient engineClient;
-    private final ImageComponent imageComponent;
+public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryToDotBracketParams, Output2D<ImageInformationPath>, SecondaryToDotBracketMongoEntity> {
 
     @Autowired
     private SecondaryToDotBracketService(
-            SecondaryToDotBracketRepository secondaryToDotBracketRepository,
             EngineClient engineClient,
             ImageComponent imageComponent,
-            AnalyzedFileService analyzedFileService
+            AnalyzedFileService analyzedFileService,
+            MessageProvider messageProvider,
+            AnalysisDataRepository analysisDataRepository,
+            ResultRepository<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultRepository
     ) {
-        super(analyzedFileService);
-        this.secondaryToDotBracketRepository = secondaryToDotBracketRepository;
-        this.engineClient = engineClient;
-        this.imageComponent = imageComponent;
+        super(engineClient,
+                imageComponent,
+                analyzedFileService,
+                messageProvider,
+                analysisDataRepository,
+                resultRepository,
+                Scenario.SCENARIO_2D);
     }
 
     public SecondaryToDotBracketMongoEntity analyzeSecondaryToDotBracket(
@@ -55,9 +61,10 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 filename,
                 fileContent);
 
-        String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
-
         UUID id = IdSupplier.generateId();
+
+        logger.info("Saving analysis results.");
+        String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity =
                 SecondaryToDotBracketMongoEntity.of(
@@ -78,24 +85,24 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                         )
                 );
 
-        secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
-        analyzedFileService.saveAnalyzedFile(id, fileContent);
+        saveMongoEntity(secondaryToDotBracketMongoEntity);
+        analyzedFileService.saveAnalyzedFile(id, filename, fileContent);
 
         return secondaryToDotBracketMongoEntity;
     }
 
     public SecondaryToDotBracketMongoEntity getResultsSecondaryToDotBracket(UUID id) {
-        return findSecondaryToDotBracketDocument(id);
+        return findDocument(id);
     }
 
     public SecondaryToDotBracketMongoEntity reanalyzeSecondaryToDotBracket(
             UUID id,
             boolean removeIsolated,
             StructuralElementsHandling structuralElementsHandling,
-            VisualizationTool visualizationTool) {
-
-        AnalyzedFileEntity analyzedFile = analyzedFileService.findAnalyzedFile(id);
-        SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findSecondaryToDotBracketDocument(id);
+            VisualizationTool visualizationTool
+    ) {
+        String analyzedFile = analyzedFileService.findAnalyzedFile(id);
+        SecondaryToDotBracketMongoEntity secondaryToDotBracketMongoEntity = findDocument(id);
         checkDocumentExpiration(secondaryToDotBracketMongoEntity.getCreatedAt(), id);
 
         Output2D<ImageInformationByteArray> engineResponse2D = engineClient.perform2DAnalysisOnEngine(
@@ -103,8 +110,9 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 structuralElementsHandling,
                 visualizationTool,
                 secondaryToDotBracketMongoEntity.getFilename(),
-                analyzedFile.getContent());
+                analyzedFile);
 
+        logger.info("Saving reanalysis results.");
         String pathToSVGImage = saveGraphicWithPath(engineResponse2D, visualizationTool);
 
         ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity =
@@ -123,7 +131,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
                 );
 
         secondaryToDotBracketMongoEntity.addResult(resultEntity);
-        secondaryToDotBracketRepository.save(secondaryToDotBracketMongoEntity);
+        saveNewResultEntity(id, resultEntity);
 
         return secondaryToDotBracketMongoEntity;
     }
@@ -138,13 +146,21 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService {
             return imageComponent.generateSvgUrl(engineResponse2D.getImageInformation().getSvgFile());
     }
 
-    private SecondaryToDotBracketMongoEntity findSecondaryToDotBracketDocument(UUID id) {
-        Optional<SecondaryToDotBracketMongoEntity> secondaryToDotBracketMongoEntity =
-                secondaryToDotBracketRepository.findById(id);
+    @Override
+    public SecondaryToDotBracketMongoEntity findDocument(UUID id) {
+        AnalysisData analysisData = findAnalysisDataDocument(id);
 
-        if (secondaryToDotBracketMongoEntity.isEmpty())
-            throw new IdNotFoundException(id);
+        SecondaryToDotBracketMongoEntity.Builder entityBuilder =
+                new SecondaryToDotBracketMongoEntity.Builder()
+                        .withId(analysisData.getId())
+                        .withFilename(analysisData.getFilename())
+                        .withCreatedAt(analysisData.getCreatedAt())
+                        .withUsePdb(analysisData.getUsePdb());
 
-        return secondaryToDotBracketMongoEntity.get();
+        for (UUID resultId : analysisData.getResults()) {
+            entityBuilder.addResult(findResultEntityDocument(resultId, id));
+        }
+
+        return entityBuilder.build();
     }
 }

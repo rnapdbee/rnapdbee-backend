@@ -3,9 +3,17 @@ package pl.poznan.put.rnapdbee.backend.shared.exception;
 import java.util.UUID;
 
 public class IdNotFoundException extends RuntimeException {
-    private static final String ID_NOT_FOUND_FORMAT = "Current id '%s' not found.";
 
-    public IdNotFoundException(UUID id) {
-        super(String.format(ID_NOT_FOUND_FORMAT, id));
+    public IdNotFoundException(
+            String messageFormat,
+            UUID id
+    ) {
+        super(String.format(messageFormat, id));
+    }
+
+    public IdNotFoundException(
+            String messageFormat,
+            String id) {
+        super(String.format(messageFormat, id));
     }
 }

@@ -3,48 +3,53 @@ package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService;
-import pl.poznan.put.rnapdbee.backend.analyzedFile.domain.PdbFileEntity;
+import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.BaseAnalyzeService;
 import pl.poznan.put.rnapdbee.backend.shared.EngineClient;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
-import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
+import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.AnalysisData;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import pl.poznan.put.rnapdbee.backend.shared.domain.entity.Scenario;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationByteArray;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
-import pl.poznan.put.rnapdbee.backend.shared.exception.IdNotFoundException;
+import pl.poznan.put.rnapdbee.backend.shared.repository.AnalysisDataRepository;
+import pl.poznan.put.rnapdbee.backend.shared.repository.ResultRepository;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationSvgFile;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMultiEntry;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
-import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.repository.TertiaryToMultiSecondaryRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
 
+/**
+ * Service class responsible for managing tertiary to multi secondary scenario analysis
+ */
 @Service
-public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
-
-    private final TertiaryToMultiSecondaryRepository tertiaryToMultiSecondaryRepository;
-    private final EngineClient engineClient;
-    private final ImageComponent imageComponent;
+public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>, TertiaryToMultiSecondaryMongoEntity> {
 
     @Autowired
     private TertiaryToMultiSecondaryService(
-            TertiaryToMultiSecondaryRepository tertiaryToMultiSecondaryRepository,
             EngineClient engineClient,
             ImageComponent imageComponent,
-            AnalyzedFileService analyzedFileService
+            AnalyzedFileService analyzedFileService,
+            MessageProvider messageProvider,
+            AnalysisDataRepository analysisDataRepository,
+            ResultRepository<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultRepository
     ) {
-        super(analyzedFileService);
-        this.tertiaryToMultiSecondaryRepository = tertiaryToMultiSecondaryRepository;
-        this.engineClient = engineClient;
-        this.imageComponent = imageComponent;
+        super(engineClient,
+                imageComponent,
+                analyzedFileService,
+                messageProvider,
+                analysisDataRepository,
+                resultRepository,
+                Scenario.SCENARIO_MULTI);
     }
 
     public TertiaryToMultiSecondaryMongoEntity analyzeTertiaryToMultiSecondary(
@@ -62,11 +67,12 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         filename,
                         fileContent);
 
+        UUID id = IdSupplier.generateId();
+
+        logger.info("Saving analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity =
                 TertiaryToMultiSecondaryMongoEntity.of(
@@ -83,14 +89,14 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         false
                 );
 
-        tertiaryToMultiSecondaryRepository.save(tertiaryToMultiSecondaryMongoEntity);
-        analyzedFileService.saveAnalyzedFile(id, fileContent);
+        saveMongoEntity(tertiaryToMultiSecondaryMongoEntity);
+        analyzedFileService.saveAnalyzedFile(id, filename, fileContent);
 
         return tertiaryToMultiSecondaryMongoEntity;
     }
 
     public TertiaryToMultiSecondaryMongoEntity getResultsTertiaryToMultiSecondary(UUID id) {
-        return findTertiaryToMultiSecondaryDocument(id);
+        return findDocument(id);
     }
 
     public TertiaryToMultiSecondaryMongoEntity reanalyzeTertiaryToMultiSecondary(
@@ -99,7 +105,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
             boolean removeIsolated,
             VisualizationTool visualizationTool
     ) {
-        TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity = findTertiaryToMultiSecondaryDocument(id);
+        TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity = findDocument(id);
         checkDocumentExpiration(tertiaryToMultiSecondaryMongoEntity.getCreatedAt(), id);
 
         String fileContent = getFileContentToReanalyze(
@@ -115,6 +121,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         tertiaryToMultiSecondaryMongoEntity.getFilename(),
                         fileContent);
 
+        logger.info("Saving reanalysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
@@ -130,7 +137,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                 );
 
         tertiaryToMultiSecondaryMongoEntity.addResult(resultEntity);
-        tertiaryToMultiSecondaryRepository.save(tertiaryToMultiSecondaryMongoEntity);
+        saveNewResultEntity(id, resultEntity);
 
         return tertiaryToMultiSecondaryMongoEntity;
     }
@@ -143,7 +150,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
     ) {
         String pdbId = pdbIdLowercase.toUpperCase();
 
-        PdbFileEntity pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
+        String pdbFile = analyzedFileService.fetchPdbStructure(pdbId);
         String filename = pdbId + PDB_FILE_EXTENSION;
 
         OutputMulti<ImageInformationByteArray, ConsensualVisualizationSvgFile> engineResponseMulti =
@@ -152,13 +159,14 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         removeIsolated,
                         visualizationTool,
                         filename,
-                        pdbFile.getContent());
+                        pdbFile);
 
+        UUID id = IdSupplier.generateId();
+
+        logger.info("Saving pdb file analysis results.");
         OutputMulti<ImageInformationPath, ConsensualVisualizationPath> outputMulti = saveGraphicsWithPath(
                 engineResponseMulti,
                 visualizationTool);
-
-        UUID id = IdSupplier.generateId();
 
         TertiaryToMultiSecondaryMongoEntity tertiaryToMultiSecondaryMongoEntity =
                 TertiaryToMultiSecondaryMongoEntity.of(
@@ -175,7 +183,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
                         true
                 );
 
-        tertiaryToMultiSecondaryRepository.save(tertiaryToMultiSecondaryMongoEntity);
+        saveMongoEntity(tertiaryToMultiSecondaryMongoEntity);
 
         return tertiaryToMultiSecondaryMongoEntity;
     }
@@ -218,13 +226,21 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService {
         return outputMultiBuilder.build();
     }
 
-    private TertiaryToMultiSecondaryMongoEntity findTertiaryToMultiSecondaryDocument(UUID id) {
-        Optional<TertiaryToMultiSecondaryMongoEntity> tertiaryToMultiSecondaryMongoEntity =
-                tertiaryToMultiSecondaryRepository.findById(id);
+    @Override
+    public TertiaryToMultiSecondaryMongoEntity findDocument(UUID id) {
+        AnalysisData analysisData = findAnalysisDataDocument(id);
 
-        if (tertiaryToMultiSecondaryMongoEntity.isEmpty())
-            throw new IdNotFoundException(id);
+        TertiaryToMultiSecondaryMongoEntity.Builder entityBuilder =
+                new TertiaryToMultiSecondaryMongoEntity.Builder()
+                        .withId(analysisData.getId())
+                        .withFilename(analysisData.getFilename())
+                        .withCreatedAt(analysisData.getCreatedAt())
+                        .withUsePdb(analysisData.getUsePdb());
 
-        return tertiaryToMultiSecondaryMongoEntity.get();
+        for (UUID resultId : analysisData.getResults()) {
+            entityBuilder.addResult(findResultEntityDocument(resultId, id));
+        }
+
+        return entityBuilder.build();
     }
 }

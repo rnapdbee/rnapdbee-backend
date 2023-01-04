@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 /**
- * DTO class representing structure of image information output from engine analyze.
+ * Class representing structure of image information output from engine analyze.
  */
 public class ImageInformationByteArray extends ImageInformation {
     private final byte[] svgFile;

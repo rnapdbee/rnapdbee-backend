@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * DTO class representing single Structural Element
+ * Class representing single Structural Element.
  */
 public class StructuralElement {
     @JsonProperty("stems")

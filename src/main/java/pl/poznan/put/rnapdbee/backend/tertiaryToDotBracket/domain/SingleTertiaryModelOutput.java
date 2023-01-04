@@ -8,7 +8,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import java.util.List;
 
 /**
- * DTO class for SingleTertiaryModelOutput
+ * Class for SingleTertiaryModelOutput
  */
 public class SingleTertiaryModelOutput<T extends ImageInformation> {
     private final Integer modelNumber;

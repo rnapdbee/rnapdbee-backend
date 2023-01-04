@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Class representing secondary to dot bracket scenario analysis data
+ */
 @Document
 public class SecondaryToDotBracketMongoEntity extends MongoEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> {
 

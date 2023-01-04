@@ -2,7 +2,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.param;
 
 
 /**
- * Enum for NonCanonicalHandling
+ * Enum for NonCanonicalHandling.
  */
 public enum NonCanonicalHandling {
     VISUALIZATION_ONLY,
