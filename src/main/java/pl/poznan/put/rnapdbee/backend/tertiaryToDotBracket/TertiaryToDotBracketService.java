@@ -274,7 +274,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
             Optional<ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>> optionalResultEntity =
                     findExpiredResultEntityDocument(expiredResultId);
 
-            if (optionalResultEntity.isEmpty()) {
+            if (optionalResultEntity.isEmpty() || optionalResultEntity.get().getParams().getVisualizationTool() == VisualizationTool.NONE) {
                 continue;
             }
 

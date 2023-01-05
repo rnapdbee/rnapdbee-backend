@@ -263,12 +263,14 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                     .getPathToSVGImage();
             imageComponent.deleteSvgImage(consensualVisualizationPathToSVGImage);
 
-            optionalResultEntity.get()
-                    .getOutput()
-                    .getEntries()
-                    .stream()
-                    .map(entry -> entry.getOutput2D().getImageInformation().getPathToSVGImage())
-                    .forEach(imageComponent::deleteSvgImage);
+            if (optionalResultEntity.get().getParams().getVisualizationTool() != VisualizationTool.NONE) {
+                optionalResultEntity.get()
+                        .getOutput()
+                        .getEntries()
+                        .stream()
+                        .map(entry -> entry.getOutput2D().getImageInformation().getPathToSVGImage())
+                        .forEach(imageComponent::deleteSvgImage);
+            }
         }
 
         resultRepository.deleteAllById(expiredResultsIds);

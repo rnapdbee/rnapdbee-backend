@@ -172,7 +172,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
             Optional<ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>>> optionalResultEntity =
                     findExpiredResultEntityDocument(expiredResultId);
 
-            if (optionalResultEntity.isEmpty()) {
+            if (optionalResultEntity.isEmpty() || optionalResultEntity.get().getParams().getVisualizationTool() == VisualizationTool.NONE) {
                 continue;
             }
 
