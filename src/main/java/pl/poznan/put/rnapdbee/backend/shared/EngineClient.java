@@ -49,7 +49,7 @@ public class EngineClient {
 
     private final WebClient engineWebClient;
     private final MessageProvider messageProvider;
-    private final Logger logger = LoggerFactory.getLogger(EngineClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(EngineClient.class);
 
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;

@@ -29,7 +29,7 @@ public class ExpirationScheduler {
     private final SecondaryToDotBracketService secondaryToDotBracketService;
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
     private final TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService;
-    private final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
     @Value("${document.storage.days}")
     private int documentStorageDays;
 

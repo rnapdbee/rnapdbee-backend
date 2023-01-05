@@ -172,9 +172,8 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
             Optional<ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>>> optionalResultEntity =
                     findExpiredResultEntityDocument(expiredResultId);
 
-            if (optionalResultEntity.isEmpty() || optionalResultEntity.get().getParams().getVisualizationTool() == VisualizationTool.NONE) {
+            if (optionalResultEntity.isEmpty() || isEmptyVisualization(optionalResultEntity.get()))
                 continue;
-            }
 
             String pathToSVGImage = optionalResultEntity.get()
                     .getOutput()
@@ -185,5 +184,10 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
         }
 
         resultRepository.deleteAllById(expiredResultsIds);
+    }
+
+    @Override
+    protected boolean isEmptyVisualization(ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity) {
+        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE;
     }
 }

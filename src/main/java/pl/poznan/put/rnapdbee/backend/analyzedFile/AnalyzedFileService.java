@@ -42,7 +42,7 @@ public class AnalyzedFileService {
     private final PdbFileDataRepository pdbFileDataRepository;
     private final PdbClient pdbClient;
     private final MessageProvider messageProvider;
-    private final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
     @Value("${document.storage.days}")
     private int documentStorageDays;
 

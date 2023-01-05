@@ -273,9 +273,8 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
             Optional<ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>> optionalResultEntity =
                     findExpiredResultEntityDocument(expiredResultId);
 
-            if (optionalResultEntity.isEmpty() || optionalResultEntity.get().getParams().getVisualizationTool() == VisualizationTool.NONE) {
+            if (optionalResultEntity.isEmpty() || isEmptyVisualization(optionalResultEntity.get()))
                 continue;
-            }
 
             optionalResultEntity.get()
                     .getOutput()
@@ -286,5 +285,10 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
         }
 
         resultRepository.deleteAllById(expiredResultsIds);
+    }
+
+    @Override
+    protected boolean isEmptyVisualization(ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultEntity) {
+        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE;
     }
 }

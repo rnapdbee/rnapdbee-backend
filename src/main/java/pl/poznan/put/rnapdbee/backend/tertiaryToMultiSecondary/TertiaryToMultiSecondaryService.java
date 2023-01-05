@@ -253,9 +253,8 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                     OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>> optionalResultEntity =
                     findExpiredResultEntityDocument(expiredResultId);
 
-            if (optionalResultEntity.isEmpty()) {
+            if (optionalResultEntity.isEmpty())
                 continue;
-            }
 
             String consensualVisualizationPathToSVGImage = optionalResultEntity.get()
                     .getOutput()
@@ -263,16 +262,20 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                     .getPathToSVGImage();
             imageComponent.deleteSvgImage(consensualVisualizationPathToSVGImage);
 
-            if (optionalResultEntity.get().getParams().getVisualizationTool() != VisualizationTool.NONE) {
+            if (!isEmptyVisualization(optionalResultEntity.get()))
                 optionalResultEntity.get()
                         .getOutput()
                         .getEntries()
                         .stream()
                         .map(entry -> entry.getOutput2D().getImageInformation().getPathToSVGImage())
                         .forEach(imageComponent::deleteSvgImage);
-            }
         }
 
         resultRepository.deleteAllById(expiredResultsIds);
+    }
+
+    @Override
+    protected boolean isEmptyVisualization(ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity) {
+        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE;
     }
 }

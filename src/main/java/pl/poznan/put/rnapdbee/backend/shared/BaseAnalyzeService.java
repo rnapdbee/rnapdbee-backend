@@ -27,6 +27,7 @@ import java.util.UUID;
  */
 public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
+    protected static final Logger logger = LoggerFactory.getLogger(BaseAnalyzeService.class);
     protected final EngineClient engineClient;
     protected final ImageComponent imageComponent;
     protected final AnalyzedFileService analyzedFileService;
@@ -34,9 +35,6 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
     protected final AnalysisDataRepository analysisDataRepository;
     protected final ResultRepository<T, O> resultRepository;
     protected final Scenario scenario;
-
-    protected final Logger logger = LoggerFactory.getLogger(BaseAnalyzeService.class);
-
     @Value("${document.storage.days}")
     private int documentStorageDays;
 
@@ -60,6 +58,8 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
     public abstract E findDocument(UUID id);
 
     public abstract void deleteExpiredResults(List<UUID> expiredResultsIds);
+
+    protected abstract boolean isEmptyVisualization(ResultEntity<T, O> resultEntity);
 
     protected String removeFileExtension(
             String filename,

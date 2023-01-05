@@ -11,7 +11,7 @@ import pl.poznan.put.rnapdbee.backend.shared.exception.FilenameNotSetException;
 public abstract class BaseController {
 
     protected final MessageProvider messageProvider;
-    protected final Logger logger = LoggerFactory.getLogger(BaseController.class);
+    protected static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     protected BaseController(
             MessageProvider messageProvider

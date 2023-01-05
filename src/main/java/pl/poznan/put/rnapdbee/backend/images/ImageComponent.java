@@ -14,15 +14,15 @@ import java.io.IOException;
  */
 @Component
 public class ImageComponent {
-    private final Logger logger = LoggerFactory.getLogger(ImageComponent.class);
-    private final String imageControllerPath = "/image";
+    private static final Logger logger = LoggerFactory.getLogger(ImageComponent.class);
+    private static final String IMAGE_CONTROLLER_PATH = "/image";
 
     @Value("${svg.images.directory.path}")
     private String imagesPath;
 
     public String generateSvgUrl(final byte[] image) {
         final File imageFile = exportImage(image);
-        return String.format("%s/%s", imageControllerPath, imageFile.getName());
+        return String.format("%s/%s", IMAGE_CONTROLLER_PATH, imageFile.getName());
     }
 
     private File exportImage(final byte[] image) {
@@ -40,9 +40,13 @@ public class ImageComponent {
     }
 
     public void deleteSvgImage(String pathToController) {
-        String imageName = pathToController.substring(imageControllerPath.length() + 1);
+        String imageName = extractImageName(pathToController);
         File imageFile = new File(String.format("%s/%s", imagesPath, imageName));
         if (!imageFile.delete())
             logger.warn(String.format("Failed to remove %s file", imageFile.getAbsolutePath()));
+    }
+
+    private String extractImageName(String pathToController) {
+        return pathToController.substring(IMAGE_CONTROLLER_PATH.length() + 1);
     }
 }
