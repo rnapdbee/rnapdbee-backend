@@ -65,7 +65,6 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
             VisualizationTool visualizationTool,
             String filename,
             String fileContent) {
-        analyzedFileService.saveAnalyzedFile(IdSupplier.generateId(), filename, fileContent);
 
         Output3D<ImageInformationByteArray> engineResponse3D = engineClient.perform3DAnalysisOnEngine(
                 modelSelection,
