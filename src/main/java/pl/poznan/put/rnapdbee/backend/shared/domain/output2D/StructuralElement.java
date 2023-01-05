@@ -21,7 +21,7 @@ public class StructuralElement {
     @JsonProperty(value = "coordinates", access = JsonProperty.Access.WRITE_ONLY)
     private final String coordinates;
 
-    private StructuralElement(
+    public StructuralElement(
             List<String> stems,
             List<String> loops,
             List<String> singleStrands,

@@ -54,7 +54,6 @@ public class ExpirationScheduler {
         List<AnalysisData> analysisDataList = analysisDataRepository.findAll(Sort.by("createdAt"));
         List<UUID> expiredAnalysisDataIds = new ArrayList<>();
 
-        //TODO remove svg images based on pathToSVGImage in ImageInformationPath and ConsensualVisualizationPath, probably need to use Scenario type data
         for (AnalysisData analysis : analysisDataList) {
             if ((int) Duration.between(analysis.getCreatedAt(), Instant.now()).toDays() >= documentStorageDays) {
                 UUID expiredAnalysisId = analysis.getId();

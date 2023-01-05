@@ -21,6 +21,8 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 import pl.poznan.put.rnapdbee.backend.shared.repository.AnalysisDataRepository;
 import pl.poznan.put.rnapdbee.backend.shared.repository.ResultRepository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -162,5 +164,26 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
         }
 
         return entityBuilder.build();
+    }
+
+    @Override
+    public void deleteExpiredResults(List<UUID> expiredResultsIds) {
+        for (UUID expiredResultId : expiredResultsIds) {
+            Optional<ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>>> optionalResultEntity =
+                    findExpiredResultEntityDocument(expiredResultId);
+
+            if (optionalResultEntity.isEmpty()) {
+                continue;
+            }
+
+            String pathToSVGImage = optionalResultEntity.get()
+                    .getOutput()
+                    .getImageInformation()
+                    .getPathToSVGImage();
+
+            imageComponent.deleteSvgImage(pathToSVGImage);
+        }
+
+        resultRepository.deleteAllById(expiredResultsIds);
     }
 }

@@ -59,11 +59,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
     public abstract E findDocument(UUID id);
 
-    public void deleteExpiredResults(List<UUID> expiredResultsIds) {
-        for (UUID expiredResultId : expiredResultsIds) {
-            resultRepository.deleteById(expiredResultId);
-        }
-    }
+    public abstract void deleteExpiredResults(List<UUID> expiredResultsIds);
 
     protected String removeFileExtension(
             String filename,
@@ -159,5 +155,18 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
         }
 
         return optionalResultEntity.get();
+    }
+
+    protected Optional<ResultEntity<T, O>> findExpiredResultEntityDocument(
+            UUID resultId
+    ) {
+        Optional<ResultEntity<T, O>> optionalResultEntity = resultRepository.findById(resultId);
+
+        if (optionalResultEntity.isEmpty()) {
+            logger.warn(String.format("Expired result entity document with id: [%s] not found.", resultId));
+            return Optional.empty();
+        }
+
+        return optionalResultEntity;
     }
 }

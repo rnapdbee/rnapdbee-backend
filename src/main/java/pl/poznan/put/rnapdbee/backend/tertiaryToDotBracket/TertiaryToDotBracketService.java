@@ -26,6 +26,8 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiary
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParams;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
@@ -264,5 +266,26 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
         }
 
         return entityBuilder.build();
+    }
+
+    @Override
+    public void deleteExpiredResults(List<UUID> expiredResultsIds) {
+        for (UUID expiredResultId : expiredResultsIds) {
+            Optional<ResultEntity<TertiaryToDotBracketParams, Output3D<ImageInformationPath>>> optionalResultEntity =
+                    findExpiredResultEntityDocument(expiredResultId);
+
+            if (optionalResultEntity.isEmpty()) {
+                continue;
+            }
+
+            optionalResultEntity.get()
+                    .getOutput()
+                    .getModels()
+                    .stream()
+                    .map(model -> model.getOutput2D().getImageInformation().getPathToSVGImage())
+                    .forEach(imageComponent::deleteSvgImage);
+        }
+
+        resultRepository.deleteAllById(expiredResultsIds);
     }
 }
