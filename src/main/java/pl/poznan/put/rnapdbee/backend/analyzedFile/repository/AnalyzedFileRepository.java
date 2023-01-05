@@ -20,7 +20,7 @@ import java.util.Optional;
 @Repository
 public class AnalyzedFileRepository {
     private final GridFsTemplate gridFsTemplate;
-    private final Logger logger = LoggerFactory.getLogger(AnalyzedFileRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnalyzedFileRepository.class);
 
     @Autowired
     public AnalyzedFileRepository(GridFsTemplate gridFsTemplate) {

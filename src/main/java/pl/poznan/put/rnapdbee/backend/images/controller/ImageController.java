@@ -24,7 +24,7 @@ import java.nio.file.Path;
 @RequestMapping("/image")
 public class ImageController {
 
-    private final Logger logger = LoggerFactory.getLogger(ImageController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @Value("${svg.images.directory.path}")
     private String imagesPath;

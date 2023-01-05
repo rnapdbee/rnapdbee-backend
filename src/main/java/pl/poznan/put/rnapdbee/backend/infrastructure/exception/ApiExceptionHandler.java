@@ -27,7 +27,7 @@ import java.util.Objects;
 public class ApiExceptionHandler {
 
     private final MessageProvider messageProvider;
-    private final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     public ApiExceptionHandler(
             MessageProvider messageProvider

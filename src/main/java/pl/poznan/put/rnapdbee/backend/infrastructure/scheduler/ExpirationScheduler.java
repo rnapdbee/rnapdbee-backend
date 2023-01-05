@@ -29,7 +29,7 @@ public class ExpirationScheduler {
     private final SecondaryToDotBracketService secondaryToDotBracketService;
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
     private final TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService;
-    private final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
     @Value("${document.storage.days}")
     private int documentStorageDays;
 
@@ -54,7 +54,6 @@ public class ExpirationScheduler {
         List<AnalysisData> analysisDataList = analysisDataRepository.findAll(Sort.by("createdAt"));
         List<UUID> expiredAnalysisDataIds = new ArrayList<>();
 
-        //TODO remove svg images based on pathToSVGImage in ImageInformationPath and ConsensualVisualizationPath, probably need to use Scenario type data
         for (AnalysisData analysis : analysisDataList) {
             if ((int) Duration.between(analysis.getCreatedAt(), Instant.now()).toDays() >= documentStorageDays) {
                 UUID expiredAnalysisId = analysis.getId();

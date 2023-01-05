@@ -24,6 +24,8 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMult
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static pl.poznan.put.rnapdbee.backend.analyzedFile.AnalyzedFileService.PDB_FILE_EXTENSION;
@@ -242,5 +244,38 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
         }
 
         return entityBuilder.build();
+    }
+
+    @Override
+    public void deleteExpiredResults(List<UUID> expiredResultsIds) {
+        for (UUID expiredResultId : expiredResultsIds) {
+            Optional<ResultEntity<TertiaryToMultiSecondaryParams,
+                    OutputMulti<ImageInformationPath, ConsensualVisualizationPath>>> optionalResultEntity =
+                    findExpiredResultEntityDocument(expiredResultId);
+
+            if (optionalResultEntity.isEmpty())
+                continue;
+
+            String consensualVisualizationPathToSVGImage = optionalResultEntity.get()
+                    .getOutput()
+                    .getConsensualVisualization()
+                    .getPathToSVGImage();
+            imageComponent.deleteSvgImage(consensualVisualizationPathToSVGImage);
+
+            if (!isEmptyVisualization(optionalResultEntity.get()))
+                optionalResultEntity.get()
+                        .getOutput()
+                        .getEntries()
+                        .stream()
+                        .map(entry -> entry.getOutput2D().getImageInformation().getPathToSVGImage())
+                        .forEach(imageComponent::deleteSvgImage);
+        }
+
+        resultRepository.deleteAllById(expiredResultsIds);
+    }
+
+    @Override
+    protected boolean isEmptyVisualization(ResultEntity<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultEntity) {
+        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE;
     }
 }

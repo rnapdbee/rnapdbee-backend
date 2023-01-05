@@ -20,7 +20,7 @@ public class PdbClient {
 
     private final WebClient pdbWebClient;
     private final MessageProvider messageProvider;
-    private final Logger logger = LoggerFactory.getLogger(PdbClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(PdbClient.class);
 
     @Autowired
     private PdbClient(
