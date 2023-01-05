@@ -1,6 +1,5 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -97,17 +96,6 @@ public class Output2D<T extends ImageInformation> {
         }
 
         public Builder<T> withStructuralElement(StructuralElement structuralElements) {
-            if (structuralElements == null) {
-                this.structuralElements = new StructuralElement(
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        null);
-                return this;
-            }
-
             this.structuralElements = structuralElements;
             return this;
         }
