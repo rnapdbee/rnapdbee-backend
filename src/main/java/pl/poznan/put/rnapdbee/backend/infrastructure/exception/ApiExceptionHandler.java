@@ -26,8 +26,8 @@ import java.util.Objects;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    private final MessageProvider messageProvider;
     private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+    private final MessageProvider messageProvider;
 
     public ApiExceptionHandler(
             MessageProvider messageProvider
@@ -81,9 +81,15 @@ public class ApiExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR);
 
         ExceptionPattern exceptionPattern = new ExceptionPattern(
-                exception.getMessage(),
-                exception.getStatus(),
-                exception.getError());
+                Objects.requireNonNullElse(
+                        exception.getMessage(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()),
+                Objects.requireNonNullElse(
+                        exception.getStatus(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                Objects.requireNonNullElse(
+                        exception.getError(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
 
         logger.error(String.format("Exception response: %s", exceptionPattern));
         return new ResponseEntity<>(exceptionPattern, httpStatus);

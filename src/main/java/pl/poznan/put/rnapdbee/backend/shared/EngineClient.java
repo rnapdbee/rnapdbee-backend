@@ -38,6 +38,8 @@ import java.util.List;
  */
 @Component
 public class EngineClient {
+    private static final Logger logger = LoggerFactory.getLogger(EngineClient.class);
+
     private static final String CONTENT_DISPOSITION_HEADER_NAME = "Content-Disposition";
     private static final String REMOVE_ISOLATED_PARAM_NAME = "removeIsolated";
     private static final String STRUCTURAL_ELEMENTS_HANDLING_PARAM_NAME = "structuralElementsHandling";
@@ -49,7 +51,6 @@ public class EngineClient {
 
     private final WebClient engineWebClient;
     private final MessageProvider messageProvider;
-    private static final Logger logger = LoggerFactory.getLogger(EngineClient.class);
 
     @Value("${rnapdbee.engine.global.multi.path}")
     private String PATH_MULTI;
@@ -65,6 +66,15 @@ public class EngineClient {
     ) {
         this.engineWebClient = engineWebClient;
         this.messageProvider = messageProvider;
+    }
+
+    private static Mono<? extends Throwable> errorHandler(ClientResponse clientResponse) {
+        logger.error("Calculation engine error occurred.");
+        return clientResponse.bodyToMono(ExceptionPattern.class)
+                .flatMap(exception -> Mono.error(new EngineReturnedException(
+                        exception.getMessage(),
+                        exception.getStatus(),
+                        exception.getError())));
     }
 
     public Output2D<ImageInformationByteArray> perform2DAnalysisOnEngine(
@@ -87,7 +97,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponse2D.class)
                     .block();
         } catch (WebClientRequestException e) {
@@ -123,7 +133,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponse3D.class)
                     .block();
         } catch (WebClientRequestException e) {
@@ -153,7 +163,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, clientResponse -> errorHandler(clientResponse, messageProvider))
+                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponseMulti.class)
                     .block();
         } catch (WebClientRequestException e) {
@@ -161,22 +171,6 @@ public class EngineClient {
             throw new EngineNotAvailableException(
                     messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE));
         }
-    }
-
-    private static Mono<? extends Throwable> errorHandler(
-            ClientResponse clientResponse,
-            MessageProvider messageProvider
-    ) {
-        if (clientResponse.statusCode().is5xxServerError()) {
-            return Mono.error(new EngineNotAvailableException(
-                    messageProvider.getMessage(MessageProvider.Message.ENGINE_NOT_AVAILABLE)));
-        }
-
-        return clientResponse.bodyToMono(ExceptionPattern.class)
-                .flatMap(exception -> Mono.error(new EngineReturnedException(
-                        exception.getMessage(),
-                        exception.getStatus(),
-                        exception.getError())));
     }
 
     private String prepareContentDispositionHeader(String filename) {

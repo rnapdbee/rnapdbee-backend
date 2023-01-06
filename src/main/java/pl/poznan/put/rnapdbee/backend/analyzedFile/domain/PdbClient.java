@@ -54,7 +54,7 @@ public class PdbClient {
                     .bodyToMono(byte[].class)
                     .block();
         } catch (WebClientRequestException e) {
-            logger.error("Protein Data Bank not available.");
+            logger.error("Protein Data Bank not available.", e);
 
             throw new PdbNotAvailableException(
                     messageProvider.getMessage(MessageProvider.Message.PDB_NOT_AVAILABLE));
