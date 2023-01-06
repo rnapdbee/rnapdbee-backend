@@ -36,7 +36,7 @@ public class MessageProvider {
         FILENAME_NOT_SET("api.exception.filename.not.set"),
         ID_NOT_FOUND_FORMAT("api.exception.id.not.found.format"),
         ENGINE_NOT_AVAILABLE("api.exception.engine.not.available"),
-        UNKNOWN_ERROR("api.exception.unknown.error");
+        UNEXPECTED_ERROR("api.exception.unexpected.error");
 
         private final String messageCode;
 

@@ -83,7 +83,7 @@ public class ApiExceptionHandler {
         ExceptionPattern exceptionPattern = new ExceptionPattern(
                 Objects.requireNonNullElse(
                         exception.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()),
+                        messageProvider.getMessage(MessageProvider.Message.UNEXPECTED_ERROR)),
                 Objects.requireNonNullElse(
                         exception.getStatus(),
                         HttpStatus.INTERNAL_SERVER_ERROR.value()),
@@ -97,10 +97,10 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionPattern> handleAllUncaughtException(Exception exception) {
-        logger.error(String.format("Unknown error occurred: %s", exception.getMessage()), exception);
+        logger.error(String.format("Unexpected error occurred: %s", exception.getMessage()), exception);
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return prepareResponseEntity(messageProvider.getMessage(MessageProvider.Message.UNKNOWN_ERROR), httpStatus);
+        return prepareResponseEntity(messageProvider.getMessage(MessageProvider.Message.UNEXPECTED_ERROR), httpStatus);
     }
 
     private ResponseEntity<ExceptionPattern> prepareResponseEntity(
