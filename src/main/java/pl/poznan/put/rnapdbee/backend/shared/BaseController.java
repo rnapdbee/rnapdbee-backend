@@ -38,7 +38,7 @@ public abstract class BaseController {
             return filename;
 
         } catch (IllegalArgumentException exception) {
-            logger.error("Filename non-parsable.");
+            logger.error("Filename non-parsable.", exception);
 
             throw new FilenameNotSetException(
                     messageProvider.getMessage(MessageProvider.Message.FILENAME_NOT_PARSABLE));

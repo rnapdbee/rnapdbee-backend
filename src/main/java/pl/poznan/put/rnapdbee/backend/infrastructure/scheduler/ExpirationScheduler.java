@@ -58,7 +58,11 @@ public class ExpirationScheduler {
             if ((int) Duration.between(analysis.getCreatedAt(), Instant.now()).toDays() >= documentStorageDays) {
                 UUID expiredAnalysisId = analysis.getId();
                 expiredAnalysisDataIds.add(expiredAnalysisId);
-                analyzedFileService.deleteAnalyzedFile(expiredAnalysisId);
+
+                Boolean expiredAnalysisUsePdb = analysis.getUsePdb();
+                if (expiredAnalysisUsePdb == null || !expiredAnalysisUsePdb) {
+                    analyzedFileService.deleteAnalyzedFile(expiredAnalysisId);
+                }
 
                 switch (analysis.getScenario()) {
                     case SCENARIO_2D:

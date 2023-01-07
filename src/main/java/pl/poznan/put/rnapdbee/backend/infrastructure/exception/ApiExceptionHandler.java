@@ -26,8 +26,8 @@ import java.util.Objects;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    private final MessageProvider messageProvider;
     private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+    private final MessageProvider messageProvider;
 
     public ApiExceptionHandler(
             MessageProvider messageProvider
@@ -81,9 +81,15 @@ public class ApiExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR);
 
         ExceptionPattern exceptionPattern = new ExceptionPattern(
-                exception.getMessage(),
-                exception.getStatus(),
-                exception.getError());
+                Objects.requireNonNullElse(
+                        exception.getMessage(),
+                        messageProvider.getMessage(MessageProvider.Message.UNEXPECTED_ERROR)),
+                Objects.requireNonNullElse(
+                        exception.getStatus(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                Objects.requireNonNullElse(
+                        exception.getError(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
 
         logger.error(String.format("Exception response: %s", exceptionPattern));
         return new ResponseEntity<>(exceptionPattern, httpStatus);
@@ -91,10 +97,10 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionPattern> handleAllUncaughtException(Exception exception) {
-        logger.error(String.format("Unknown error occurred: %s", exception.getMessage()), exception);
+        logger.error(String.format("Unexpected error occurred: %s", exception.getMessage()), exception);
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        return prepareResponseEntity(messageProvider.getMessage(MessageProvider.Message.UNKNOWN_ERROR), httpStatus);
+        return prepareResponseEntity(messageProvider.getMessage(MessageProvider.Message.UNEXPECTED_ERROR), httpStatus);
     }
 
     private ResponseEntity<ExceptionPattern> prepareResponseEntity(
