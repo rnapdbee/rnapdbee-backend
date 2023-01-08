@@ -206,7 +206,8 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
         for (OutputMultiEntry<ImageInformationByteArray> model : engineResponseMulti.getEntries()) {
             String pathToSVGImage;
 
-            if (visualizationTool == VisualizationTool.NONE)
+            if (visualizationTool == VisualizationTool.NONE
+                    || !model.getOutput2D().getImageInformation().wasDrawn())
                 pathToSVGImage = null;
             else
                 pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
@@ -267,6 +268,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
                         .getOutput()
                         .getEntries()
                         .stream()
+                        .filter(entry -> entry.getOutput2D().getImageInformation().wasDrawn())
                         .map(entry -> entry.getOutput2D().getImageInformation().getPathToSVGImage())
                         .forEach(imageComponent::deleteSvgImage);
         }

@@ -24,12 +24,12 @@ import java.util.UUID;
 @EnableScheduling
 public class ExpirationScheduler {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
     private final AnalyzedFileService analyzedFileService;
     private final AnalysisDataRepository analysisDataRepository;
     private final SecondaryToDotBracketService secondaryToDotBracketService;
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
     private final TertiaryToMultiSecondaryService tertiaryToMultiSecondaryService;
-    private static final Logger logger = LoggerFactory.getLogger(ExpirationScheduler.class);
     @Value("${document.storage.days}")
     private int documentStorageDays;
 

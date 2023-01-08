@@ -35,4 +35,28 @@ public class StructuralElement {
         this.singleStrands3p = singleStrands3p;
         this.coordinates = coordinates;
     }
+
+    public List<String> getStems() {
+        return stems;
+    }
+
+    public List<String> getLoops() {
+        return loops;
+    }
+
+    public List<String> getSingleStrands() {
+        return singleStrands;
+    }
+
+    public List<String> getSingleStrands5p() {
+        return singleStrands5p;
+    }
+
+    public List<String> getSingleStrands3p() {
+        return singleStrands3p;
+    }
+
+    public String getCoordinates() {
+        return coordinates;
+    }
 }

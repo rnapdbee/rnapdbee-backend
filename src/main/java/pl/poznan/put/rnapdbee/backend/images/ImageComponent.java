@@ -4,10 +4,12 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Component managing image resources.
@@ -37,6 +39,13 @@ public class ImageComponent {
             logger.error("Error occurred during exporting svg image.", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public FileSystemResource findSvgImage(String pathToController) {
+        String name = extractImageName(pathToController);
+        String inputFile = String.format("%s/%s", imagesPath, name);
+        Path path = new File(inputFile).toPath();
+        return new FileSystemResource(path);
     }
 
     public void deleteSvgImage(String pathToController) {

@@ -6,12 +6,12 @@ import javax.persistence.Id;
 import java.time.Instant;
 
 /**
- * Class representing data of analyzed file downloaded from Protein Data Bank
+ * Class representing data of analyzed file downloaded from Protein Data Bank.
  */
 @Document
 public class PdbFileDataEntity {
     /**
-     * filename without extension
+     * Filename without extension.
      */
     @Id
     private final String id;

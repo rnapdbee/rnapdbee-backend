@@ -12,7 +12,7 @@ public class ImageInformationByteArray extends ImageInformation {
             byte[] svgFile,
             VisualizationTool successfulVisualizationTool,
             VisualizationTool failedVisualizationTool,
-            String drawingResult) {
+            DrawingResult drawingResult) {
         super(successfulVisualizationTool, failedVisualizationTool, drawingResult);
         this.svgFile = svgFile;
     }

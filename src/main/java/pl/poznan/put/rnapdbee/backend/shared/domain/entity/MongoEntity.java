@@ -17,6 +17,9 @@ import java.util.UUID;
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;
+    /**
+     * Filename of analyzed file with extension.
+     */
     protected final String filename;
     protected List<ResultEntity<T, O>> results;
     @JsonIgnore

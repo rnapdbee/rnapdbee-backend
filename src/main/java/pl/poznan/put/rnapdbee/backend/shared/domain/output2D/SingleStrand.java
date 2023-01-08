@@ -21,4 +21,11 @@ public class SingleStrand {
         this.sequence = sequence;
         this.structure = structure;
     }
+
+    @Override
+    public String toString() {
+        return name + System.lineSeparator() +
+                sequence + System.lineSeparator() +
+                structure + System.lineSeparator();
+    }
 }

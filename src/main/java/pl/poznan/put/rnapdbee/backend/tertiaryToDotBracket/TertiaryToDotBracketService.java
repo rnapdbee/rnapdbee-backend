@@ -227,7 +227,8 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
         for (SingleTertiaryModelOutput<ImageInformationByteArray> model : engineResponse3D.getModels()) {
             String pathToSVGImage;
 
-            if (visualizationTool == VisualizationTool.NONE)
+            if (visualizationTool == VisualizationTool.NONE
+                    || !model.getOutput2D().getImageInformation().wasDrawn())
                 pathToSVGImage = null;
             else
                 pathToSVGImage = imageComponent.generateSvgUrl(model.getOutput2D().getImageInformation().getSvgFile());
@@ -280,6 +281,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
                     .getOutput()
                     .getModels()
                     .stream()
+                    .filter(modelOutput -> modelOutput.getOutput2D().getImageInformation().wasDrawn())
                     .map(model -> model.getOutput2D().getImageInformation().getPathToSVGImage())
                     .forEach(imageComponent::deleteSvgImage);
         }

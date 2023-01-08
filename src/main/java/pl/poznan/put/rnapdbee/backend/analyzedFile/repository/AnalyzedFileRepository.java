@@ -19,8 +19,8 @@ import java.util.Optional;
 
 @Repository
 public class AnalyzedFileRepository {
-    private final GridFsTemplate gridFsTemplate;
     private static final Logger logger = LoggerFactory.getLogger(AnalyzedFileRepository.class);
+    private final GridFsTemplate gridFsTemplate;
 
     @Autowired
     public AnalyzedFileRepository(GridFsTemplate gridFsTemplate) {

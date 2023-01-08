@@ -18,9 +18,9 @@ import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 @Component
 public class PdbClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(PdbClient.class);
     private final WebClient pdbWebClient;
     private final MessageProvider messageProvider;
-    private static final Logger logger = LoggerFactory.getLogger(PdbClient.class);
 
     @Autowired
     private PdbClient(
