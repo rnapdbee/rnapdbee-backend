@@ -36,33 +36,24 @@ public class DownloadResultController {
             @RequestBody List<DownloadSelection2D> downloadSelection2DList,
             HttpServletResponse response
     ) throws IOException {
-        logger.info(String.format("Prepare ZIP output for id [%s]", id));
-        response.setContentType("application/zip");
+        logger.info(String.format("Prepare 2D scenario ZIP results for id [%s]", id));
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-//            ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream());
         String directoryName = downloadResultService.download2DResult(id, downloadSelection2DList, zipOutputStream);
-//            ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-//                    .filename(directoryName)
-//                    .build();
-        response.setHeader(
-                "Content-Disposition",
-                String.format("attachment; filename=\"%s\"", directoryName));
 
-        if (zipOutputStream != null) {
-            zipOutputStream.finish();
-            zipOutputStream.flush();
-            IOUtils.closeQuietly(zipOutputStream);
-        }
+        zipOutputStream.finish();
+        zipOutputStream.flush();
+
+        IOUtils.closeQuietly(zipOutputStream);
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
 
-        return byteArrayOutputStream.toByteArray();
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", directoryName));
 
-//        } catch (IOException e) {
-//            logger.error("Failed to prepare ZIP output stream", e);
-//        }
+        return byteArrayOutputStream.toByteArray();
     }
 }
