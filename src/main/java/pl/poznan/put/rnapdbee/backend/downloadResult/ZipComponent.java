@@ -6,11 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection2D;
+import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection3D;
 import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.SingleStrand;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.StructuralElement;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
 
 import java.io.IOException;
@@ -20,18 +23,26 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Component
-public class ZipComponent {
+class ZipComponent {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipComponent.class);
 
-    private static final String strandsPostfix = "-2D-dotbracket.txt";
-    private static final String bpSeqPostfix = "-2D-bpseq.txt";
-    private static final String ctPostfix = "-2D-ct.txt";
-    private static final String interactionsPostfix = "-rna-to-rna.txt";
-    private static final String structuralElementsPostfix = "-elements.txt";
-    private static final String coordinatesPostfix = "-coordinates.txt";
-    private static final String image2DPostfix = "-2D";
-    private static final String imageConsensusPostfix = "-consensus";
+    private static final String strandsSuffix = "-2D-dotbracket.txt";
+    private static final String bpSeqSuffix = "-2D-bpseq.txt";
+    private static final String ctSuffix = "-2D-ct.txt";
+    private static final String interactionsSuffix = "-rna-to-rna.txt";
+    private static final String structuralElementsSuffix = "-elements.txt";
+    private static final String coordinatesSuffix = "-coordinates.txt";
+    private static final String messagesSuffix = "-2D-processing.log";
+    private static final String canonicalInteractionsSuffix = "-canonical.csv";
+    private static final String nonCanonicalInteractionsSuffix = "-non-canonical.csv";
+    private static final String interStrandInteractionsSuffix = "-rna-to-rna.csv";
+    private static final String stackingInteractionsSuffix = "-stacking.csv";
+    private static final String basePhosphateInteractionsSuffix = "-base-phoshpate.csv";
+    private static final String baseRiboseInteractionsSuffix = "-base-ribose.csv";
+
+    private static final String image2DSuffix = "-2D";
+    private static final String imageConsensusSuffix = "-consensus";
     private static final String imageExtension = ".svg";
 
     private final ZipFormatComponent zipFormatComponent;
@@ -42,6 +53,40 @@ public class ZipComponent {
             ImageComponent imageComponent) {
         this.zipFormatComponent = zipFormatComponent;
         this.imageComponent = imageComponent;
+    }
+
+    public void zipSingleTertiaryModelOutput(
+            final SingleTertiaryModelOutput<ImageInformationPath> singleTertiaryModelOutput,
+            final DownloadSelection3D.SingleDownloadSelection3D downloadSelection3D,
+            final String namePrefix,
+            final ZipOutputStream zipOutputStream
+    ) {
+        zipOutput2D(singleTertiaryModelOutput.getOutput2D(),
+                downloadSelection3D.getOutput2D(),
+                namePrefix,
+                zipOutputStream);
+
+        if (downloadSelection3D.isMessages())
+            zipMessages(singleTertiaryModelOutput.getMessages(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isCanonicalInteractions())
+            zipCanonicalInteractions(singleTertiaryModelOutput.getCanonicalInteractions(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isNonCanonicalInteractions())
+            zipNonCanonicalInteractions(singleTertiaryModelOutput.getNonCanonicalInteractions(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isInterStrandInteractions())
+            zipInterStrandInteractions(singleTertiaryModelOutput.getInterStrandInteractions(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isStackingInteractions())
+            zipStackingInteractions(singleTertiaryModelOutput.getStackingInteractions(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isBasePhosphateInteractions())
+            zipBasePhosphateInteractions(singleTertiaryModelOutput.getBasePhosphateInteractions(), namePrefix, zipOutputStream);
+
+        if (downloadSelection3D.isBaseRiboseInteractions())
+            zipBaseRiboseInteractions(singleTertiaryModelOutput.getBaseRiboseInteractions(), namePrefix, zipOutputStream);
+
     }
 
     public void zipOutput2D(
@@ -66,7 +111,7 @@ public class ZipComponent {
             zipStructuralElement(output2D.getStructuralElements(), namePrefix, zipOutputStream);
 
         if (downloadSelection2D.isImageInformation() && output2D.getImageInformation().wasDrawn())
-            zipImage(output2D.getImageInformation().getPathToSVGImage(), namePrefix, image2DPostfix, zipOutputStream);
+            zipImage(output2D.getImageInformation().getPathToSVGImage(), namePrefix, image2DSuffix, zipOutputStream);
     }
 
     public void zipConsensualVisualization(
@@ -76,7 +121,7 @@ public class ZipComponent {
     ) {
         String pathToSVGImage = consensualVisualizationPath.getPathToSVGImage();
         if (consensualVisualizationPath.getPathToSVGImage() != null)
-            zipImage(pathToSVGImage, namePrefix, imageConsensusPostfix, zipOutputStream);
+            zipImage(pathToSVGImage, namePrefix, imageConsensusSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist Consensus Visualization image.");
     }
@@ -98,11 +143,11 @@ public class ZipComponent {
     private void zipImage(
             String pathToSVGImage,
             String namePrefix,
-            String namePostfix,
+            String nameSuffix,
             ZipOutputStream zipOutputStream
     ) {
         FileSystemResource resource = imageComponent.findSvgImage(pathToSVGImage);
-        String imageName = namePrefix + namePostfix + imageExtension;
+        String imageName = namePrefix + nameSuffix + imageExtension;
         try {
             zipOutputStream.putNextEntry(new ZipEntry(imageName));
             zipOutputStream.write(resource.getInputStream().readAllBytes());
@@ -118,7 +163,7 @@ public class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         if (strands != null && !strands.isEmpty())
-            zipData(zipFormatComponent.strandsZipFormat(strands), namePrefix + strandsPostfix, zipOutputStream);
+            zipData(zipFormatComponent.strandsZipFormat(strands), namePrefix + strandsSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist Strands data.");
 
@@ -130,7 +175,7 @@ public class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         if (bpSeq != null && !bpSeq.isEmpty())
-            zipData(zipFormatComponent.bpSeqZipFormat(bpSeq), namePrefix + bpSeqPostfix, zipOutputStream);
+            zipData(zipFormatComponent.bpSeqZipFormat(bpSeq), namePrefix + bpSeqSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist BPSEQ data.");
 
@@ -142,7 +187,7 @@ public class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         if (ct != null && !ct.isEmpty())
-            zipData(zipFormatComponent.ctZipFormat(ct), namePrefix + ctPostfix, zipOutputStream);
+            zipData(zipFormatComponent.ctZipFormat(ct), namePrefix + ctSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist CT data.");
     }
@@ -153,7 +198,7 @@ public class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         if (interactions != null && !interactions.isEmpty())
-            zipData(zipFormatComponent.interactionsZipFormat(interactions), namePrefix + interactionsPostfix, zipOutputStream);
+            zipData(zipFormatComponent.interactionsZipFormat(interactions), namePrefix + interactionsSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist Interactions data.");
     }
@@ -178,12 +223,89 @@ public class ZipComponent {
                     singleStrands5p != null && !singleStrands5p.isEmpty())
 
                 zipData(zipFormatComponent.structuralElementsZipFormat(stems, loops, singleStrands, singleStrands5p, singleStrands3p),
-                        namePrefix + structuralElementsPostfix,
+                        namePrefix + structuralElementsSuffix,
                         zipOutputStream);
 
             if (coordinates != null)
-                zipData(coordinates, namePrefix + coordinatesPostfix, zipOutputStream);
+                zipData(coordinates, namePrefix + coordinatesSuffix, zipOutputStream);
         } else
             logger.error("Failed to archive not exist Strands data.");
+    }
+
+    private void zipMessages(
+            List<String> messages,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (messages != null && !messages.isEmpty())
+            zipData(zipFormatComponent.messagesZipFormat(messages), namePrefix + messagesSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist Messages data.");
+    }
+
+    private void zipCanonicalInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + canonicalInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist CanonicalInteractions data.");
+    }
+
+    private void zipNonCanonicalInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + nonCanonicalInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist NonCanonicalInteractions data.");
+    }
+
+    private void zipInterStrandInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + interStrandInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist InterStrandInteractions data.");
+    }
+
+    private void zipStackingInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + stackingInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist StackingInteractions data.");
+    }
+
+    private void zipBasePhosphateInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + basePhosphateInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist BasePhosphateInteractions data.");
+    }
+
+    private void zipBaseRiboseInteractions(
+            List<BasePair> interactions,
+            String namePrefix,
+            ZipOutputStream zipOutputStream
+    ) {
+        if (interactions != null && !interactions.isEmpty())
+            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + baseRiboseInteractionsSuffix, zipOutputStream);
+        else
+            logger.error("Failed to archive not exist BaseRiboseInteractions data.");
     }
 }

@@ -1,18 +1,17 @@
 package pl.poznan.put.rnapdbee.backend.downloadResult;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.SingleStrand;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.NamedResidue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
-public class ZipFormatComponent {
-
-    private static final Logger logger = LoggerFactory.getLogger(ZipFormatComponent.class);
+class ZipFormatComponent {
 
     public String strandsZipFormat(List<SingleStrand> strands) {
         return strands.stream()
@@ -73,5 +72,90 @@ public class ZipFormatComponent {
 
         return stringList.stream()
                 .collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    public String messagesZipFormat(List<String> messages) {
+        return messages.stream()
+                .map(message -> message + System.lineSeparator())
+                .collect(Collectors.joining());
+    }
+
+    public String basePairsToCSV(List<BasePair> basePairs) {
+        char delimiter = ';';
+        StringBuilder stringBuilder =
+                new StringBuilder("Base-pair;" +
+                        "Interaction type;" +
+                        "Canonical;" +
+                        "Saenger;" +
+                        "Leontis-Westhof;" +
+                        "BPh;" +
+                        "BR;" +
+                        "Represented in dot-bracket")
+                        .append(System.lineSeparator());
+
+        for (BasePair basePair : basePairs) {
+            String basePairResides = basePairResides(basePair.getLeftResidue(), basePair.getRightResidue());
+            String iteractionType = prepareInteractionType(basePair.getInteractionType());
+            String saenger = prepareSaenger(basePair.getSaenger());
+            String canonical = isSaengerCanonical(saenger);
+
+            String leontisWesthof = prepareLeontisWesthof(basePair.getLeontisWesthof());
+            String BPh = prepareBPh(basePair.getbPh());
+            String BR = prepareBR(basePair.getBr());
+
+            //TODO
+            String representedInDotBracket = "N";
+
+            stringBuilder.append(basePairResides)
+                    .append(delimiter).append(iteractionType)
+                    .append(delimiter).append(saenger)
+                    .append(delimiter).append(canonical)
+                    .append(delimiter).append(leontisWesthof)
+                    .append(delimiter).append(BPh)
+                    .append(delimiter).append(BR)
+                    .append(delimiter).append(representedInDotBracket)
+                    .append(System.lineSeparator());
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String basePairResides(
+            NamedResidue leftResidue,
+            NamedResidue rightResidue
+    ) {
+        return leftResidue.toString() + " - " + rightResidue.toString();
+    }
+
+    private String prepareInteractionType(String iteractionType) {
+        if (iteractionType == null)
+            return "base - base";
+        return iteractionType.toLowerCase();
+    }
+
+    private String prepareSaenger(String saenger) {
+        if (saenger == null || saenger.equals("UNKNOWN"))
+            return "n/a";
+        return saenger;
+    }
+
+    private String isSaengerCanonical(String saenger) {
+        return Objects.equals(saenger, "XIX")
+                || Objects.equals(saenger, "XX")
+                || Objects.equals(saenger, "XXVIII") ? "Y" : "N";
+    }
+
+    private String prepareLeontisWesthof(String leontisWesthof) {
+        if (leontisWesthof == null || leontisWesthof.equals("UNKNOWN"))
+            return "n/a";
+        return leontisWesthof;
+    }
+
+    private String prepareBPh(String BPh) {
+        return Objects.requireNonNullElse(BPh, "UNKNOWN");
+    }
+
+    private String prepareBR(String BR) {
+        return Objects.requireNonNullElse(BR, "UNKNOWN");
     }
 }

@@ -6,10 +6,13 @@ import java.util.List;
  * Class indicates 3D scenario results resources to download.
  */
 public class DownloadSelection3D {
-    private final List<SingleDownloadSelection3D> models;
+    private List<SingleDownloadSelection3D> models;
 
     public DownloadSelection3D(List<SingleDownloadSelection3D> models) {
         this.models = models;
+    }
+
+    public DownloadSelection3D() {
     }
 
     public List<SingleDownloadSelection3D> getModels() {
@@ -17,14 +20,14 @@ public class DownloadSelection3D {
     }
 
     public static class SingleDownloadSelection3D {
-        private final DownloadSelection2D output2D;
-        private final boolean messages;
-        private final boolean canonicalInteractions;
-        private final boolean nonCanonicalInteractions;
-        private final boolean interStrandInteractions;
-        private final boolean stackingInteractions;
-        private final boolean basePhosphateInteractions;
-        private final boolean baseRiboseInteractions;
+        private DownloadSelection2D output2D;
+        private boolean messages;
+        private boolean canonicalInteractions;
+        private boolean nonCanonicalInteractions;
+        private boolean interStrandInteractions;
+        private boolean stackingInteractions;
+        private boolean basePhosphateInteractions;
+        private boolean baseRiboseInteractions;
 
         public SingleDownloadSelection3D(
                 DownloadSelection2D output2D,
@@ -43,6 +46,9 @@ public class DownloadSelection3D {
             this.stackingInteractions = stackingInteractions;
             this.basePhosphateInteractions = basePhosphateInteractions;
             this.baseRiboseInteractions = baseRiboseInteractions;
+        }
+
+        public SingleDownloadSelection3D() {
         }
 
         public DownloadSelection2D getOutput2D() {

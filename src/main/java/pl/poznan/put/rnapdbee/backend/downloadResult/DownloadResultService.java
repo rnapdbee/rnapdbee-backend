@@ -8,6 +8,7 @@ import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection2D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection3D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelectionMulti;
 import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadEntriesSelectionListSizeException;
+import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadModelsSelectionListSizeException;
 import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadSelectionListSizeException;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.SecondaryToDotBracketService;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
@@ -16,6 +17,9 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.TertiaryToDotBracketService;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
@@ -58,7 +62,34 @@ public class DownloadResultService {
             List<DownloadSelection3D> downloadSelection3DList,
             ZipOutputStream stream
     ) {
-        return "";
+        TertiaryToDotBracketMongoEntity document3D = tertiaryToDotBracketService.findDocument(id);
+
+        String filename = tertiaryToDotBracketService.removeFileExtension(document3D.getFilename(), true);
+        List<Output3D<ImageInformationPath>> resultsOutput3dList = document3D.getResults()
+                .stream()
+                .map(ResultEntity::getOutput)
+                .collect(Collectors.toList());
+
+        int resultsCount = resultsOutput3dList.size();
+        int selectionListCount = downloadSelection3DList.size();
+        checkSelectionListSize(resultsCount, selectionListCount);
+
+        String basicDirPrefix = prepareBasicDirPrefix(filename, resultsCount);
+
+        for (int i = 0; i < resultsOutput3dList.size(); i++) {
+            DownloadSelection3D selection3D = downloadSelection3DList.get(i);
+            String dirPrefix = prepareResultDirPrefix(basicDirPrefix, i, resultsCount);
+
+            download3DModels(
+                    resultsOutput3dList.get(i).getModels(),
+                    selection3D.getModels(),
+                    i,
+                    dirPrefix,
+                    filename,
+                    stream);
+        }
+
+        return prepareZipName(filename);
     }
 
     public String download2DResult(
@@ -129,7 +160,7 @@ public class DownloadResultService {
                         stream);
             }
 
-            downloadMultiOutput2D(
+            downloadMultiEntries(
                     resultsOutputMultiList.get(i).getEntries(),
                     selectionMulti.getEntries(),
                     i,
@@ -151,7 +182,7 @@ public class DownloadResultService {
      * @param filename         name of analyzed file
      * @param stream           Zip Output stream storing selected data
      */
-    private void downloadMultiOutput2D(
+    private void downloadMultiEntries(
             List<OutputMultiEntry<ImageInformationPath>> entryList,
             List<DownloadSelectionMulti.SingleDownloadSelectionMulti> selectionEntries,
             int resultNumber,
@@ -161,7 +192,7 @@ public class DownloadResultService {
     ) {
         int entriesCount = entryList.size();
         int singleDownloadSelectionMultiCount = selectionEntries.size();
-        checkEntriesSelectionListSize(resultNumber, entriesCount, singleDownloadSelectionMultiCount);
+        checkEntriesSelectionListSize(resultNumber + 1, entriesCount, singleDownloadSelectionMultiCount);
 
         for (int j = 0; j < entriesCount; j++) {
             DownloadSelection2D selection2D = selectionEntries.get(j).getOutput2D();
@@ -176,6 +207,26 @@ public class DownloadResultService {
                 String entriesDirPrefix = prepareResultDirPrefix(dirPrefix, j, entriesCount);
                 zipComponent.zipOutput2D(entryList.get(j).getOutput2D(), selection2D, entriesDirPrefix + filename, stream);
             }
+        }
+    }
+
+    private void download3DModels(
+            List<SingleTertiaryModelOutput<ImageInformationPath>> modelsList,
+            List<DownloadSelection3D.SingleDownloadSelection3D> selectionsModels,
+            int resultNumber,
+            String dirPrefix,
+            String filename,
+            ZipOutputStream stream
+    ) {
+        int modelsCount = modelsList.size();
+        int singleDownloadSelection3DCount = selectionsModels.size();
+        checkModelsSelectionListSize(resultNumber + 1, modelsCount, singleDownloadSelection3DCount);
+
+        for (int j = 0; j < modelsCount; j++) {
+            DownloadSelection3D.SingleDownloadSelection3D selection3D = selectionsModels.get(j);
+
+            String entriesDirPrefix = prepareResultDirPrefix(dirPrefix, modelsList.get(j).getModelNumber(), modelsCount);
+            zipComponent.zipSingleTertiaryModelOutput(modelsList.get(j), selection3D, entriesDirPrefix + filename, stream);
         }
     }
 
@@ -231,6 +282,23 @@ public class DownloadResultService {
                     singleDownloadSelectionMultiCount));
             throw new BadEntriesSelectionListSizeException(
                     messageProvider.getMessage(MessageProvider.Message.BAD_ENTRIES_SELECTION_LIST_SIZE_FORMAT),
+                    resultNumber,
+                    entriesCount,
+                    singleDownloadSelectionMultiCount);
+        }
+    }
+
+    private void checkModelsSelectionListSize(
+            int resultNumber,
+            int entriesCount,
+            int singleDownloadSelectionMultiCount) {
+        if (entriesCount != singleDownloadSelectionMultiCount) {
+            logger.error(String.format("Download selection list [%s] element models size incorrect, expected: [%s], occurred: [%s].",
+                    resultNumber,
+                    entriesCount,
+                    singleDownloadSelectionMultiCount));
+            throw new BadModelsSelectionListSizeException(
+                    messageProvider.getMessage(MessageProvider.Message.BAD_MODELS_SELECTION_LIST_SIZE_FORMAT),
                     resultNumber,
                     entriesCount,
                     singleDownloadSelectionMultiCount);

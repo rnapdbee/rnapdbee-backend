@@ -22,4 +22,36 @@ public class BasePair {
     NamedResidue leftResidue;
     @JsonProperty("rightResidue")
     NamedResidue rightResidue;
+
+    public String getInteractionType() {
+        return interactionType;
+    }
+
+    public String getSaenger() {
+        return saenger;
+    }
+
+    public String getLeontisWesthof() {
+        return leontisWesthof;
+    }
+
+    public String getbPh() {
+        return bPh;
+    }
+
+    public String getBr() {
+        return br;
+    }
+
+    public String getStackingTopology() {
+        return stackingTopology;
+    }
+
+    public NamedResidue getLeftResidue() {
+        return leftResidue;
+    }
+
+    public NamedResidue getRightResidue() {
+        return rightResidue;
+    }
 }
