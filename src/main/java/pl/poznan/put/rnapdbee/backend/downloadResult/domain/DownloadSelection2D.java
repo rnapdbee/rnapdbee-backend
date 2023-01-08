@@ -1,7 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.downloadResult.domain;
 
 /**
- * Class indicates the Output2D resources to download.
+ * Class indicates 2D scenario results resources to download.
  */
 public class DownloadSelection2D {
     private final boolean strands;

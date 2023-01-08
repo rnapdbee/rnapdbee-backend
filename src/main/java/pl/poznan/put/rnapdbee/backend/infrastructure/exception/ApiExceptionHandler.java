@@ -11,6 +11,7 @@ import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdExcepti
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileUnzipException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbNotAvailableException;
+import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadEntriesSelectionListSizeException;
 import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadSelectionListSizeException;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
 import pl.poznan.put.rnapdbee.backend.shared.exception.DocumentExpiredException;
@@ -39,7 +40,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(value = {
             FilenameNotSetException.class,
             InvalidPdbIdException.class,
-            BadSelectionListSizeException.class
+            BadSelectionListSizeException.class,
+            BadEntriesSelectionListSizeException.class
     })
     public ResponseEntity<ExceptionPattern> handleBadRequestException(RuntimeException exception) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;

@@ -45,4 +45,13 @@ public class OpenApiConfiguration {
                 .packagesToScan("pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi downloadResultApi() {
+        return GroupedOpenApi.builder()
+                .group("Download")
+                .pathsToMatch("/**")
+                .packagesToScan("pl.poznan.put.rnapdbee.backend.downloadResult")
+                .build();
+    }
 }

@@ -37,7 +37,8 @@ public class MessageProvider {
         ID_NOT_FOUND_FORMAT("api.exception.id.not.found.format"),
         ENGINE_NOT_AVAILABLE("api.exception.engine.not.available"),
         UNEXPECTED_ERROR("api.exception.unexpected.error"),
-        BAD_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.selection.list.size.format");
+        BAD_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.selection.list.size.format"),
+        BAD_ENTRIES_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.entries.selection.list.size.format");
 
         private final String messageCode;
 
