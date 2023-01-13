@@ -24,8 +24,8 @@ public class SingleStrand {
 
     @Override
     public String toString() {
-        return name + System.lineSeparator() +
-                sequence + System.lineSeparator() +
-                structure + System.lineSeparator();
+        return name + "\n" +
+                sequence + "\n" +
+                structure + "\n";
     }
 }

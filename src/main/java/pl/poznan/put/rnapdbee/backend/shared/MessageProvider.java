@@ -36,10 +36,11 @@ public class MessageProvider {
         FILENAME_NOT_SET("api.exception.filename.not.set"),
         ID_NOT_FOUND_FORMAT("api.exception.id.not.found.format"),
         ENGINE_NOT_AVAILABLE("api.exception.engine.not.available"),
-        UNEXPECTED_ERROR("api.exception.unexpected.error"),
         BAD_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.selection.list.size.format"),
         BAD_ENTRIES_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.entries.selection.list.size.format"),
-        BAD_MODELS_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.models.selection.list.size.format");
+        BAD_MODELS_SELECTION_LIST_SIZE_FORMAT("api.exception.bad.models.selection.list.size.format"),
+        UNEXPECTED_ANALYSIS_ERROR("api.exception.unexpected.analysis.error"),
+        UNEXPECTED_ERROR("api.exception.unexpected.error");
 
         private final String messageCode;
 

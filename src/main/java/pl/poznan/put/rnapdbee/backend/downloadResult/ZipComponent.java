@@ -27,18 +27,18 @@ class ZipComponent {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipComponent.class);
 
-    private static final String strandsSuffix = "-2D-dotbracket.txt";
-    private static final String bpSeqSuffix = "-2D-bpseq.txt";
-    private static final String ctSuffix = "-2D-ct.txt";
-    private static final String interactionsSuffix = "-rna-to-rna.txt";
+    private static final String strandsSuffix = "-2D.dbn";
+    private static final String bpSeqSuffix = "-2D.bpseq";
+    private static final String ctSuffix = "-2D.ct";
+    private static final String interactionsSuffix = "-interstrand.txt";
     private static final String structuralElementsSuffix = "-elements.txt";
-    private static final String coordinatesSuffix = "-coordinates.txt";
-    private static final String messagesSuffix = "-2D-processing.log";
+    private static final String coordinatesSuffix = "-coordinates.";
+    private static final String messagesSuffix = "-processing.log";
     private static final String canonicalInteractionsSuffix = "-canonical.csv";
     private static final String nonCanonicalInteractionsSuffix = "-non-canonical.csv";
-    private static final String interStrandInteractionsSuffix = "-rna-to-rna.csv";
+    private static final String interStrandInteractionsSuffix = "-interstrand.csv";
     private static final String stackingInteractionsSuffix = "-stacking.csv";
-    private static final String basePhosphateInteractionsSuffix = "-base-phoshpate.csv";
+    private static final String basePhosphateInteractionsSuffix = "-base-phosphate.csv";
     private static final String baseRiboseInteractionsSuffix = "-base-ribose.csv";
 
     private static final String image2DSuffix = "-2D";
@@ -59,11 +59,13 @@ class ZipComponent {
             final SingleTertiaryModelOutput<ImageInformationPath> singleTertiaryModelOutput,
             final DownloadSelection3D.SingleDownloadSelection3D downloadSelection3D,
             final String namePrefix,
+            final String analyzedFileExtension,
             final ZipOutputStream zipOutputStream
     ) {
         zipOutput2D(singleTertiaryModelOutput.getOutput2D(),
                 downloadSelection3D.getOutput2D(),
                 namePrefix,
+                analyzedFileExtension,
                 zipOutputStream);
 
         if (downloadSelection3D.isMessages())
@@ -86,13 +88,13 @@ class ZipComponent {
 
         if (downloadSelection3D.isBaseRiboseInteractions())
             zipBaseRiboseInteractions(singleTertiaryModelOutput.getBaseRiboseInteractions(), namePrefix, zipOutputStream);
-
     }
 
     public void zipOutput2D(
             final Output2D<ImageInformationPath> output2D,
             final DownloadSelection2D downloadSelection2D,
             final String namePrefix,
+            final String analyzedFileExtension,
             final ZipOutputStream zipOutputStream
     ) {
         if (downloadSelection2D.isStrands())
@@ -108,7 +110,7 @@ class ZipComponent {
             zipInteractions(output2D.getInteractions(), namePrefix, zipOutputStream);
 
         if (downloadSelection2D.isStructuralElements())
-            zipStructuralElement(output2D.getStructuralElements(), namePrefix, zipOutputStream);
+            zipStructuralElement(output2D.getStructuralElements(), namePrefix, analyzedFileExtension, zipOutputStream);
 
         if (downloadSelection2D.isImageInformation() && output2D.getImageInformation().wasDrawn())
             zipImage(output2D.getImageInformation().getPathToSVGImage(), namePrefix, image2DSuffix, zipOutputStream);
@@ -120,7 +122,7 @@ class ZipComponent {
             final ZipOutputStream zipOutputStream
     ) {
         String pathToSVGImage = consensualVisualizationPath.getPathToSVGImage();
-        if (consensualVisualizationPath.getPathToSVGImage() != null)
+        if (pathToSVGImage != null && pathToSVGImage.isBlank())
             zipImage(pathToSVGImage, namePrefix, imageConsensusSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist Consensus Visualization image.");
@@ -149,8 +151,10 @@ class ZipComponent {
         FileSystemResource resource = imageComponent.findSvgImage(pathToSVGImage);
         String imageName = namePrefix + nameSuffix + imageExtension;
         try {
+            byte[] image = resource.getInputStream().readAllBytes();
+
             zipOutputStream.putNextEntry(new ZipEntry(imageName));
-            zipOutputStream.write(resource.getInputStream().readAllBytes());
+            zipOutputStream.write(image);
             zipOutputStream.closeEntry();
         } catch (final IOException e) {
             logger.error(String.format("Failed to add [%s] image file to ZIP archive", imageName), e);
@@ -206,6 +210,7 @@ class ZipComponent {
     private void zipStructuralElement(
             StructuralElement structuralElement,
             String namePrefix,
+            String coordinatesExtension,
             ZipOutputStream zipOutputStream
     ) {
         if (structuralElement != null) {
@@ -219,15 +224,15 @@ class ZipComponent {
             if (stems != null && !stems.isEmpty() ||
                     loops != null && !loops.isEmpty() ||
                     singleStrands != null && !singleStrands.isEmpty() ||
-                    singleStrands3p != null && !singleStrands3p.isEmpty() ||
-                    singleStrands5p != null && !singleStrands5p.isEmpty())
+                    singleStrands5p != null && !singleStrands5p.isEmpty() ||
+                    singleStrands3p != null && !singleStrands3p.isEmpty())
 
                 zipData(zipFormatComponent.structuralElementsZipFormat(stems, loops, singleStrands, singleStrands5p, singleStrands3p),
                         namePrefix + structuralElementsSuffix,
                         zipOutputStream);
 
             if (coordinates != null)
-                zipData(coordinates, namePrefix + coordinatesSuffix, zipOutputStream);
+                zipData(coordinates, namePrefix + coordinatesSuffix + coordinatesExtension, zipOutputStream);
         } else
             logger.error("Failed to archive not exist Strands data.");
     }
@@ -249,7 +254,7 @@ class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         if (interactions != null && !interactions.isEmpty())
-            zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + canonicalInteractionsSuffix, zipOutputStream);
+            zipData(zipFormatComponent.canonicalBasePairsToCSV(interactions), namePrefix + canonicalInteractionsSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not exist CanonicalInteractions data.");
     }

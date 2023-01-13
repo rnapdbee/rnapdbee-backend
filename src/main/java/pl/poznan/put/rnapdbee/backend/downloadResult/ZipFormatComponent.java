@@ -16,24 +16,24 @@ class ZipFormatComponent {
     public String strandsZipFormat(List<SingleStrand> strands) {
         return strands.stream()
                 .map(SingleStrand::toString)
-                .collect(Collectors.joining(System.lineSeparator()));
+                .collect(Collectors.joining("\n"));
     }
 
     public String bpSeqZipFormat(List<String> bpSeq) {
         return bpSeq.stream()
-                .map(seq -> seq + System.lineSeparator())
+                .map(seq -> seq + "\n")
                 .collect(Collectors.joining());
     }
 
     public String ctZipFormat(List<String> ct) {
         return ct.stream()
-                .map(line -> line + System.lineSeparator())
+                .map(line -> line + "\n")
                 .collect(Collectors.joining());
     }
 
     public String interactionsZipFormat(List<String> interactions) {
         return interactions.stream()
-                .map(line -> line + System.lineSeparator())
+                .map(line -> line + "\n")
                 .collect(Collectors.joining());
     }
 
@@ -47,41 +47,52 @@ class ZipFormatComponent {
 
         if (stems != null && !stems.isEmpty())
             stringList.add(stems.stream()
-                    .map(line -> "Stem " + line + System.lineSeparator())
+                    .map(line -> "Stem " + line + "\n")
                     .collect(Collectors.joining()));
 
         if (loops != null && !loops.isEmpty())
             stringList.add(loops.stream()
-                    .map(line -> "Loop " + line + System.lineSeparator())
+                    .map(line -> "Loop " + line + "\n")
                     .collect(Collectors.joining()));
 
         if (singleStrands != null && !singleStrands.isEmpty())
             stringList.add(singleStrands.stream()
-                    .map(line -> "Single strand " + line + System.lineSeparator())
+                    .map(line -> "Single strand " + line + "\n")
                     .collect(Collectors.joining()));
 
         if (singleStrands5p != null && !singleStrands5p.isEmpty())
             stringList.add(singleStrands5p.stream()
-                    .map(line -> "Single strand 5' " + line + System.lineSeparator())
+                    .map(line -> "Single strand 5' " + line + "\n")
                     .collect(Collectors.joining()));
 
         if (singleStrands3p != null && !singleStrands3p.isEmpty())
             stringList.add(singleStrands3p.stream()
-                    .map(line -> "Single strand 3' " + line + System.lineSeparator())
+                    .map(line -> "Single strand 3' " + line + "\n")
                     .collect(Collectors.joining()));
 
-        return stringList.stream()
-                .collect(Collectors.joining(System.lineSeparator()));
+        return String.join("\n", stringList);
     }
 
     public String messagesZipFormat(List<String> messages) {
         return messages.stream()
-                .map(message -> message + System.lineSeparator())
+                .map(message -> message + "\n")
                 .collect(Collectors.joining());
     }
 
     public String basePairsToCSV(List<BasePair> basePairs) {
+        return basePairsToCSV(basePairs, 'N');
+    }
+
+    public String canonicalBasePairsToCSV(List<BasePair> basePairs) {
+        return basePairsToCSV(basePairs, 'Y');
+    }
+
+    private String basePairsToCSV(
+            List<BasePair> basePairs,
+            char canonical
+    ) {
         char delimiter = ';';
+
         StringBuilder stringBuilder =
                 new StringBuilder("Base-pair;" +
                         "Interaction type;" +
@@ -89,32 +100,26 @@ class ZipFormatComponent {
                         "Saenger;" +
                         "Leontis-Westhof;" +
                         "BPh;" +
-                        "BR;" +
-                        "Represented in dot-bracket")
-                        .append(System.lineSeparator());
+                        "BR")
+                        .append("\n");
 
         for (BasePair basePair : basePairs) {
             String basePairResides = basePairResides(basePair.getLeftResidue(), basePair.getRightResidue());
             String iteractionType = prepareInteractionType(basePair.getInteractionType());
             String saenger = prepareSaenger(basePair.getSaenger());
-            String canonical = isSaengerCanonical(saenger);
 
             String leontisWesthof = prepareLeontisWesthof(basePair.getLeontisWesthof());
             String BPh = prepareBPh(basePair.getbPh());
             String BR = prepareBR(basePair.getBr());
 
-            //TODO
-            String representedInDotBracket = "N";
-
             stringBuilder.append(basePairResides)
                     .append(delimiter).append(iteractionType)
-                    .append(delimiter).append(saenger)
                     .append(delimiter).append(canonical)
+                    .append(delimiter).append(saenger)
                     .append(delimiter).append(leontisWesthof)
                     .append(delimiter).append(BPh)
                     .append(delimiter).append(BR)
-                    .append(delimiter).append(representedInDotBracket)
-                    .append(System.lineSeparator());
+                    .append("\n");
         }
 
         return stringBuilder.toString();
@@ -139,12 +144,6 @@ class ZipFormatComponent {
         return saenger;
     }
 
-    private String isSaengerCanonical(String saenger) {
-        return Objects.equals(saenger, "XIX")
-                || Objects.equals(saenger, "XX")
-                || Objects.equals(saenger, "XXVIII") ? "Y" : "N";
-    }
-
     private String prepareLeontisWesthof(String leontisWesthof) {
         if (leontisWesthof == null || leontisWesthof.equals("UNKNOWN"))
             return "n/a";
@@ -152,10 +151,10 @@ class ZipFormatComponent {
     }
 
     private String prepareBPh(String BPh) {
-        return Objects.requireNonNullElse(BPh, "UNKNOWN");
+        return Objects.requireNonNullElse(BPh, "n/a");
     }
 
     private String prepareBR(String BR) {
-        return Objects.requireNonNullElse(BR, "UNKNOWN");
+        return Objects.requireNonNullElse(BR, "n/a");
     }
 }

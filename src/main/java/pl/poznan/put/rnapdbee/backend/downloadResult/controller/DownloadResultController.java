@@ -49,7 +49,7 @@ public class DownloadResultController {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-        String directoryName = downloadResultService.download3DResult(id, downloadSelection3DList, zipOutputStream);
+        String zipName = downloadResultService.download3DResults(id, downloadSelection3DList, zipOutputStream);
 
         zipOutputStream.finish();
         zipOutputStream.flush();
@@ -58,7 +58,7 @@ public class DownloadResultController {
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
 
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", directoryName));
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", zipName));
 
         return byteArrayOutputStream.toByteArray();
     }
@@ -76,7 +76,7 @@ public class DownloadResultController {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-        String directoryName = downloadResultService.download2DResult(id, downloadSelection2DList, zipOutputStream);
+        String zipName = downloadResultService.download2DResults(id, downloadSelection2DList, zipOutputStream);
 
         zipOutputStream.finish();
         zipOutputStream.flush();
@@ -85,7 +85,7 @@ public class DownloadResultController {
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
 
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", directoryName));
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", zipName));
 
         return byteArrayOutputStream.toByteArray();
     }
@@ -103,7 +103,7 @@ public class DownloadResultController {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-        String directoryName = downloadResultService.downloadMultiResult(id, downloadSelectionMultiList, zipOutputStream);
+        String zipName = downloadResultService.downloadMultiResults(id, downloadSelectionMultiList, zipOutputStream);
 
         zipOutputStream.finish();
         zipOutputStream.flush();
@@ -112,7 +112,7 @@ public class DownloadResultController {
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
 
-        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", directoryName));
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", zipName));
 
         return byteArrayOutputStream.toByteArray();
     }

@@ -12,21 +12,22 @@ import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadModelsSelectio
 import pl.poznan.put.rnapdbee.backend.downloadResult.exception.BadSelectionListSizeException;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.SecondaryToDotBracketService;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketMongoEntity;
+import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.shared.MessageProvider;
-import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
-import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.Output2D;
+import pl.poznan.put.rnapdbee.backend.shared.domain.param.AnalysisTool;
+import pl.poznan.put.rnapdbee.backend.shared.domain.param.NonCanonicalHandling;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.TertiaryToDotBracketService;
-import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.Output3D;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketMongoEntity;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.TertiaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.TertiaryToMultiSecondaryService;
-import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
-import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMultiEntry;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryMongoEntity;
+import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,9 @@ import java.util.zip.ZipOutputStream;
 public class DownloadResultService {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadResultService.class);
+    private static final String DIR_DELIMITER = "-";
+    private static final String REMOVE_ISOLATED_ARCHIVE_NAME = "Isolated_removed";
+    private static final String INCLUDE_NON_CANONICAL_ARCHIVE_NAME = "Non_canonical_included";
 
     private final SecondaryToDotBracketService secondaryToDotBracketService;
     private final TertiaryToDotBracketService tertiaryToDotBracketService;
@@ -57,62 +61,56 @@ public class DownloadResultService {
         this.messageProvider = messageProvider;
     }
 
-    public String download3DResult(
+    public String download3DResults(
             UUID id,
             List<DownloadSelection3D> downloadSelection3DList,
             ZipOutputStream stream
     ) {
         TertiaryToDotBracketMongoEntity document3D = tertiaryToDotBracketService.findDocument(id);
 
-        String filename = tertiaryToDotBracketService.removeFileExtension(document3D.getFilename(), true);
-        List<Output3D<ImageInformationPath>> resultsOutput3dList = document3D.getResults()
-                .stream()
-                .map(ResultEntity::getOutput)
-                .collect(Collectors.toList());
+        String filename = tertiaryToDotBracketService.removeFileExtension(
+                document3D.getFilename(),
+                true);
+        String fileExtension = document3D.getFileExtension();
 
-        int resultsCount = resultsOutput3dList.size();
-        int selectionListCount = downloadSelection3DList.size();
-        checkSelectionListSize(resultsCount, selectionListCount);
+        int resultsCount = document3D.getResults().size();
+        checkSelectionListSize(resultsCount, downloadSelection3DList.size());
 
-        String basicDirPrefix = prepareBasicDirPrefix(filename, resultsCount);
-
-        for (int i = 0; i < resultsOutput3dList.size(); i++) {
-            DownloadSelection3D selection3D = downloadSelection3DList.get(i);
-            String dirPrefix = prepareResultDirPrefix(basicDirPrefix, i, resultsCount);
+        for (int resultNumber = 0; resultNumber < resultsCount; resultNumber++) {
+            String resultDirPrefix = prepareResultDirPrefix(
+                    document3D.getResults().get(resultNumber).getParams(),
+                    resultsCount);
 
             download3DModels(
-                    resultsOutput3dList.get(i).getModels(),
-                    selection3D.getModels(),
-                    i,
-                    dirPrefix,
+                    document3D.getResults().get(resultNumber).getOutput().getModels(),
+                    downloadSelection3DList.get(resultNumber).getModels(),
+                    resultNumber,
+                    resultDirPrefix,
                     filename,
+                    fileExtension,
                     stream);
         }
 
         return prepareZipName(filename);
     }
 
-    public String download2DResult(
+    public String download2DResults(
             UUID id,
             List<DownloadSelection2D> downloadSelection2DList,
             ZipOutputStream stream
     ) {
         SecondaryToDotBracketMongoEntity document2D = secondaryToDotBracketService.findDocument(id);
 
-        String filename = secondaryToDotBracketService.removeFileExtension(document2D.getFilename(), true);
-        List<Output2D<ImageInformationPath>> output2DList = document2D.getResults()
-                .stream()
-                .map(ResultEntity::getOutput)
-                .collect(Collectors.toList());
+        String filename = secondaryToDotBracketService.removeFileExtension(
+                document2D.getFilename(),
+                true);
+        String fileExtension = document2D.getFileExtension();
 
-        int resultsCount = output2DList.size();
-        int selectionListCount = downloadSelection2DList.size();
-        checkSelectionListSize(resultsCount, selectionListCount);
+        int resultsCount = document2D.getResults().size();
+        checkSelectionListSize(resultsCount, downloadSelection2DList.size());
 
-        String basicDirPrefix = prepareBasicDirPrefix(filename, resultsCount);
-
-        for (int i = 0; i < output2DList.size(); i++) {
-            DownloadSelection2D selection2D = downloadSelection2DList.get(i);
+        for (int resultNumber = 0; resultNumber < resultsCount; resultNumber++) {
+            DownloadSelection2D selection2D = downloadSelection2DList.get(resultNumber);
 
             if (selection2D.isStrands()
                     || selection2D.isBpSeq()
@@ -121,81 +119,114 @@ public class DownloadResultService {
                     || selection2D.isStructuralElements()
                     || selection2D.isImageInformation()) {
 
-                String dirPrefix = prepareResultDirPrefix(basicDirPrefix, i, resultsCount);
-                zipComponent.zipOutput2D(output2DList.get(i), selection2D, dirPrefix + filename, stream);
+                String resultDirPrefix = prepareResultDirPrefix(
+                        document2D.getResults().get(resultNumber).getParams(),
+                        resultsCount);
+
+                zipComponent.zipOutput2D(
+                        document2D.getResults().get(resultNumber).getOutput(),
+                        selection2D,
+                        resultDirPrefix + filename,
+                        fileExtension,
+                        stream);
             }
         }
 
         return prepareZipName(filename);
     }
 
-    public String downloadMultiResult(
+    public String downloadMultiResults(
             UUID id,
             List<DownloadSelectionMulti> downloadSelectionMultiList,
             ZipOutputStream stream
     ) {
         TertiaryToMultiSecondaryMongoEntity documentMulti = tertiaryToMultiSecondaryService.findDocument(id);
 
-        String filename = tertiaryToMultiSecondaryService.removeFileExtension(documentMulti.getFilename(), true);
-        List<OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultsOutputMultiList =
-                documentMulti.getResults()
-                        .stream()
-                        .map(ResultEntity::getOutput)
-                        .collect(Collectors.toList());
+        String filename = tertiaryToMultiSecondaryService.removeFileExtension(
+                documentMulti.getFilename(),
+                true);
+        String fileExtension = documentMulti.getFileExtension();
 
-        int resultsCount = resultsOutputMultiList.size();
-        int selectionListCount = downloadSelectionMultiList.size();
-        checkSelectionListSize(resultsCount, selectionListCount);
+        int resultsCount = documentMulti.getResults().size();
+        checkSelectionListSize(resultsCount, downloadSelectionMultiList.size());
 
-        String basicDirPrefix = prepareBasicDirPrefix(filename, resultsCount);
-
-        for (int i = 0; i < resultsOutputMultiList.size(); i++) {
-            DownloadSelectionMulti selectionMulti = downloadSelectionMultiList.get(i);
-            String dirPrefix = prepareResultDirPrefix(basicDirPrefix, i, resultsCount);
+        for (int resultNumber = 0; resultNumber < resultsCount; resultNumber++) {
+            DownloadSelectionMulti selectionMulti = downloadSelectionMultiList.get(resultNumber);
+            String resultDirPrefix = prepareResultDirPrefix(
+                    documentMulti.getResults().get(resultNumber).getParams(),
+                    resultsCount);
 
             if (selectionMulti.isConsensualVisualization()) {
                 zipComponent.zipConsensualVisualization(
-                        resultsOutputMultiList.get(i).getConsensualVisualization(),
-                        dirPrefix + filename,
+                        documentMulti.getResults().get(resultNumber).getOutput().getConsensualVisualization(),
+                        resultDirPrefix + filename,
                         stream);
             }
 
             downloadMultiEntries(
-                    resultsOutputMultiList.get(i).getEntries(),
+                    documentMulti.getResults().get(resultNumber).getOutput().getEntries(),
                     selectionMulti.getEntries(),
-                    i,
-                    dirPrefix,
+                    resultNumber,
+                    resultDirPrefix,
                     filename,
+                    fileExtension,
                     stream);
         }
 
         return prepareZipName(filename);
     }
 
+    private void download3DModels(
+            List<SingleTertiaryModelOutput<ImageInformationPath>> modelsList,
+            List<DownloadSelection3D.SingleDownloadSelection3D> selectionsModels,
+            int resultNumber,
+            String resultDirPrefix,
+            String filename,
+            String fileExtension,
+            ZipOutputStream stream
+    ) {
+        int modelsCount = modelsList.size();
+        checkModelsSelectionListSize(resultNumber + 1, modelsCount, selectionsModels.size());
+
+        for (int modelNumber = 0; modelNumber < modelsCount; modelNumber++) {
+            String modelDirPrefix = prepareModelDirPrefix(
+                    resultDirPrefix,
+                    modelsList.get(modelNumber).getModelNumber(),
+                    modelsCount);
+
+            zipComponent.zipSingleTertiaryModelOutput(
+                    modelsList.get(modelNumber),
+                    selectionsModels.get(modelNumber),
+                    modelDirPrefix + filename,
+                    fileExtension,
+                    stream);
+        }
+    }
+
     /**
      * Methods adding to ZIP file every select field of Output2D from entries list of one Multi scenario result
      *
-     * @param entryList        list of entries from one Multi scenario result
+     * @param entriesList      list of entries from one Multi scenario result
      * @param selectionEntries selection of entries to ZIP from one Multi scenario result
      * @param resultNumber     number of result to download
-     * @param dirPrefix        prefix of directory to save selected files
+     * @param resultDirPrefix  prefix of result directory to save selected files
      * @param filename         name of analyzed file
      * @param stream           Zip Output stream storing selected data
      */
     private void downloadMultiEntries(
-            List<OutputMultiEntry<ImageInformationPath>> entryList,
+            List<OutputMultiEntry<ImageInformationPath>> entriesList,
             List<DownloadSelectionMulti.SingleDownloadSelectionMulti> selectionEntries,
             int resultNumber,
-            String dirPrefix,
+            String resultDirPrefix,
             String filename,
+            String fileExtension,
             ZipOutputStream stream
     ) {
-        int entriesCount = entryList.size();
-        int singleDownloadSelectionMultiCount = selectionEntries.size();
-        checkEntriesSelectionListSize(resultNumber + 1, entriesCount, singleDownloadSelectionMultiCount);
+        int entriesCount = entriesList.size();
+        checkEntriesSelectionListSize(resultNumber + 1, entriesCount, selectionEntries.size());
 
-        for (int j = 0; j < entriesCount; j++) {
-            DownloadSelection2D selection2D = selectionEntries.get(j).getOutput2D();
+        for (int entryNumber = 0; entryNumber < entriesCount; entryNumber++) {
+            DownloadSelection2D selection2D = selectionEntries.get(entryNumber).getOutput2D();
 
             if (selection2D.isStrands()
                     || selection2D.isBpSeq()
@@ -204,57 +235,119 @@ public class DownloadResultService {
                     || selection2D.isStructuralElements()
                     || selection2D.isImageInformation()) {
 
-                String entriesDirPrefix = prepareResultDirPrefix(dirPrefix, j, entriesCount);
-                zipComponent.zipOutput2D(entryList.get(j).getOutput2D(), selection2D, entriesDirPrefix + filename, stream);
+                String entriesDirPrefix = prepareEntryDirPrefix(
+                        resultDirPrefix,
+                        entriesList.get(entryNumber).getAdapterEnums(),
+                        entryNumber,
+                        entriesCount);
+
+                zipComponent.zipOutput2D(
+                        entriesList.get(entryNumber).getOutput2D(),
+                        selection2D,
+                        entriesDirPrefix + filename,
+                        fileExtension,
+                        stream);
             }
         }
-    }
-
-    private void download3DModels(
-            List<SingleTertiaryModelOutput<ImageInformationPath>> modelsList,
-            List<DownloadSelection3D.SingleDownloadSelection3D> selectionsModels,
-            int resultNumber,
-            String dirPrefix,
-            String filename,
-            ZipOutputStream stream
-    ) {
-        int modelsCount = modelsList.size();
-        int singleDownloadSelection3DCount = selectionsModels.size();
-        checkModelsSelectionListSize(resultNumber + 1, modelsCount, singleDownloadSelection3DCount);
-
-        for (int j = 0; j < modelsCount; j++) {
-            DownloadSelection3D.SingleDownloadSelection3D selection3D = selectionsModels.get(j);
-
-            String entriesDirPrefix = prepareResultDirPrefix(dirPrefix, modelsList.get(j).getModelNumber(), modelsCount);
-            zipComponent.zipSingleTertiaryModelOutput(modelsList.get(j), selection3D, entriesDirPrefix + filename, stream);
-        }
-    }
-
-    private String prepareBasicDirPrefix(
-            String filename,
-            int resultsCount
-    ) {
-        if (resultsCount > 1)
-            return filename + File.separator;
-        else
-            return "";
-    }
-
-    private String prepareResultDirPrefix(
-            String basicDirPrefix,
-            int resultsNumber,
-            int resultsCount
-    ) {
-        if (resultsCount > 1)
-            return basicDirPrefix + resultsNumber + File.separator;
-        else
-            return "";
     }
 
     private String prepareZipName(String filename) {
         return String.format("RNApdbee-%s-%s.zip",
                 filename,
                 DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.format(new Date()));
+    }
+
+    private String prepareResultDirPrefix(
+            TertiaryToDotBracketParams params3D,
+            int resultsCount
+    ) {
+        if (resultsCount > 1) {
+            List<String> dirBuilder = new ArrayList<>();
+
+            dirBuilder.add(params3D.getModelSelection().getArchiveName());
+            dirBuilder.add(params3D.getAnalysisTool().getArchiveName());
+
+            if (params3D.getNonCanonicalHandling() != NonCanonicalHandling.IGNORE)
+                dirBuilder.add(params3D.getNonCanonicalHandling().getArchiveName());
+
+            if (params3D.isRemoveIsolated())
+                dirBuilder.add(REMOVE_ISOLATED_ARCHIVE_NAME);
+
+            dirBuilder.add(params3D.getStructuralElementsHandling().getArchiveName());
+            dirBuilder.add(params3D.getVisualizationTool().getArchiveName());
+
+            return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
+        } else
+            return "";
+    }
+
+    private String prepareResultDirPrefix(
+            SecondaryToDotBracketParams params2D,
+            int resultsCount
+    ) {
+        if (resultsCount > 1) {
+            List<String> dirBuilder = new ArrayList<>();
+
+            dirBuilder.add(params2D.getStructuralElementsHandling().getArchiveName());
+
+            if (params2D.isRemoveIsolated())
+                dirBuilder.add(REMOVE_ISOLATED_ARCHIVE_NAME);
+
+            dirBuilder.add(params2D.getVisualizationTool().getArchiveName());
+
+            return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
+        } else
+            return "";
+    }
+
+    private String prepareResultDirPrefix(
+            TertiaryToMultiSecondaryParams paramsMulti,
+            int resultsCount
+    ) {
+        if (resultsCount > 1) {
+            List<String> dirBuilder = new ArrayList<>();
+
+            if (paramsMulti.isIncludeNonCanonical())
+                dirBuilder.add(INCLUDE_NON_CANONICAL_ARCHIVE_NAME);
+
+            if (paramsMulti.isRemoveIsolated())
+                dirBuilder.add(REMOVE_ISOLATED_ARCHIVE_NAME);
+
+            dirBuilder.add(paramsMulti.getVisualizationTool().getArchiveName());
+
+            return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
+        } else
+            return "";
+    }
+
+    private String prepareModelDirPrefix(
+            String resultDirPrefix,
+            int modelNumber,
+            int modelsCount
+    ) {
+        if (modelsCount > 1) {
+            String modelDir = String.format("Model_%s", modelNumber);
+
+            return resultDirPrefix + modelDir + File.separator;
+        } else
+            return resultDirPrefix;
+    }
+
+    private String prepareEntryDirPrefix(
+            String resultDirPrefix,
+            List<AnalysisTool> analysisTools,
+            int entryNumber,
+            int entriesCount
+    ) {
+        if (entriesCount > 1) {
+            String toolsArchiveNames = analysisTools.stream()
+                    .map(AnalysisTool::getArchiveName)
+                    .collect(Collectors.joining(DIR_DELIMITER));
+            String entryDir = String.format("Entry_%s%s%s", entryNumber, DIR_DELIMITER, toolsArchiveNames);
+
+            return resultDirPrefix + entryDir + File.separator;
+        } else
+            return resultDirPrefix;
     }
 
     private void checkSelectionListSize(
