@@ -20,6 +20,15 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    public GroupedOpenApi allEndpointsApi() {
+        return GroupedOpenApi.builder()
+                .group("All-endpoints")
+                .pathsToMatch("/**")
+                .packagesToScan("pl.poznan.put.rnapdbee.backend")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi tertiaryToDotBracketApi() {
         return GroupedOpenApi.builder()
                 .group("TertiaryToDotBracket")
@@ -52,6 +61,15 @@ public class OpenApiConfiguration {
                 .group("Download")
                 .pathsToMatch("/**")
                 .packagesToScan("pl.poznan.put.rnapdbee.backend.downloadResult")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi imagesApi() {
+        return GroupedOpenApi.builder()
+                .group("Image")
+                .pathsToMatch("/**")
+                .packagesToScan("pl.poznan.put.rnapdbee.backend.images")
                 .build();
     }
 }
