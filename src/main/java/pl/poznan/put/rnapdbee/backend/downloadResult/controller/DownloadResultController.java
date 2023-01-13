@@ -26,7 +26,7 @@ import java.util.zip.ZipOutputStream;
  * Controller class responsible for downloading zipped results from a calculation
  */
 @RestController
-@RequestMapping(path = "/download")
+@RequestMapping(path = "api/v1/engine/download")
 public class DownloadResultController {
 
     protected static final Logger logger = LoggerFactory.getLogger(DownloadResultController.class);

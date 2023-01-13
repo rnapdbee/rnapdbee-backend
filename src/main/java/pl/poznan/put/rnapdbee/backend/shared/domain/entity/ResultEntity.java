@@ -33,7 +33,7 @@ public class ResultEntity<T, O> {
     private ResultEntity(
             T params,
             O output) {
-        this.id = IdSupplier.generateId();
+        this.id = IdSupplier.generateResultEntityId();
         this.params = params;
         this.output = output;
     }

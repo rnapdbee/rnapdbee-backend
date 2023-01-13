@@ -52,25 +52,46 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (Stream.of(allowedURIStart).anyMatch(requestURI::startsWith)) {
             String[] parts = requestURI.split("/");
 
-            if (parts.length == 6) {
-                String id = parts[parts.length - 1];
+            if (parts.length == 6)
+                return getUUID(parts);
+            else if (parts.length == 7)
+                return parts[parts.length - 1].toUpperCase();
+            else
+                return UNKNOWN_ID;
+        }
 
-                try {
-                    UUID.fromString(id);
-                    return id;
-                } catch (IllegalArgumentException e) {
-                    logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id), e);
-                    throw new IdNotFoundException(
-                            messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
-                }
-            } else if (parts.length == 7) {
-                String id = parts[parts.length - 1];
-                return id.toUpperCase();
-            } else
+        if (requestURI.startsWith("/api/v1/engine/download")) {
+            String[] parts = requestURI.split("/");
+
+            if (parts.length == 7)
+                return getUUID(parts);
+            else
+                return UNKNOWN_ID;
+        }
+
+        if (requestURI.startsWith("/image")) {
+            String[] parts = requestURI.split("/");
+
+            if (parts.length == 3)
+                return parts[parts.length - 1];
+            else
                 return UNKNOWN_ID;
         }
 
         return "";
+    }
+
+    private String getUUID(String[] parts) {
+        String id = parts[parts.length - 1];
+
+        try {
+            UUID.fromString(id);
+            return id;
+        } catch (IllegalArgumentException e) {
+            logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id), e);
+            throw new IdNotFoundException(
+                    messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
+        }
     }
 
     @Override
