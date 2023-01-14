@@ -8,12 +8,12 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 public abstract class ImageInformation {
     protected final VisualizationTool successfulVisualizationTool;
     protected final VisualizationTool failedVisualizationTool;
-    protected final String drawingResult;
+    protected final DrawingResult drawingResult;
 
     protected ImageInformation(
             VisualizationTool successfulVisualizationTool,
             VisualizationTool failedVisualizationTool,
-            String drawingResult) {
+            DrawingResult drawingResult) {
         this.successfulVisualizationTool = successfulVisualizationTool;
         this.failedVisualizationTool = failedVisualizationTool;
         this.drawingResult = drawingResult;
@@ -27,14 +27,18 @@ public abstract class ImageInformation {
         return failedVisualizationTool;
     }
 
-    public String getDrawingResult() {
+    public DrawingResult getDrawingResult() {
         return drawingResult;
+    }
+
+    public boolean wasDrawn() {
+        return drawingResult != DrawingResult.FAILED_BY_BOTH_DRAWERS && drawingResult != DrawingResult.NOT_DRAWN;
     }
 
     protected abstract static class Builder<B extends Builder<B>> {
         private VisualizationTool successfulVisualizationTool;
         private VisualizationTool failedVisualizationTool;
-        private String drawingResult;
+        private DrawingResult drawingResult;
 
         protected abstract B self();
 
@@ -55,7 +59,7 @@ public abstract class ImageInformation {
             return failedVisualizationTool;
         }
 
-        public String getDrawingResult() {
+        public DrawingResult getDrawingResult() {
             return drawingResult;
         }
     }

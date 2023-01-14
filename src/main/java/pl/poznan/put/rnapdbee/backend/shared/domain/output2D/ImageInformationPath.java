@@ -12,7 +12,7 @@ public class ImageInformationPath extends ImageInformation {
             String pathToSVGImage,
             VisualizationTool successfulVisualizationTool,
             VisualizationTool failedVisualizationTool,
-            String drawingResult) {
+            DrawingResult drawingResult) {
         super(successfulVisualizationTool, failedVisualizationTool, drawingResult);
         this.pathToSVGImage = pathToSVGImage;
     }

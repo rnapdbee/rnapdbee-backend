@@ -142,7 +142,8 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
             Output2D<ImageInformationByteArray> engineResponse2D,
             VisualizationTool visualizationTool
     ) {
-        if (visualizationTool == VisualizationTool.NONE)
+        if (visualizationTool == VisualizationTool.NONE
+                || !engineResponse2D.getImageInformation().wasDrawn())
             return null;
         else
             return imageComponent.generateSvgUrl(engineResponse2D.getImageInformation().getSvgFile());
@@ -188,6 +189,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
 
     @Override
     protected boolean isEmptyVisualization(ResultEntity<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultEntity) {
-        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE;
+        return resultEntity.getParams().getVisualizationTool() == VisualizationTool.NONE
+                || !resultEntity.getOutput().getImageInformation().wasDrawn();
     }
 }

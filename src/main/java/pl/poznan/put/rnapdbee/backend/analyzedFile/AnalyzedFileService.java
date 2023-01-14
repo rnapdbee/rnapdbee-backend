@@ -37,12 +37,13 @@ public class AnalyzedFileService {
 
     public static final String PDB_FILE_EXTENSION = ".cif";
     private static final String ARCHIVE_FILE_EXTENSION = ".gz";
+    private static final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
 
     private final AnalyzedFileRepository analyzedFileRepository;
     private final PdbFileDataRepository pdbFileDataRepository;
     private final PdbClient pdbClient;
     private final MessageProvider messageProvider;
-    private static final Logger logger = LoggerFactory.getLogger(AnalyzedFileService.class);
+
     @Value("${document.storage.days}")
     private int documentStorageDays;
 

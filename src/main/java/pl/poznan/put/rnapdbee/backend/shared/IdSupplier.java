@@ -14,4 +14,8 @@ public abstract class IdSupplier {
 
         return uuid;
     }
+
+    public static UUID generateResultEntityId() {
+        return UUID.randomUUID();
+    }
 }

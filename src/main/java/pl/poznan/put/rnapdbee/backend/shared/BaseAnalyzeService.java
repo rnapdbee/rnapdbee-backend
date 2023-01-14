@@ -61,7 +61,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
 
     protected abstract boolean isEmptyVisualization(ResultEntity<T, O> resultEntity);
 
-    protected String removeFileExtension(
+    public String removeFileExtension(
             String filename,
             boolean removeAllExtensions) {
         String extensionsPattern = "(?<!^)[.]" + (removeAllExtensions ? ".*" : "[^.]*$");

@@ -1,6 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.persistence.Id;
 import java.time.Instant;
@@ -17,6 +18,9 @@ import java.util.UUID;
 public abstract class MongoEntity<T, O> {
     @Id
     protected final UUID id;
+    /**
+     * Filename of analyzed file with extension.
+     */
     protected final String filename;
     protected List<ResultEntity<T, O>> results;
     @JsonIgnore
@@ -60,6 +64,10 @@ public abstract class MongoEntity<T, O> {
 
     public Boolean isUsePdb() {
         return usePdb;
+    }
+
+    public String getFileExtension() {
+        return FilenameUtils.getExtension(this.filename);
     }
 
     protected abstract static class Builder<B extends Builder<B, T, O>, T, O> {

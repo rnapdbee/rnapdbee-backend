@@ -44,33 +44,48 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     private String getIdFromRequest(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        String[] allowedURIStart = {
+        String[] parts = requestURI.split("/");
+
+        String[] allowedAnalysisURIStart = {
                 "/api/v1/engine/2d",
                 "/api/v1/engine/3d",
                 "/api/v1/engine/multi"};
+        if (Stream.of(allowedAnalysisURIStart).anyMatch(requestURI::startsWith)) {
+            if (parts.length == 6)
+                return getUUID(parts);
+            if (parts.length == 7)
+                return parts[parts.length - 1].toUpperCase();
+            return UNKNOWN_ID;
+        }
 
-        if (Stream.of(allowedURIStart).anyMatch(requestURI::startsWith)) {
-            String[] parts = requestURI.split("/");
+        String downloadURIStart = "/api/v1/engine/download";
+        if (requestURI.startsWith(downloadURIStart)) {
+            if (parts.length == 7)
+                return getUUID(parts);
+            return UNKNOWN_ID;
+        }
 
-            if (parts.length == 6) {
-                String id = parts[parts.length - 1];
-
-                try {
-                    UUID.fromString(id);
-                    return id;
-                } catch (IllegalArgumentException e) {
-                    logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id), e);
-                    throw new IdNotFoundException(
-                            messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
-                }
-            } else if (parts.length == 7) {
-                String id = parts[parts.length - 1];
-                return id.toUpperCase();
-            } else
-                return UNKNOWN_ID;
+        String imageURIStart = "/image";
+        if (requestURI.startsWith(imageURIStart)) {
+            if (parts.length == 3)
+                return parts[parts.length - 1];
+            return UNKNOWN_ID;
         }
 
         return "";
+    }
+
+    private String getUUID(String[] parts) {
+        String id = parts[parts.length - 1];
+
+        try {
+            UUID.fromString(id);
+            return id;
+        } catch (IllegalArgumentException e) {
+            logger.error(String.format("Pre handled UUID: '%s' non-parsable.", id), e);
+            throw new IdNotFoundException(
+                    messageProvider.getMessage(MessageProvider.Message.ID_NOT_FOUND_FORMAT), id);
+        }
     }
 
     @Override
