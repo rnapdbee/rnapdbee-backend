@@ -125,7 +125,7 @@ class ZipComponent {
         if (pathToSVGImage != null && pathToSVGImage.isBlank())
             zipImage(pathToSVGImage, namePrefix, imageConsensusSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist Consensus Visualization image.");
+            logger.error("Failed to archive not existing Consensus Visualization image.");
     }
 
     private void zipData(
@@ -169,7 +169,7 @@ class ZipComponent {
         if (strands != null && !strands.isEmpty())
             zipData(zipFormatComponent.strandsZipFormat(strands), namePrefix + strandsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist Strands data.");
+            logger.error("Failed to archive not existing Strands data.");
 
     }
 
@@ -181,7 +181,7 @@ class ZipComponent {
         if (bpSeq != null && !bpSeq.isEmpty())
             zipData(zipFormatComponent.bpSeqZipFormat(bpSeq), namePrefix + bpSeqSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist BPSEQ data.");
+            logger.error("Failed to archive not existing BPSEQ data.");
 
     }
 
@@ -193,7 +193,7 @@ class ZipComponent {
         if (ct != null && !ct.isEmpty())
             zipData(zipFormatComponent.ctZipFormat(ct), namePrefix + ctSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist CT data.");
+            logger.error("Failed to archive not existing CT data.");
     }
 
     private void zipInteractions(
@@ -204,7 +204,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.interactionsZipFormat(interactions), namePrefix + interactionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist Interactions data.");
+            logger.error("Failed to archive not existing Interactions data.");
     }
 
     private void zipStructuralElement(
@@ -234,7 +234,7 @@ class ZipComponent {
             if (coordinates != null)
                 zipData(coordinates, namePrefix + coordinatesSuffix + coordinatesExtension, zipOutputStream);
         } else
-            logger.error("Failed to archive not exist Strands data.");
+            logger.error("Failed to archive not existing Strands data.");
     }
 
     private void zipMessages(
@@ -245,7 +245,7 @@ class ZipComponent {
         if (messages != null && !messages.isEmpty())
             zipData(zipFormatComponent.messagesZipFormat(messages), namePrefix + messagesSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist Messages data.");
+            logger.error("Failed to archive not existing Messages data.");
     }
 
     private void zipCanonicalInteractions(
@@ -256,7 +256,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.canonicalBasePairsToCSV(interactions), namePrefix + canonicalInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist CanonicalInteractions data.");
+            logger.error("Failed to archive not existing CanonicalInteractions data.");
     }
 
     private void zipNonCanonicalInteractions(
@@ -267,7 +267,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + nonCanonicalInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist NonCanonicalInteractions data.");
+            logger.error("Failed to archive not existing NonCanonicalInteractions data.");
     }
 
     private void zipInterStrandInteractions(
@@ -278,7 +278,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + interStrandInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist InterStrandInteractions data.");
+            logger.error("Failed to archive not existing InterStrandInteractions data.");
     }
 
     private void zipStackingInteractions(
@@ -289,7 +289,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + stackingInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist StackingInteractions data.");
+            logger.error("Failed to archive not existing StackingInteractions data.");
     }
 
     private void zipBasePhosphateInteractions(
@@ -300,7 +300,7 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + basePhosphateInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist BasePhosphateInteractions data.");
+            logger.error("Failed to archive not existing BasePhosphateInteractions data.");
     }
 
     private void zipBaseRiboseInteractions(
@@ -311,6 +311,6 @@ class ZipComponent {
         if (interactions != null && !interactions.isEmpty())
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + baseRiboseInteractionsSuffix, zipOutputStream);
         else
-            logger.error("Failed to archive not exist BaseRiboseInteractions data.");
+            logger.error("Failed to archive not existing BaseRiboseInteractions data.");
     }
 }

@@ -277,8 +277,8 @@ public class DownloadResultService {
             dirBuilder.add(params3D.getVisualizationTool().getArchiveName());
 
             return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
-        } else
-            return "";
+        }
+        return "";
     }
 
     private String prepareResultDirPrefix(
@@ -296,8 +296,8 @@ public class DownloadResultService {
             dirBuilder.add(params2D.getVisualizationTool().getArchiveName());
 
             return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
-        } else
-            return "";
+        }
+        return "";
     }
 
     private String prepareResultDirPrefix(
@@ -316,8 +316,8 @@ public class DownloadResultService {
             dirBuilder.add(paramsMulti.getVisualizationTool().getArchiveName());
 
             return String.join(DIR_DELIMITER, dirBuilder) + File.separator;
-        } else
-            return "";
+        }
+        return "";
     }
 
     private String prepareModelDirPrefix(
@@ -329,8 +329,8 @@ public class DownloadResultService {
             String modelDir = String.format("Model_%s", modelNumber);
 
             return resultDirPrefix + modelDir + File.separator;
-        } else
-            return resultDirPrefix;
+        }
+        return resultDirPrefix;
     }
 
     private String prepareEntryDirPrefix(
@@ -346,8 +346,8 @@ public class DownloadResultService {
             String entryDir = String.format("Entry_%s%s%s", entryNumber, DIR_DELIMITER, toolsArchiveNames);
 
             return resultDirPrefix + entryDir + File.separator;
-        } else
-            return resultDirPrefix;
+        }
+        return resultDirPrefix;
     }
 
     private void checkSelectionListSize(

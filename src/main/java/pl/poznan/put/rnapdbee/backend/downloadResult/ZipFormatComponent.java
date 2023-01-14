@@ -7,7 +7,6 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.NamedResidue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -42,7 +41,8 @@ class ZipFormatComponent {
             List<String> loops,
             List<String> singleStrands,
             List<String> singleStrands5p,
-            List<String> singleStrands3p) {
+            List<String> singleStrands3p
+    ) {
         List<String> stringList = new ArrayList<>();
 
         if (stems != null && !stems.isEmpty())
@@ -151,10 +151,14 @@ class ZipFormatComponent {
     }
 
     private String prepareBPh(String BPh) {
-        return Objects.requireNonNullElse(BPh, "n/a");
+        if (BPh == null || BPh.equals("UNKNOWN"))
+            return "n/a";
+        return BPh;
     }
 
     private String prepareBR(String BR) {
-        return Objects.requireNonNullElse(BR, "n/a");
+        if (BR == null || BR.equals("UNKNOWN"))
+            return "n/a";
+        return BR;
     }
 }

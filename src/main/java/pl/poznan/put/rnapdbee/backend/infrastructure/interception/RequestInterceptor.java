@@ -44,38 +44,32 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     private String getIdFromRequest(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        String[] allowedURIStart = {
+        String[] parts = requestURI.split("/");
+
+        String[] allowedAnalysisURIStart = {
                 "/api/v1/engine/2d",
                 "/api/v1/engine/3d",
                 "/api/v1/engine/multi"};
-
-        if (Stream.of(allowedURIStart).anyMatch(requestURI::startsWith)) {
-            String[] parts = requestURI.split("/");
-
+        if (Stream.of(allowedAnalysisURIStart).anyMatch(requestURI::startsWith)) {
             if (parts.length == 6)
                 return getUUID(parts);
-            else if (parts.length == 7)
+            if (parts.length == 7)
                 return parts[parts.length - 1].toUpperCase();
-            else
-                return UNKNOWN_ID;
+            return UNKNOWN_ID;
         }
 
-        if (requestURI.startsWith("/api/v1/engine/download")) {
-            String[] parts = requestURI.split("/");
-
+        String downloadURIStart = "/api/v1/engine/download";
+        if (requestURI.startsWith(downloadURIStart)) {
             if (parts.length == 7)
                 return getUUID(parts);
-            else
-                return UNKNOWN_ID;
+            return UNKNOWN_ID;
         }
 
-        if (requestURI.startsWith("/image")) {
-            String[] parts = requestURI.split("/");
-
+        String imageURIStart = "/image";
+        if (requestURI.startsWith(imageURIStart)) {
             if (parts.length == 3)
                 return parts[parts.length - 1];
-            else
-                return UNKNOWN_ID;
+            return UNKNOWN_ID;
         }
 
         return "";
