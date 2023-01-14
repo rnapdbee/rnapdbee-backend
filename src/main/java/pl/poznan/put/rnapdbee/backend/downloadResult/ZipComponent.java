@@ -156,7 +156,7 @@ class ZipComponent {
             zipOutputStream.putNextEntry(new ZipEntry(imageName));
             zipOutputStream.write(image);
             zipOutputStream.closeEntry();
-        } catch (final IOException e) {
+        } catch (IOException e) {
             logger.error(String.format("Failed to add [%s] image file to ZIP archive", imageName), e);
         }
     }
