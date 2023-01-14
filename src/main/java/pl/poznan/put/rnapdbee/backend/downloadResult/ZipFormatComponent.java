@@ -19,21 +19,15 @@ class ZipFormatComponent {
     }
 
     public String bpSeqZipFormat(List<String> bpSeq) {
-        return bpSeq.stream()
-                .map(seq -> seq + "\n")
-                .collect(Collectors.joining());
+        return String.join("\n", bpSeq) + "\n";
     }
 
     public String ctZipFormat(List<String> ct) {
-        return ct.stream()
-                .map(line -> line + "\n")
-                .collect(Collectors.joining());
+        return String.join("\n", ct) + "\n";
     }
 
     public String interactionsZipFormat(List<String> interactions) {
-        return interactions.stream()
-                .map(line -> line + "\n")
-                .collect(Collectors.joining());
+        return String.join("\n", interactions) + "\n";
     }
 
     public String structuralElementsZipFormat(
@@ -74,9 +68,7 @@ class ZipFormatComponent {
     }
 
     public String messagesZipFormat(List<String> messages) {
-        return messages.stream()
-                .map(message -> message + "\n")
-                .collect(Collectors.joining());
+        return String.join("\n", messages) + "\n";
     }
 
     public String basePairsToCSV(List<BasePair> basePairs) {
