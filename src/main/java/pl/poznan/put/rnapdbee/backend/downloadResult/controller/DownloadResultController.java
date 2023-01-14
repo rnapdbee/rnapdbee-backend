@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Controller class responsible for downloading zipped results from a calculation
  */
+@CrossOrigin(exposedHeaders = "Content-Disposition")
 @RestController
 @RequestMapping(path = "api/v1/engine/download")
 public class DownloadResultController {
