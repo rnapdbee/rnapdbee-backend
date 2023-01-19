@@ -122,7 +122,7 @@ class ZipComponent {
             final ZipOutputStream zipOutputStream
     ) {
         String pathToSVGImage = consensualVisualizationPath.getPathToSVGImage();
-        if (pathToSVGImage != null && pathToSVGImage.isBlank())
+        if (pathToSVGImage != null && !pathToSVGImage.isBlank())
             zipImage(pathToSVGImage, namePrefix, imageConsensusSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not existing Consensus Visualization image.");
