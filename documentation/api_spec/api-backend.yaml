@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: "This is API of the back-end service of RNApdbee v3.0."
-  version: "1.0.18"
+  version: "1.0.19"
   title: "RNApdbee Backend"
 
 
@@ -13,6 +13,10 @@ tags:
     description: "Access to RNApdbee engine for 2D calculations"
   - name: "3D -> multi 2D"
     description: "Access to RNApdbee engine for Multi calculations"
+  - name: "Download"
+    description: "Download zipped results from a calculation"
+  - name: "Image"
+    description: "Access to RNApdbee for visualization images"
 
 
 servers:
@@ -330,6 +334,138 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response2D"
 
+  /download/3d/{ID}:
+    post:
+      tags:
+        - "Download"
+      summary: "Get zipped content of the selected elements from 3D -> (...) analysis"
+      description: ""
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of resource in the database"
+      requestBody:
+        description: "Array of select-objects that shows what to include in response file. every item in array represents one result"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request3DSelect"
+      responses:
+        "400":
+          description: "Bad request"
+        "200":
+          description: "OK"
+          headers:
+            Content-Disposition:
+              schema:
+                type: "string"
+                example: "attachment; filename=\"result.zip\""
+          content:
+            application/zip:
+              schema:
+                type: "string"
+                format: "byte"
+
+  /download/2d/{ID}:
+    post:
+      tags:
+        - "Download"
+      summary: "Get zipped content of the selected elements from 2D -> (...) analysis"
+      description: ""
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of resource in the database"
+      requestBody:
+        description: "Array of select-objects that shows what to include in response file. every item in array represents one result"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request2DSelect"
+      responses:
+        "400":
+          description: "Bad request"
+        "200":
+          description: "OK"
+          headers:
+            Content-Disposition:
+              schema:
+                type: "string"
+                example: "attachment; filename=\"result.zip\""
+          content:
+            application/zip:
+              schema:
+                type: "string"
+                format: "byte"
+
+  /download/multi/{ID}:
+    post:
+      tags:
+        - "Download"
+      summary: "Get zipped content of the selected elements from 3D -> multi 2D analysis"
+      description: ""
+      parameters:
+        - name: "ID"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of resource in the database"
+      requestBody:
+        description: "Array of select-objects that shows what to include in response file. every item in array represents one result"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestMultiSelect"
+      responses:
+        "400":
+          description: "Bad request"
+        "200":
+          description: "OK"
+          headers:
+            Content-Disposition:
+              schema:
+                type: "string"
+                example: "attachment; filename=\"result.zip\""
+          content:
+            application/zip:
+              schema:
+                type: "string"
+                format: "byte"
+
+  /image/{filename}:
+    get:
+      tags:
+        - "Image"
+      summary: "Get calculation visualization SVG file"
+      description: ""
+      parameters:
+        - name: "filename"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+          description: "Name of the designated file"
+      responses:
+        "400":
+          description: "Bad request"
+        "200":
+          description: "OK"
+          content:
+            image/svg:
+              schema:
+                type: "string"
+                example: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" ...>\n...\n</svg>"
+
 components:
   parameters:
     modelSelection:
@@ -387,8 +523,8 @@ components:
       required: true
       schema:
         type: "string"
-        description: "Used only with `application/pdf` responses"
-        example: 'attachment; filename="name.pdf"'
+        description: "Used for file transfer"
+        example: 'attachment; filename="name.pdb"'
 
   schemas:
     Response3D:
@@ -437,6 +573,12 @@ components:
         - "filename"
         - "results"
 
+    Request3DSelect:
+      description: "shows which elements shoud be included in zipped response"
+      type: "array"
+      items:
+        $ref: "#/components/schemas/Output3DSelect"
+
     ResponseMulti:
       type: "object"
       properties:
@@ -474,6 +616,12 @@ components:
         - "filename"
         - "results"
 
+    RequestMultiSelect:
+      description: "shows which elements shoud be included in zipped response"
+      type: "array"
+      items:
+        $ref: "#/components/schemas/OutputMultiSelect"
+
     Response2D:
       type: "object"
       properties:
@@ -510,6 +658,12 @@ components:
         - "id"
         - "filename"
         - "results"
+
+    Request2DSelect:
+      description: "shows which elements shoud be included in zipped response"
+      type: "array"
+      items:
+        $ref: "#/components/schemas/Output2DSelect"
 
     ModelSelection:
       type: "string"
@@ -563,6 +717,16 @@ components:
       required:
         - "models"
 
+    Output3DSelect:
+      type: "object"
+      properties:
+        models:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/SingleTertiaryModelOutputSelect"
+      required:
+        - "models"
+  
     SingleTertiaryModelOutput:
       type: "object"
       description: "Single model output. Interaction arrays can be empty (but not null)."
@@ -592,6 +756,42 @@ components:
           $ref: "#/components/schemas/TertiaryInteractions"
       required:
         - "modelNumber"
+        - "output2D"
+        - "messages"
+        - "canonicalInteractions"
+        - "nonCanonicalInteractions"
+        - "interStrandInteractions"
+        - "stackingInteractions"
+        - "basePhosphateInteractions"
+        - "baseRiboseInteractions"
+
+    SingleTertiaryModelOutputSelect:
+      type: "object"
+      properties:
+        output2D:
+          $ref: "#/components/schemas/Output2DSelect"
+        messages:
+          type: "boolean"
+          enum: [ false, true ]
+        canonicalInteractions:
+          type: "boolean"
+          enum: [ false, true ]       
+        nonCanonicalInteractions:
+          type: "boolean"
+          enum: [ false, true ]       
+        interStrandInteractions:
+          type: "boolean"
+          enum: [ false, true ]       
+        stackingInteractions:
+          type: "boolean"
+          enum: [ false, true ]       
+        basePhosphateInteractions:
+          type: "boolean"
+          enum: [ false, true ]       
+        baseRiboseInteractions:
+          type: "boolean"
+          enum: [ false, true ]
+      required:
         - "output2D"
         - "messages"
         - "canonicalInteractions"
@@ -644,6 +844,20 @@ components:
         - "entries"
         - "consensualVisualization"
 
+    OutputMultiSelect:
+      type: "object"
+      properties:
+        entries:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OutputMultiEntrySelect"
+        consensualVisualization:
+          type: "boolean"
+          enum: [ false, true ]
+      required:
+        - "entries"
+        - "consensualVisualization"
+
     OutputMultiEntry:
       type: "object"
       properties:
@@ -659,12 +873,20 @@ components:
         - "output2D"
         - "adapterEnums"
 
+    OutputMultiEntrySelect:
+      type: "object"
+      properties:
+        output2D:
+          $ref: "#/components/schemas/Output2DSelect"
+      required:
+        - "output2D"
+
     ConsensualVisualization:
       type: "object"
       properties:
         pathToSVGImage:
           type: "string"
-          example: "/resources/tmp/RNApdbee5553721596686458067.svg"
+          example: "/image/RNApdbee5553721596686458067.svg"
       required:
         - "pathToSVGImage"
 
@@ -691,13 +913,42 @@ components:
         - "structuralElements"
         - "imageInformation"
 
+    Output2DSelect:
+      type: "object"
+      properties:
+        strands:
+          type: "boolean"
+          enum: [ false, true ]
+        bpSeq:
+          type: "boolean"
+          enum: [ false, true ]
+        ct:
+          type: "boolean"
+          enum: [ false, true ]
+        interactions:
+          type: "boolean"
+          enum: [ false, true ]
+        structuralElements:
+          type: "boolean"
+          enum: [ false, true ]
+        imageInformation:
+          type: "boolean"
+          enum: [ false, true ]
+      required:
+        - "strands"
+        - "bpSeq"
+        - "ct"
+        - "interactions"
+        - "structuralElements"
+        - "imageInformation"
+
     ImageInformation:
       type: "object"
       properties:
         pathToSVGImage:
           type: "string"
           description: "path to resource svg file"
-          example: "/resources/tmp/RNApdbee2052380807386422791.svg"
+          example: "/image/RNApdbee2052380807386422791.svg"
         successfulVisualizationTool:
           $ref: "#/components/schemas/VisualizationTool"
         failedVisualizationTool:
@@ -719,7 +970,7 @@ components:
 
     Interactions:
       type: "array"
-      description: "mandatory for 2D analysis result, null in 3D and consensual (Multi) analysis result"
+      description: "Simplified version of 'Interstrand interactions' from 3D scenarios. Mandatory for 2D analysis result, null in 3D and consensual (Multi) analysis result."
       items:
         type: "string"
         example: "A.A181 - Z.U418"
