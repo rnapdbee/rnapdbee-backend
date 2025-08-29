@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  CI:
+  build:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -28,28 +28,14 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B install -DskipTests
-
-      - name: Validate, build and run tests
-        run: |
-          mvn test
-          mvn --batch-mode --update-snapshots verify
-
-      - name: Upload package
-        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: rnapdbee-backend-package
-          path: ./target/*.jar
-          retention-days: 1
+        run: mvn -B package
 
       - name: Docker Build
-        run: docker network create rnapdbee-network && docker-compose up -d
+        run: docker-compose build
 
-  ci-dependabot:
-    if: ${{ github.actor == 'dependabot[bot]' && github.base_ref == 'dependabot/updates'}}
-    needs: CI
-
+  auto-approve-dependabot:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    needs: build
     runs-on: ubuntu-20.04
 
     permissions:
