@@ -6,7 +6,7 @@ import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 /**
  * Class representing structure of image information.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = ImageInformationByteArray.class)
 public abstract class ImageInformation {
     protected final VisualizationTool successfulVisualizationTool;
     protected final VisualizationTool failedVisualizationTool;
