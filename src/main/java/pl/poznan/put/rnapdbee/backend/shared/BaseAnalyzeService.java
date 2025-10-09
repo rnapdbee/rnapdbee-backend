@@ -33,7 +33,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
     protected final AnalyzedFileService analyzedFileService;
     protected final MessageProvider messageProvider;
     protected final AnalysisDataRepository analysisDataRepository;
-    protected final ResultRepository<T, O> resultRepository;
+    protected final ResultRepository resultRepository;
     protected final Scenario scenario;
     @Value("${document.storage.days}")
     private int documentStorageDays;
@@ -44,7 +44,7 @@ public abstract class BaseAnalyzeService<T, O, E extends MongoEntity<T, O>> {
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
             AnalysisDataRepository analysisDataRepository,
-            ResultRepository<T, O> resultRepository,
+            ResultRepository resultRepository,
             Scenario scenario) {
         this.engineClient = engineClient;
         this.imageComponent = imageComponent;
