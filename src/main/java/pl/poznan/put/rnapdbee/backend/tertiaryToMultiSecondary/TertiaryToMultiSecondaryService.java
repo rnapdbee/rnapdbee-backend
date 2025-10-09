@@ -43,7 +43,7 @@ public class TertiaryToMultiSecondaryService extends BaseAnalyzeService<Tertiary
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
             AnalysisDataRepository analysisDataRepository,
-            ResultRepository<TertiaryToMultiSecondaryParams, OutputMulti<ImageInformationPath, ConsensualVisualizationPath>> resultRepository
+            ResultRepository resultRepository
     ) {
         super(engineClient,
                 imageComponent,

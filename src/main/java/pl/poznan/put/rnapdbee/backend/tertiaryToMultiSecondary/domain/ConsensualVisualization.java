@@ -1,8 +1,11 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * Class representing structure of Consensual Visualization
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = ConsensualVisualizationSvgFile.class)
 public abstract class ConsensualVisualization {
     protected abstract static class Builder<B extends Builder<B>> {
         protected abstract B self();

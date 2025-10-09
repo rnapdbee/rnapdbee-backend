@@ -1,6 +1,7 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import pl.poznan.put.rnapdbee.backend.secondaryToDotBracket.domain.SecondaryToDotBracketParams;
 import pl.poznan.put.rnapdbee.backend.shared.IdSupplier;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.ImageInformationPath;
@@ -24,7 +25,9 @@ public class ResultEntity<T, O> {
     @Id
     @JsonIgnore
     private UUID id;
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
     private T params;
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
     private O output;
 
     public ResultEntity() {

@@ -1,10 +1,12 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.output2D;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import pl.poznan.put.rnapdbee.backend.shared.domain.param.VisualizationTool;
 
 /**
  * Class representing structure of image information.
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, defaultImpl = ImageInformationByteArray.class)
 public abstract class ImageInformation {
     protected final VisualizationTool successfulVisualizationTool;
     protected final VisualizationTool failedVisualizationTool;
