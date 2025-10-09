@@ -45,7 +45,7 @@ public class TertiaryToDotBracketService extends BaseAnalyzeService<TertiaryToDo
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
             AnalysisDataRepository analysisDataRepository,
-            ResultRepository<TertiaryToDotBracketParams, Output3D<ImageInformationPath>> resultRepository
+            ResultRepository resultRepository
     ) {
         super(engineClient,
                 imageComponent,

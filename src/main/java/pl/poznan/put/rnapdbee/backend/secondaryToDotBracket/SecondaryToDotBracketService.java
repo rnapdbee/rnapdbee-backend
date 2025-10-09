@@ -38,7 +38,7 @@ public class SecondaryToDotBracketService extends BaseAnalyzeService<SecondaryTo
             AnalyzedFileService analyzedFileService,
             MessageProvider messageProvider,
             AnalysisDataRepository analysisDataRepository,
-            ResultRepository<SecondaryToDotBracketParams, Output2D<ImageInformationPath>> resultRepository
+            ResultRepository resultRepository
     ) {
         super(engineClient,
                 imageComponent,

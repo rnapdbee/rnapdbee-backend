@@ -70,4 +70,8 @@ public class ResultRepository {
     public void deleteById(UUID id) {
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(id.toString())));
     }
+
+    public void deleteAllById(Iterable<UUID> ids) {
+        ids.forEach(this::deleteById);
+    }
 }
