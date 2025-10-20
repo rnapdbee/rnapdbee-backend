@@ -175,8 +175,8 @@ public class AnalyzedFileService {
     }
 
     private void validatePdbId(String pdbId) {
-        if (pdbId.length() != 4) {
-            logger.error(String.format("Invalid PDB id: '%s', 4 characters required in id.", pdbId));
+        if (pdbId.length() != 4 && pdbId.length() != 12) {
+            logger.error(String.format("Invalid PDB id: '%s', 4 or 12 characters required in id.", pdbId));
 
             throw new InvalidPdbIdException(
                     messageProvider.getMessage(MessageProvider.Message.INVALID_PDB_ID_FORMAT), pdbId);
