@@ -20,6 +20,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
     private final List<BasePair> stackingInteractions;
     private final List<BasePair> basePhosphateInteractions;
     private final List<BasePair> baseRiboseInteractions;
+    private final List<BaseTriple> baseTriples;
 
     private SingleTertiaryModelOutput(
             Integer modelNumber,
@@ -30,7 +31,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
             List<BasePair> interStrandInteractions,
             List<BasePair> stackingInteractions,
             List<BasePair> basePhosphateInteractions,
-            List<BasePair> baseRiboseInteractions) {
+            List<BasePair> baseRiboseInteractions, List<BaseTriple> baseTriples) {
         this.modelNumber = modelNumber;
         this.output2D = output2D;
         this.messages = messages;
@@ -40,6 +41,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
         this.stackingInteractions = stackingInteractions;
         this.basePhosphateInteractions = basePhosphateInteractions;
         this.baseRiboseInteractions = baseRiboseInteractions;
+        this.baseTriples = baseTriples;
     }
 
     public static SingleTertiaryModelOutput<ImageInformationPath> of(
@@ -56,6 +58,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
                 .setStackingInteractions(engineModelResponse.getStackingInteractions())
                 .setBasePhosphateInteractions(engineModelResponse.getBasePhosphateInteractions())
                 .setBaseRiboseInteractions(engineModelResponse.getBaseRiboseInteractions())
+                .setBaseTriples(engineModelResponse.getBaseTriples())
                 .build();
     }
 
@@ -91,6 +94,10 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
         return baseRiboseInteractions;
     }
 
+    public List<BaseTriple> getBaseTriples() {
+        return baseTriples;
+    }
+
     public Integer getModelNumber() {
         return modelNumber;
     }
@@ -105,6 +112,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
         private List<BasePair> stackingInteractions;
         private List<BasePair> basePhosphateInteractions;
         private List<BasePair> baseRiboseInteractions;
+        private List<BaseTriple> baseTriples;
 
         public Builder<T> setModelNumber(Integer modelNumber) {
             this.modelNumber = modelNumber;
@@ -151,6 +159,11 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
             return this;
         }
 
+        public Builder<T> setBaseTriples(List<BaseTriple> baseTriples) {
+            this.baseTriples = baseTriples;
+            return this;
+        }
+
         public SingleTertiaryModelOutput<T> build() {
             return new SingleTertiaryModelOutput<>(
                     modelNumber,
@@ -161,7 +174,7 @@ public class SingleTertiaryModelOutput<T extends ImageInformation> {
                     interStrandInteractions,
                     stackingInteractions,
                     basePhosphateInteractions,
-                    baseRiboseInteractions);
+                    baseRiboseInteractions, baseTriples);
         }
     }
 }
