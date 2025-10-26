@@ -5,7 +5,6 @@ info:
   version: "1.0.19"
   title: "RNApdbee Backend"
 
-
 tags:
   - name: "3D -> (...)"
     description: "Access to RNApdbee engine for 3D calculations"
@@ -17,7 +16,6 @@ tags:
     description: "Download zipped results from a calculation"
   - name: "Image"
     description: "Access to RNApdbee for visualization images"
-
 
 servers:
   - url: "{protocol}://RNApdbee.cs.put.poznan.pl/api/v1/engine"
@@ -34,7 +32,6 @@ servers:
         default: "http"
 
 paths:
-
   /3d:
     post:
       tags:
@@ -363,7 +360,7 @@ paths:
             Content-Disposition:
               schema:
                 type: "string"
-                example: "attachment; filename=\"result.zip\""
+                example: 'attachment; filename="result.zip"'
           content:
             application/zip:
               schema:
@@ -399,7 +396,7 @@ paths:
             Content-Disposition:
               schema:
                 type: "string"
-                example: "attachment; filename=\"result.zip\""
+                example: 'attachment; filename="result.zip"'
           content:
             application/zip:
               schema:
@@ -435,7 +432,7 @@ paths:
             Content-Disposition:
               schema:
                 type: "string"
-                example: "attachment; filename=\"result.zip\""
+                example: 'attachment; filename="result.zip"'
           content:
             application/zip:
               schema:
@@ -667,7 +664,7 @@ components:
 
     ModelSelection:
       type: "string"
-      enum: [ "FIRST", "ALL" ]
+      enum: ["FIRST", "ALL"]
 
     AnalysisTool:
       type: "string"
@@ -678,6 +675,7 @@ components:
         - "BARNABA"
         - "RNAVIEW"
         - "MC_ANNOTATE"
+        - "MAXIT"
 
     NonCanonicalHandling:
       type: "string"
@@ -688,19 +686,19 @@ components:
 
     RemoveIsolated:
       type: "boolean"
-      enum: [ false, true ]
+      enum: [false, true]
 
     IncludeNonCanonical:
       type: "boolean"
-      enum: [ false, true ]
+      enum: [false, true]
 
     StructuralElementsHandling:
       type: "string"
-      enum: [ "USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS" ]
+      enum: ["USE_PSEUDOKNOTS", "IGNORE_PSEUDOKNOTS"]
 
     VisualizationTool:
       type: "string"
-      enum: [ "RNA_PUZZLER", "VARNA", "PSEUDO_VIEWER", "R_CHIE", "NONE" ]
+      enum: ["RNA_PUZZLER", "VARNA", "PSEUDO_VIEWER", "R_CHIE", "NONE"]
 
     Output3D:
       type: "object"
@@ -726,7 +724,7 @@ components:
             $ref: "#/components/schemas/SingleTertiaryModelOutputSelect"
       required:
         - "models"
-  
+
     SingleTertiaryModelOutput:
       type: "object"
       description: "Single model output. Interaction arrays can be empty (but not null)."
@@ -772,25 +770,25 @@ components:
           $ref: "#/components/schemas/Output2DSelect"
         messages:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         canonicalInteractions:
           type: "boolean"
-          enum: [ false, true ]       
+          enum: [false, true]
         nonCanonicalInteractions:
           type: "boolean"
-          enum: [ false, true ]       
+          enum: [false, true]
         interStrandInteractions:
           type: "boolean"
-          enum: [ false, true ]       
+          enum: [false, true]
         stackingInteractions:
           type: "boolean"
-          enum: [ false, true ]       
+          enum: [false, true]
         basePhosphateInteractions:
           type: "boolean"
-          enum: [ false, true ]       
+          enum: [false, true]
         baseRiboseInteractions:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
       required:
         - "output2D"
         - "messages"
@@ -853,7 +851,7 @@ components:
             $ref: "#/components/schemas/OutputMultiEntrySelect"
         consensualVisualization:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
       required:
         - "entries"
         - "consensualVisualization"
@@ -918,22 +916,22 @@ components:
       properties:
         strands:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         bpSeq:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         ct:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         interactions:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         structuralElements:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
         imageInformation:
           type: "boolean"
-          enum: [ false, true ]
+          enum: [false, true]
       required:
         - "strands"
         - "bpSeq"
@@ -1130,7 +1128,13 @@ components:
 
     DrawingResult:
       type: "string"
-      enum: [ "DONE_BY_MAIN_DRAWER", "DONE_BY_BACKUP_DRAWER", "FAILED_BY_BOTH_DRAWERS", "NOT_DRAWN" ]
+      enum:
+        [
+          "DONE_BY_MAIN_DRAWER",
+          "DONE_BY_BACKUP_DRAWER",
+          "FAILED_BY_BOTH_DRAWERS",
+          "NOT_DRAWN",
+        ]
 
 externalDocs:
   description: "Find out more about Swagger"
