@@ -1,10 +1,21 @@
-FROM maven:3-eclipse-temurin-11 AS build
-COPY src /src
-COPY pom.xml pom.xml
+FROM maven:3.9.11-eclipse-temurin-25-alpine AS build
+
+WORKDIR /app
+
+COPY pom.xml /app/pom.xml
+
+RUN mvn dependency:resolve -DskipTests -B
+
+COPY src /app/src
+
 RUN mvn -Pdev clean install
 
-FROM eclipse-temurin:11
-ARG JAR_FILE=target/*.jar
-COPY --from=build ${JAR_FILE} app.jar
+#######################################
+
+FROM eclipse-temurin:25-alpine
+
+COPY --from=build /app/target/*.jar /app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","./app.jar"]
+
+ENTRYPOINT ["java", "-XX:+ExitOnOutOfMemoryError", "-jar", "/app.jar"]
