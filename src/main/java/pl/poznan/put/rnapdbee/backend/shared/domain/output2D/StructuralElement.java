@@ -18,7 +18,7 @@ public class StructuralElement {
     private final List<String> singleStrands5p;
     @JsonProperty("singleStrands3p")
     private final List<String> singleStrands3p;
-    @JsonProperty(value = "coordinates", access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(value = "coordinates")
     private final String coordinates;
 
     private StructuralElement(
