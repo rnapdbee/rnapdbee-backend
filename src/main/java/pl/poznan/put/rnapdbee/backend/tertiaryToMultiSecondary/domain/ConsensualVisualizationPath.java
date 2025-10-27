@@ -1,12 +1,16 @@
 package pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Class representing structure of Consensual Visualization response and entity.
  */
 public class ConsensualVisualizationPath extends ConsensualVisualization {
     private final String pathToSVGImage;
 
-    private ConsensualVisualizationPath(String pathToSVGImage) {
+    @JsonCreator
+    private ConsensualVisualizationPath(@JsonProperty("pathToSVGImage") final String pathToSVGImage) {
         this.pathToSVGImage = pathToSVGImage;
     }
 
