@@ -3,8 +3,17 @@ package pl.poznan.put.rnapdbee.backend.downloadResult;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection2D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection3D;
 import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
@@ -18,7 +27,9 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.Consensual
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -27,6 +38,7 @@ class ZipComponent {
 
     private static final Logger logger = LoggerFactory.getLogger(ZipComponent.class);
 
+    private static final String RUN_COMMAND_PATH = "/run-command";
     private static final String strandsSuffix = "-2D.dbn";
     private static final String bpSeqSuffix = "-2D.bpseq";
     private static final String ctSuffix = "-2D.ct";
@@ -47,12 +59,17 @@ class ZipComponent {
 
     private final ZipFormatComponent zipFormatComponent;
     private final ImageComponent imageComponent;
+    private final RestTemplate restTemplate;
+    private final String svgToPdfServiceUrl;
 
     public ZipComponent(
             ZipFormatComponent zipFormatComponent,
-            ImageComponent imageComponent) {
+            ImageComponent imageComponent,
+            @Value("${svg-to-pdf.service.url}") String svgToPdfServiceUrl) {
         this.zipFormatComponent = zipFormatComponent;
         this.imageComponent = imageComponent;
+        this.restTemplate = new RestTemplate();
+        this.svgToPdfServiceUrl = svgToPdfServiceUrl;
     }
 
     public void zipSingleTertiaryModelOutput(
@@ -149,15 +166,24 @@ class ZipComponent {
             ZipOutputStream zipOutputStream
     ) {
         FileSystemResource resource = imageComponent.findSvgImage(pathToSVGImage);
-        String imageName = namePrefix + nameSuffix + imageExtension;
+        String imageNamePrefix = namePrefix + nameSuffix;
+        String svgImageName = imageNamePrefix + imageExtension;
         try {
-            byte[] image = resource.getInputStream().readAllBytes();
+            byte[] svgImage = resource.getInputStream().readAllBytes();
 
-            zipOutputStream.putNextEntry(new ZipEntry(imageName));
-            zipOutputStream.write(image);
+            zipOutputStream.putNextEntry(new ZipEntry(svgImageName));
+            zipOutputStream.write(svgImage);
             zipOutputStream.closeEntry();
+
+            byte[] pdfImage = convertSvgToPdf(svgImage, imageNamePrefix);
+            if (pdfImage != null) {
+                String pdfImageName = imageNamePrefix + ".pdf";
+                zipOutputStream.putNextEntry(new ZipEntry(pdfImageName));
+                zipOutputStream.write(pdfImage);
+                zipOutputStream.closeEntry();
+            }
         } catch (IOException e) {
-            logger.error(String.format("Failed to add [%s] image file to ZIP archive", imageName), e);
+            logger.error(String.format("Failed to add [%s] image file to ZIP archive", svgImageName), e);
         }
     }
 
@@ -312,5 +338,86 @@ class ZipComponent {
             zipData(zipFormatComponent.basePairsToCSV(interactions), namePrefix + baseRiboseInteractionsSuffix, zipOutputStream);
         else
             logger.error("Failed to archive not existing BaseRiboseInteractions data.");
+    }
+
+    private byte[] convertSvgToPdf(byte[] svgData, String caption) {
+        try {
+            // Prepare request
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("arguments", "python");
+            body.add("arguments", "/add-text-to-svg.py");
+            body.add("arguments", "input.svg");
+            body.add("arguments", caption);
+            body.add("arguments", "output.pdf");
+            body.add("output_files", "output.pdf");
+
+            ByteArrayResource fileResource =
+                    new ByteArrayResource(svgData) {
+                        @Override
+                        public String getFilename() {
+                            return "input.svg";
+                        }
+                    };
+            body.add("input_files", fileResource);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            // Execute request
+            String url = svgToPdfServiceUrl + RUN_COMMAND_PATH;
+            logger.debug("Sending svg->pdf conversion request to service at: {}", url);
+
+            Map<String, Object> response = restTemplate.postForObject(url, requestEntity, Map.class);
+
+            // Process response
+            if (response != null) {
+                logger.debug("Received response from svg->pdf conversion service");
+
+                // Log stdout and stderr
+                if (response.containsKey("stdout")) {
+                    logger.debug("svg->pdf stdout: {}", response.get("stdout"));
+                }
+
+                if (response.containsKey("stderr")) {
+                    String stderr = (String) response.get("stderr");
+                    if (stderr != null && !stderr.isEmpty()) {
+                        logger.warn("svg->pdf stderr: {}", stderr);
+                    }
+                }
+
+                // Check exit code
+                Integer exitCode = (Integer) response.get("exit_code");
+                if (exitCode != null && exitCode != 0) {
+                    logger.error("svg->pdf conversion command failed with exit code: {}", exitCode);
+                    return null;
+                }
+
+                // Process output files
+                if (response.containsKey("output_files") && response.get("output_files") != null) {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, String>> outputFiles =
+                            (List<Map<String, String>>) response.get("output_files");
+
+                    for (Map<String, String> file : outputFiles) {
+                        String relativePath = file.get("relative_path");
+                        if ("output.pdf".equals(relativePath) && file.containsKey("content_base64")) {
+                            return Base64.getDecoder().decode(file.get("content_base64"));
+                        }
+                    }
+                }
+
+                logger.warn("No output.pdf file found in the response for conversion");
+            } else {
+                logger.error("Received null response from svg->pdf conversion service");
+            }
+        } catch (RestClientException e) {
+            logger.error("Error communicating with svg->pdf conversion service", e);
+        } catch (Exception e) {
+            logger.error("Unexpected error during svg->pdf conversion", e);
+        }
+
+        return null;
     }
 }
