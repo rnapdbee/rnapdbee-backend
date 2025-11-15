@@ -28,6 +28,7 @@ public class DownloadSelection3D {
         private boolean stackingInteractions;
         private boolean basePhosphateInteractions;
         private boolean baseRiboseInteractions;
+        private boolean baseTriples;
 
         public SingleDownloadSelection3D(
                 DownloadSelection2D output2D,
@@ -37,7 +38,8 @@ public class DownloadSelection3D {
                 boolean interStrandInteractions,
                 boolean stackingInteractions,
                 boolean basePhosphateInteractions,
-                boolean baseRiboseInteractions) {
+                boolean baseRiboseInteractions,
+                boolean baseTriples) {
             this.output2D = output2D;
             this.messages = messages;
             this.canonicalInteractions = canonicalInteractions;
@@ -46,6 +48,7 @@ public class DownloadSelection3D {
             this.stackingInteractions = stackingInteractions;
             this.basePhosphateInteractions = basePhosphateInteractions;
             this.baseRiboseInteractions = baseRiboseInteractions;
+            this.baseTriples = baseTriples;
         }
 
         public SingleDownloadSelection3D() {
@@ -81,6 +84,10 @@ public class DownloadSelection3D {
 
         public boolean isBaseRiboseInteractions() {
             return baseRiboseInteractions;
+        }
+
+        public boolean isBaseTriples() {
+            return baseTriples;
         }
     }
 }
