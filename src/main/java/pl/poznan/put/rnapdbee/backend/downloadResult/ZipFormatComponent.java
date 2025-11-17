@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.poznan.put.rnapdbee.backend.shared.domain.output2D.SingleStrand;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.NamedResidue;
+import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BaseTriple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,7 @@ class ZipFormatComponent {
             List<String> loops,
             List<String> singleStrands,
             List<String> singleStrands5p,
-            List<String> singleStrands3p
-    ) {
+            List<String> singleStrands3p) {
         List<String> stringList = new ArrayList<>();
 
         if (stems != null && !stems.isEmpty())
@@ -81,19 +81,17 @@ class ZipFormatComponent {
 
     private String basePairsToCSV(
             List<BasePair> basePairs,
-            char canonical
-    ) {
+            char canonical) {
         char delimiter = ';';
 
-        StringBuilder stringBuilder =
-                new StringBuilder("Base-pair;" +
-                        "Interaction type;" +
-                        "Canonical;" +
-                        "Saenger;" +
-                        "Leontis-Westhof;" +
-                        "BPh;" +
-                        "BR")
-                        .append("\n");
+        StringBuilder stringBuilder = new StringBuilder("Base-pair;" +
+                "Interaction type;" +
+                "Canonical;" +
+                "Saenger;" +
+                "Leontis-Westhof;" +
+                "BPh;" +
+                "BR")
+                .append("\n");
 
         for (BasePair basePair : basePairs) {
             String basePairResides = basePairResides(basePair.getLeftResidue(), basePair.getRightResidue());
@@ -119,8 +117,7 @@ class ZipFormatComponent {
 
     private String basePairResides(
             NamedResidue leftResidue,
-            NamedResidue rightResidue
-    ) {
+            NamedResidue rightResidue) {
         return leftResidue.toString() + " - " + rightResidue.toString();
     }
 
@@ -152,5 +149,26 @@ class ZipFormatComponent {
         if (BR == null || BR.equals("UNKNOWN"))
             return "n/a";
         return BR;
+    }
+
+    public String baseTriplesToCSV(List<BaseTriple> baseTriples) {
+        char delimiter = ';';
+
+        StringBuilder stringBuilder = new StringBuilder("Residue;Type;FirstPartner;SecondPartner").append("\n");
+
+        for (BaseTriple triple : baseTriples) {
+            String residue = triple.getResidue() == null ? "n/a" : triple.getResidue().toString();
+            String type = triple.getType() == null ? "n/a" : triple.getType();
+            String first = triple.getFirstPartner() == null ? "n/a" : triple.getFirstPartner().toString();
+            String second = triple.getSecondPartner() == null ? "n/a" : triple.getSecondPartner().toString();
+
+            stringBuilder.append(residue)
+                    .append(delimiter).append(type)
+                    .append(delimiter).append(first)
+                    .append(delimiter).append(second)
+                    .append("\n");
+        }
+
+        return stringBuilder.toString();
     }
 }
