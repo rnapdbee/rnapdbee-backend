@@ -8,12 +8,15 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection2D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection3D;
 import pl.poznan.put.rnapdbee.backend.images.ImageComponent;
@@ -25,12 +28,17 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BaseTriple;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -63,6 +71,7 @@ class ZipComponent {
     private final ImageComponent imageComponent;
     private final RestTemplate restTemplate;
     private final String svgToPdfServiceUrl;
+    private final ObjectMapper objectMapper;
 
     public ZipComponent(ZipFormatComponent zipFormatComponent, ImageComponent imageComponent,
             @Value("${svg-to-pdf.service.url}") String svgToPdfServiceUrl) {
@@ -70,6 +79,7 @@ class ZipComponent {
         this.imageComponent = imageComponent;
         this.restTemplate = new RestTemplate();
         this.svgToPdfServiceUrl = svgToPdfServiceUrl;
+        this.objectMapper = new ObjectMapper();
     }
 
     public void zipSingleTertiaryModelOutput(
@@ -321,51 +331,29 @@ class ZipComponent {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
             // Execute request
-            String url = svgToPdfServiceUrl + RUN_COMMAND_PATH;
+            String url = UriComponentsBuilder.fromHttpUrl(svgToPdfServiceUrl)
+                    .path(RUN_COMMAND_PATH)
+                    .toUriString();
             logger.debug("Sending svg->pdf conversion request to service at: {}", url);
 
-            Map<String, Object> response = restTemplate.postForObject(url, requestEntity, Map.class);
+            ResponseEntity<byte[]> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    byte[].class);
 
-            // Process response
-            if (response != null) {
-                logger.debug("Received response from svg->pdf conversion service");
-
-                // Log stdout and stderr
-                if (response.containsKey("stdout")) {
-                    logger.debug("svg->pdf stdout: {}", response.get("stdout"));
-                }
-
-                if (response.containsKey("stderr")) {
-                    String stderr = (String) response.get("stderr");
-                    if (stderr != null && !stderr.isEmpty()) {
-                        logger.warn("svg->pdf stderr: {}", stderr);
-                    }
-                }
-
-                // Check exit code
-                Integer exitCode = (Integer) response.get("exit_code");
-                if (exitCode != null && exitCode != 0) {
-                    logger.error("svg->pdf conversion command failed with exit code: {}", exitCode);
+            MediaType contentType = responseEntity.getHeaders().getContentType();
+            if (contentType != null && MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
+                String boundary = extractBoundary(contentType);
+                if (boundary == null) {
+                    logger.error("Multipart svg->pdf response missing boundary parameter");
                     return null;
                 }
-
-                // Process output files
-                if (response.containsKey("output_files") && response.get("output_files") != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Map<String, String>> outputFiles = (List<Map<String, String>>) response.get("output_files");
-
-                    for (Map<String, String> file : outputFiles) {
-                        String relativePath = file.get("relative_path");
-                        if ("output.pdf".equals(relativePath) && file.containsKey("content_base64")) {
-                            return Base64.getDecoder().decode(file.get("content_base64"));
-                        }
-                    }
-                }
-
-                logger.warn("No output.pdf file found in the response for conversion");
-            } else {
-                logger.error("Received null response from svg->pdf conversion service");
+                return handleMultipartResponse(responseEntity.getBody(), boundary);
             }
+
+            Map<String, Object> response = parseJsonResponse(responseEntity.getBody());
+            return handleLegacyResponse(response);
         } catch (RestClientException e) {
             logger.error("Error communicating with svg->pdf conversion service", e);
         } catch (Exception e) {
@@ -373,5 +361,241 @@ class ZipComponent {
         }
 
         return null;
+    }
+
+    private byte[] handleMultipartResponse(byte[] responseBody, String boundary) throws IOException {
+        if (responseBody == null || responseBody.length == 0) {
+            logger.error("Received empty multipart response from svg->pdf conversion service");
+            return null;
+        }
+
+        List<MultipartPart> parts = parseMultipartParts(responseBody, boundary);
+        Map<String, Object> metadata = parseMetadataPart(parts);
+        logMetadata(metadata);
+        if (!validateExitCode(metadata)) {
+            return null;
+        }
+
+        byte[] pdfBytes = extractFileBytes(parts, "output.pdf");
+        if (pdfBytes == null) {
+            logger.warn("No output.pdf file found in the multipart response");
+        }
+        return pdfBytes;
+    }
+
+    private byte[] handleLegacyResponse(Map<String, Object> response) {
+        if (response == null) {
+            logger.error("Received null response from svg->pdf conversion service");
+            return null;
+        }
+
+        logger.debug("Received response from svg->pdf conversion service");
+        logMetadata(response);
+        if (!validateExitCode(response)) {
+            return null;
+        }
+
+        if (response.containsKey("output_files") && response.get("output_files") != null) {
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> outputFiles = (List<Map<String, String>>) response.get("output_files");
+
+            for (Map<String, String> file : outputFiles) {
+                String relativePath = file.get("relative_path");
+                if ("output.pdf".equals(relativePath) && file.containsKey("content_base64")) {
+                    return Base64.getDecoder().decode(file.get("content_base64"));
+                }
+            }
+        }
+
+        logger.warn("No output.pdf file found in the response for conversion");
+        return null;
+    }
+
+    private Map<String, Object> parseMetadataPart(List<MultipartPart> parts) throws IOException {
+        for (MultipartPart part : parts) {
+            if ("metadata".equals(part.getName())) {
+                return objectMapper.readValue(part.getContent(), new TypeReference<Map<String, Object>>() {
+                });
+            }
+        }
+
+        return null;
+    }
+
+    private Map<String, Object> parseJsonResponse(byte[] responseBody) throws IOException {
+        if (responseBody == null || responseBody.length == 0) {
+            return null;
+        }
+
+        return objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {
+        });
+    }
+
+    private void logMetadata(Map<String, Object> metadata) {
+        if (metadata == null) {
+            return;
+        }
+
+        if (metadata.containsKey("stdout")) {
+            logger.debug("svg->pdf stdout: {}", metadata.get("stdout"));
+        }
+
+        if (metadata.containsKey("stderr")) {
+            String stderr = String.valueOf(metadata.get("stderr"));
+            if (stderr != null && !stderr.isEmpty() && !"null".equals(stderr)) {
+                logger.warn("svg->pdf stderr: {}", stderr);
+            }
+        }
+    }
+
+    private boolean validateExitCode(Map<String, Object> metadata) {
+        if (metadata == null || !metadata.containsKey("exit_code")) {
+            return true;
+        }
+
+        Integer exitCode = null;
+        Object exitValue = metadata.get("exit_code");
+        if (exitValue instanceof Number) {
+            exitCode = ((Number) exitValue).intValue();
+        } else if (exitValue != null) {
+            try {
+                exitCode = Integer.parseInt(exitValue.toString());
+            } catch (NumberFormatException ignored) {
+                logger.warn("Unable to parse svg->pdf exit_code: {}", exitValue);
+            }
+        }
+
+        if (exitCode != null && exitCode != 0) {
+            logger.error("svg->pdf conversion command failed with exit code: {}", exitCode);
+            return false;
+        }
+        return true;
+    }
+
+    private byte[] extractFileBytes(List<MultipartPart> parts, String expectedFilename) {
+        for (MultipartPart part : parts) {
+            if (expectedFilename.equals(part.getFilename())) {
+                return part.getContent();
+            }
+        }
+        return null;
+    }
+
+    private List<MultipartPart> parseMultipartParts(byte[] responseBody, String boundary) {
+        String rawBody = new String(responseBody, StandardCharsets.ISO_8859_1);
+        String boundaryMarker = "--" + boundary;
+        String[] sections = rawBody.split(Pattern.quote(boundaryMarker));
+
+        List<MultipartPart> parts = new java.util.ArrayList<>();
+        for (String section : sections) {
+            String trimmed = trimSection(section);
+            if (trimmed.isEmpty() || "--".equals(trimmed)) {
+                continue;
+            }
+
+            int headerEndIndex = trimmed.indexOf("\r\n\r\n");
+            if (headerEndIndex < 0) {
+                continue;
+            }
+
+            String headerBlock = trimmed.substring(0, headerEndIndex);
+            String bodyBlock = trimmed.substring(headerEndIndex + 4);
+            if (bodyBlock.endsWith("\r\n")) {
+                bodyBlock = bodyBlock.substring(0, bodyBlock.length() - 2);
+            }
+
+            MultipartHeaders headers = parseHeaders(headerBlock);
+            byte[] content = bodyBlock.getBytes(StandardCharsets.ISO_8859_1);
+            parts.add(new MultipartPart(headers.name, headers.filename, content));
+        }
+
+        if (parts.isEmpty()) {
+            logger.warn("No parts parsed from multipart response");
+        }
+        return parts;
+    }
+
+    private String trimSection(String section) {
+        String trimmed = section;
+        if (trimmed.startsWith("\r\n")) {
+            trimmed = trimmed.substring(2);
+        }
+        if (trimmed.endsWith("--")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 2);
+        }
+        return trimmed;
+    }
+
+    private MultipartHeaders parseHeaders(String headerBlock) {
+        String[] lines = headerBlock.split("\r\n");
+        String name = null;
+        String filename = null;
+        for (String line : lines) {
+            int colonIndex = line.indexOf(':');
+            if (colonIndex < 0) {
+                continue;
+            }
+            String headerName = line.substring(0, colonIndex).trim();
+            String headerValue = line.substring(colonIndex + 1).trim();
+            if ("Content-Disposition".equalsIgnoreCase(headerName)) {
+                name = extractDispositionValue(headerValue, "name");
+                filename = extractDispositionValue(headerValue, "filename");
+            }
+        }
+        return new MultipartHeaders(name, filename);
+    }
+
+    private String extractDispositionValue(String headerValue, String attribute) {
+        Pattern pattern = Pattern.compile(attribute + "=\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(headerValue);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    private String extractBoundary(MediaType contentType) {
+        String boundary = contentType.getParameter("boundary");
+        if (boundary == null) {
+            return null;
+        }
+        if (boundary.startsWith("\"") && boundary.endsWith("\"") && boundary.length() > 1) {
+            return boundary.substring(1, boundary.length() - 1);
+        }
+        return boundary;
+    }
+
+    private static final class MultipartHeaders {
+        private final String name;
+        private final String filename;
+
+        private MultipartHeaders(String name, String filename) {
+            this.name = name;
+            this.filename = filename;
+        }
+    }
+
+    private static final class MultipartPart {
+        private final String name;
+        private final String filename;
+        private final byte[] content;
+
+        private MultipartPart(String name, String filename, byte[] content) {
+            this.name = name;
+            this.filename = filename;
+            this.content = content;
+        }
+
+        private String getName() {
+            return name;
+        }
+
+        private String getFilename() {
+            return filename;
+        }
+
+        private byte[] getContent() {
+            return content;
+        }
     }
 }
