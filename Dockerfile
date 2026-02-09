@@ -18,4 +18,11 @@ COPY --from=build /app/target/*.jar /app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-XX:+ExitOnOutOfMemoryError", "-jar", "/app.jar"]
+ENTRYPOINT ["java", \
+    "-XX:+ExitOnOutOfMemoryError", \
+    "-XX:+UseContainerSupport", \
+    "-XX:ActiveProcessorCount=2", \
+    "-Xmx512m", \
+    "-Xms256m", \
+    "-XX:+UseG1GC", \
+    "-jar", "/app.jar"]
