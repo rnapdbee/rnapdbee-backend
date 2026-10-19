@@ -35,3 +35,7 @@ docker-compose up backend-db
 
 When the project is working auto generated swagger endpoint documentation is available at the
 following [LINK](http://localhost:8080/swagger-ui.html).
+
+## Funding
+
+This work was supported by the National Science Centre, Poland (Narodowe Centrum Nauki) under grant No. 2023/51/D/ST6/01207, "Exploring Multiple Loop Motifs in RNA Structures".
