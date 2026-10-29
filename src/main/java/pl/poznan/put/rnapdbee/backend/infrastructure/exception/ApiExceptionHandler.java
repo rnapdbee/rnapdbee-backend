@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.AnalyzedFileEntityNotFoundException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.InvalidPdbIdException;
 import pl.poznan.put.rnapdbee.backend.analyzedFile.exception.PdbFileNotFoundException;
@@ -99,6 +100,14 @@ public class ApiExceptionHandler {
 
         logger.error(String.format("Exception response: %s", exceptionPattern));
         return new ResponseEntity<>(exceptionPattern, httpStatus);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ExceptionPattern> handleNoResourceFoundException(NoResourceFoundException exception) {
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+
+        logger.warn(String.format("Resource not found: %s", exception.getMessage()));
+        return prepareResponseEntity(exception.getMessage(), httpStatus);
     }
 
     @ExceptionHandler(Exception.class)

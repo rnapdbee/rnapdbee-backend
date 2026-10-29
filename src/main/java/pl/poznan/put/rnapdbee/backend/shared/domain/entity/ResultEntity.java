@@ -12,7 +12,7 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.Consensual
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.OutputMulti;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.TertiaryToMultiSecondaryParams;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.util.UUID;
 
 /**

@@ -1,16 +1,15 @@
 package pl.poznan.put.rnapdbee.backend.infrastructure.configuration;
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 
@@ -18,13 +17,13 @@ import java.time.Duration;
 @Configuration
 public class EngineWebClientConfiguration {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+    private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder()
             .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
             .build();
 
     private static final ExchangeStrategies EXCHANGE_STRATEGIES = ExchangeStrategies.builder()
             .codecs(configurer -> configurer.defaultCodecs()
-                    .jackson2JsonDecoder(new Jackson2JsonDecoder(OBJECT_MAPPER)))
+                    .jacksonJsonDecoder(new JacksonJsonDecoder(OBJECT_MAPPER)))
             .build();
 
     @Value("${rnapdbee.engine.global.host}")

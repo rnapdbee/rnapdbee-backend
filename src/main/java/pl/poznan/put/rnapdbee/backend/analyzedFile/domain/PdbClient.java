@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -39,13 +39,13 @@ public class PdbClient {
                     .get()
                     .uri(pdbId + fileExtension)
                     .retrieve()
-                    .onStatus(HttpStatus::is4xxClientError, response -> {
+                    .onStatus(HttpStatusCode::is4xxClientError, response -> {
                         logger.error(String.format("File '%s%s' not found in Protein Data Bank.", pdbId, fileExtension));
 
                         throw new PdbFileNotFoundException(
                                 messageProvider.getMessage(MessageProvider.Message.PDB_FILE_NOT_FOUND_FORMAT), pdbId);
                     })
-                    .onStatus(HttpStatus::is5xxServerError, response -> {
+                    .onStatus(HttpStatusCode::is5xxServerError, response -> {
                         logger.error("Protein Data Bank not available.");
 
                         throw new PdbNotAvailableException(

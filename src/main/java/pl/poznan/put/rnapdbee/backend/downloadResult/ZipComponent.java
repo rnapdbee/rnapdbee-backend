@@ -28,8 +28,9 @@ import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BasePair;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.BaseTriple;
 import pl.poznan.put.rnapdbee.backend.tertiaryToDotBracket.domain.SingleTertiaryModelOutput;
 import pl.poznan.put.rnapdbee.backend.tertiaryToMultiSecondary.domain.ConsensualVisualizationPath;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -79,7 +80,7 @@ class ZipComponent {
         this.imageComponent = imageComponent;
         this.restTemplate = new RestTemplate();
         this.svgToPdfServiceUrl = svgToPdfServiceUrl;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = new JsonMapper();
     }
 
     public void zipSingleTertiaryModelOutput(
@@ -331,7 +332,7 @@ class ZipComponent {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
             // Execute request
-            String url = UriComponentsBuilder.fromHttpUrl(svgToPdfServiceUrl)
+            String url = UriComponentsBuilder.fromUriString(svgToPdfServiceUrl)
                     .path(RUN_COMMAND_PATH)
                     .toUriString();
             logger.debug("Sending svg->pdf conversion request to service at: {}", url);

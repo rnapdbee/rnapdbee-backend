@@ -3,7 +3,7 @@ package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.io.FilenameUtils;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

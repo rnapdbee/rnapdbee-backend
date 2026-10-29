@@ -1,6 +1,5 @@
 package pl.poznan.put.rnapdbee.backend.shared.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,8 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsUpload;
 import org.springframework.stereotype.Repository;
 import pl.poznan.put.rnapdbee.backend.shared.domain.entity.ResultEntity;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class ResultRepository {
                     .build();
 
             gridFsTemplate.store(upload);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             logger.error("Error occurred during serializing ResultEntity to String.", e);
             throw new RuntimeException(e);
         }
@@ -61,7 +62,7 @@ public class ResultRepository {
             String json = new String(resource.getContent().readAllBytes(), StandardCharsets.UTF_8);
             ResultEntity<T, O> resultEntity = (ResultEntity<T, O>) objectMapper.readValue(json, ResultEntity.class);
             return Optional.of(resultEntity);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             logger.error("Error occurred during converting InputStream to String or deserializing.", e);
             throw new RuntimeException(e);
         }
