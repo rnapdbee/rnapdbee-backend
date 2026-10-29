@@ -1,6 +1,6 @@
 package pl.poznan.put.rnapdbee.backend.shared.domain.entity;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

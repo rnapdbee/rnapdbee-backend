@@ -15,7 +15,7 @@ import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection2D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelection3D;
 import pl.poznan.put.rnapdbee.backend.downloadResult.domain.DownloadSelectionMulti;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

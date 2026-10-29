@@ -2,7 +2,7 @@ package pl.poznan.put.rnapdbee.backend.analyzedFile.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
 import java.time.Instant;
 
 /**

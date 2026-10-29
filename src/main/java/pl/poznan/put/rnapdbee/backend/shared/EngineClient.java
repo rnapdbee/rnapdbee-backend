@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -97,7 +97,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
+                    .onStatus(HttpStatusCode::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponse2D.class)
                     .block();
         } catch (WebClientRequestException e) {
@@ -133,7 +133,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
+                    .onStatus(HttpStatusCode::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponse3D.class)
                     .block();
         } catch (WebClientRequestException e) {
@@ -163,7 +163,7 @@ public class EngineClient {
                     .header(CONTENT_DISPOSITION_HEADER_NAME, prepareContentDispositionHeader(filename))
                     .body(BodyInserters.fromValue(fileContent))
                     .retrieve()
-                    .onStatus(HttpStatus::isError, EngineClient::errorHandler)
+                    .onStatus(HttpStatusCode::isError, EngineClient::errorHandler)
                     .bodyToMono(EngineResponseMulti.class)
                     .block();
         } catch (WebClientRequestException e) {
