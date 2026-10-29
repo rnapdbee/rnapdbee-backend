@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * longer register any handler mapping, so these endpoints silently return 500 instead of docs.
  */
 @SpringBootTest(
-        properties = {"spring.data.mongodb.host=localhost", "spring.data.mongodb.port=27017"},
+        properties = {"spring.mongodb.host=localhost", "spring.mongodb.port=27017"},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OpenApiConfigurationTest {
 

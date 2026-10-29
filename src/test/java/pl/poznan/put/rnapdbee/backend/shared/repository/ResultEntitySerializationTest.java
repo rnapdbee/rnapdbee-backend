@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * migration. {@link ResultEntity} resolves its generic fields through {@code @JsonTypeInfo(Id.CLASS)},
  * so the document below is the exact shape stored in MongoDB.
  */
-@SpringBootTest(properties = {"spring.data.mongodb.host=localhost", "spring.data.mongodb.port=27017"})
+@SpringBootTest(properties = {"spring.mongodb.host=localhost", "spring.mongodb.port=27017"})
 class ResultEntitySerializationTest {
 
     private static final String PERSISTED_RESULT = """

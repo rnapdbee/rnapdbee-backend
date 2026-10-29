@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@link ApiExceptionHandler} turns those into 500s, which changes the API contract.
  */
 @SpringBootTest(
-        properties = {"spring.data.mongodb.host=localhost", "spring.data.mongodb.port=27017"},
+        properties = {"spring.mongodb.host=localhost", "spring.mongodb.port=27017"},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApiExceptionHandlerTest {
 

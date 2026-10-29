@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * {@code WebClient.Builder}, and Jackson 3 requires {@code spring.jackson.visibility.creator}
  * to use the private constructors these engine response types rely on.
  */
-@SpringBootTest(properties = {"spring.data.mongodb.host=localhost", "spring.data.mongodb.port=27017"})
+@SpringBootTest(properties = {"spring.mongodb.host=localhost", "spring.mongodb.port=27017"})
 class EngineWebClientConfigurationTest {
 
     @Autowired
